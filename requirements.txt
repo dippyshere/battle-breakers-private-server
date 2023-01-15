@@ -1,4 +1,4 @@
 orjson
-sanic
+sanic[ext]
 colorama
 tomli
