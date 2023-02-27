@@ -1,5 +1,5 @@
 """
-Handles the tax calculation
+Handles the events timeline
 """
 
 import sanic

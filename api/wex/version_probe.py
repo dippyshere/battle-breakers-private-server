@@ -1,5 +1,5 @@
 """
-Handles the tax calculation
+Handles the mcp version probe
 """
 
 import sanic

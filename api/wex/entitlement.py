@@ -1,5 +1,5 @@
 """
-Handles the tax calculation
+Handles entitlement check
 """
 
 import sanic

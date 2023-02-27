@@ -1,5 +1,5 @@
 """
-Handles the tax calculation
+Handles the store catalog
 """
 
 import sanic
@@ -12,7 +12,7 @@ wex_catalog = sanic.Blueprint("wex_catalog")
 @wex_catalog.route("/wex/api/storefront/v2/catalog", methods=["GET"])
 async def catalog(request):
     """
-    get calendar timeline
+    get store catalog
     :param request: The request object
     :return: The response object
     """
