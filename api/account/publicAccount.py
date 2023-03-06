@@ -17,7 +17,7 @@ async def public_account_info(request):
     :return: The response object
     """
     accountId = request.args.get("accountId")
-    with open("res/account/api/public/account/ec0ebb7e56f6454e86c62299a7b32e21.json", "r", encoding='utf-8') as file:
+    with open("res/account/api/public/account/ec0ebb7e56f6454e86c62299a7b32e20.json", "r", encoding='utf-8') as file:
         return sanic.response.json(orjson.loads(file.read()))
 
 
@@ -29,7 +29,16 @@ async def account_displayname(request, displayName):
     :param displayName: The display name
     :return: The response object
     """
-    return sanic.response.text("")
+    return sanic.response.json({
+        "errorCode": "errors.com.epicgames.account.account_not_found",
+        "errorMessage": f"Sorry, we couldn't find an account for {displayName}",
+        "messageVars": [
+            f"{displayName}"
+        ],
+        "numericErrorCode": 18007,
+        "originatingService": "com.epicgames.account.public",
+        "intent": "prod"
+    }, status=404)
 
 
 @public_account.route("/account/api/public/account/email/<email>", methods=["GET"])
@@ -40,4 +49,13 @@ async def account_email(request, email):
     :param email: The email
     :return: The response object
     """
-    return sanic.response.text("")
+    return sanic.response.json({
+        "errorCode": "errors.com.epicgames.account.account_not_found",
+        "errorMessage": f"Sorry, we couldn't find an account for {email}",
+        "messageVars": [
+            f"{email}"
+        ],
+        "numericErrorCode": 18007,
+        "originatingService": "com.epicgames.account.public",
+        "intent": "prod"
+    }, status=404)
