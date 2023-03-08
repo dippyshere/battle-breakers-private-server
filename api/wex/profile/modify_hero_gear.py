@@ -16,4 +16,4 @@ async def modify_hero_gear(request, accountId):
     :param accountId: The account id
     :return: The response object (204)
     """
-    return sanic.response.empty()
+    return sanic.response.empty(status=200)

@@ -17,4 +17,4 @@ async def cash_out_workshop(request, accountId):
     :return: The response object (204)
     """
     # TODO: Cash out workshop
-    return sanic.response.empty()
+    return sanic.response.empty(status=200)

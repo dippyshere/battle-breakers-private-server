@@ -17,4 +17,4 @@ async def buy_back_from_monster_pit(request, accountId):
     :return: The response object (204)
     """
     # TODO: Buy back from monster pit
-    return sanic.response.empty()
+    return sanic.response.empty(status=200)

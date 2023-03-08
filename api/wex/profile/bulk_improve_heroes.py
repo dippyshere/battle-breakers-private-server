@@ -17,4 +17,4 @@ async def bulk_improve_heroes(request, accountId):
     :return: The response object (204)
     """
     # TODO: Bulk improve heroes
-    return sanic.response.empty()
+    return sanic.response.empty(status=200)

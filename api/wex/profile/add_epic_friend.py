@@ -17,4 +17,4 @@ async def add_epic_friend(request, accountId):
     :return: The response object (204)
     """
     # TODO: Add Epic Friend
-    return sanic.response.empty()
+    return sanic.response.empty(status=200)
