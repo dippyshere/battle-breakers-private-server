@@ -5,6 +5,7 @@ import sanic
 from .log_upload import wex_log
 from .entitlement import wex_entitlement
 from .catalog import wex_catalog
+from .receipts import wex_receipts
 from .timeline import wex_timeline
 from .version_check import wex_version_check
 from .version_probe import wex_version_probe
@@ -84,4 +85,5 @@ wex = sanic.Blueprint.group(wex_log, wex_entitlement, wex_catalog, wex_timeline,
                             wex_profile_tap_hammer_chest, wex_profile_unlock_armor_gear, wex_profile_unlock_hero_gear,
                             wex_profile_unlock_region, wex_profile_unlock_weapon_gear, wex_profile_update_friends,
                             wex_profile_update_monster_pit_power, wex_profile_update_party,
-                            wex_profile_upgrade_building, wex_profile_upgrade_hero, wex_profile_upgrade_hero_skills)
+                            wex_profile_upgrade_building, wex_profile_upgrade_hero, wex_profile_upgrade_hero_skills,
+                            wex_receipts)

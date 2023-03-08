@@ -16,6 +16,7 @@ async def version_check_windows(request):
     :return: The response object
     """
     return sanic.response.json({"type": "NO_UPDATE"})
+    # return sanic.response.json({"type": "NO_UPDATE"})
 
 
 @wex_version_check.route("/wex/api/v2/versioncheck/Android", methods=['GET'])

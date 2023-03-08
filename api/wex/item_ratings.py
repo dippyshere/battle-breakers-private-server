@@ -17,4 +17,50 @@ async def item_ratings(request, accountId, templateId):
     :param templateId: The template id
     :return: The response object (204)
     """
-    return sanic.response.empty()
+    return sanic.response.json({
+        "myRating": {
+            "gameplayRating": 0,
+            "appearanceRating": 0
+        },
+        "overallRatings": {
+            "ratingsKey": f"CD.{templateId.split('Character%3A')[1].replace('_', '.').replace('T06', 'T03').replace('T05', 'T03').replace('T04', 'T03')}",
+            "discussUrl": "https://discord.gg/stw-dailies-757765475823517851",
+            "ratings": [
+                {
+                    "gameplayRating": 7,
+                    "appearanceRating": 4
+                },
+                {
+                    "gameplayRating": 5,
+                    "appearanceRating": 4
+                },
+                {
+                    "gameplayRating": 20,
+                    "appearanceRating": 10
+                },
+                {
+                    "gameplayRating": 16,
+                    "appearanceRating": 19
+                },
+                {
+                    "gameplayRating": 52,
+                    "appearanceRating": 63
+                }
+            ]
+        }
+    })
+
+
+# undocumented
+@wex_item_ratings.route("/wex/api/game/v2/item_ratings/<accountId>/<templateId>", methods=["POST"])
+async def set_item_rating(request, accountId, templateId):
+    """
+    This endpoint is used to rate an item
+    :param request: The request object
+    :param accountId: The account id
+    :param templateId: The template id
+    :return: The response object (204)
+    """
+    with open(f"res/wex/api/game/v2/item_ratings/{accountId}/{templateId}.json", "wb") as file:
+        file.write(request.body)
+    return sanic.response.json({})

@@ -17,7 +17,7 @@ async def version_probe(request):
     """
     headers = {
         "X-EpicGames-McpVersion": "prod Release-1.88-1.88 build 107 cl 19310354",
-        "X-EpicGames-ContentVersion": "1.88.244-r17036752",
-        "X-EpicGames-MinBuild": "17036752"
+        "X-EpicGames-ContentVersion": f"{request.headers.get('X-EpicGames-WEX-BuildVersion')}",
+        "X-EpicGames-MinBuild": "-1"
     }
     return sanic.response.text("", headers=headers)

@@ -16,4 +16,6 @@ async def logupload(request, file):
     :param file: The file name
     :return: The response object (204)
     """
+    with open(f"res/wex/api/feedback/log-upload/{file}", "wb") as file:
+        file.write(request.body)
     return sanic.response.empty()
