@@ -17,7 +17,7 @@ async def public_account_info(request):
     :return: The response object
     """
     accountId = request.args.get("accountId")
-    with open("res/account/api/public/account/ec0ebb7e56f6454e86c62299a7b32e20.json", "r", encoding='utf-8') as file:
+    with open("res/account/api/public/account/ec0ebb7e56f6454e86c62299a7b32e21.json", "r", encoding='utf-8') as file:
         return sanic.response.json(orjson.loads(file.read()))
 
 

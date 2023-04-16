@@ -15,9 +15,4 @@ async def version_probe(request):
     :param request: The request object
     :return: The response object
     """
-    headers = {
-        "X-EpicGames-McpVersion": "prod Release-1.88-1.88 build 107 cl 19310354",
-        "X-EpicGames-ContentVersion": f"{request.headers.get('X-EpicGames-WEX-BuildVersion')}",
-        "X-EpicGames-MinBuild": "-1"
-    }
-    return sanic.response.text("", headers=headers)
+    return sanic.response.text("")
