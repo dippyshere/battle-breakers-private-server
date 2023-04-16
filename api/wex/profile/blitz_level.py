@@ -17,4 +17,4 @@ async def blitz_level(request, accountId):
     :return: The response object (204)
     """
     # TODO: Blitz level
-    return sanic.response.empty(status=200)
+    return sanic.response.empty()

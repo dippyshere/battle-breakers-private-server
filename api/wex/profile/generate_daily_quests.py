@@ -16,4 +16,4 @@ async def generate_daily_quests(request, accountId):
     :param accountId: The account id
     :return: The response object (204)
     """
-    return sanic.response.empty(status=200)
+    return sanic.response.empty()

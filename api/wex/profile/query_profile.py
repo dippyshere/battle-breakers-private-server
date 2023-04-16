@@ -17,6 +17,9 @@ async def query_profile(request, accountId: str):
     :param accountId: The account id
     :return: The response object
     """
-    with open(f"res/wex/api/game/v2/profile/{accountId}/QueryProfile/{request.args.get('profileId')}.json",
+    # with open(f"res/wex/api/game/v2/profile/{accountId}/QueryProfile/{request.args.get('profileId')}.json",
+    #           "r", encoding='utf-8') as file:
+    #     return sanic.response.json(orjson.loads(file.read()))
+    with open(f"res/wex/api/game/v2/profile/smol/QueryProfile/{request.args.get('profileId')}.json",
               "r", encoding='utf-8') as file:
         return sanic.response.json(orjson.loads(file.read()))
