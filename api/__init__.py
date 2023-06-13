@@ -1,16 +1,26 @@
 """
+Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2023 by Alex Hanson (Dippyshere).
+Please do not skid my hard work.
+https://github.com/dippyshere/battle-breakers-private-server
+This code is licensed under the [TBD] license.
+
 Main Blueprint group for the server
 """
 import sanic
 from .thirdpartytrackers import trackers
 from .account import account
-# from .battlebreakers import bb_cdn
+from .affiliate import affiliate
+from .battlebreakers import bb_cdn
 from .catalog import catalog
 from .datarouter import datarouter
-from .entitlement import entitlement
+from .entitlement import entitlements
 from .friends import friends
 from .lightswitch import lightswitch
+from .login import login
+from .misc import misc
+from .presence import presence
 from .priceengine import priceengine
 from .wex import wex
 
-api = sanic.Blueprint.group(trackers, account, catalog, datarouter, entitlement, friends, lightswitch, priceengine, wex)
+api = sanic.Blueprint.group(trackers, account, catalog, datarouter, entitlements, friends, lightswitch, login, misc,
+                            presence, priceengine, wex, bb_cdn, affiliate)

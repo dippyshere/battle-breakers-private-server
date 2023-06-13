@@ -1,238 +1,123 @@
 """
+Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2023 by Alex Hanson (Dippyshere).
+Please do not skid my hard work.
+https://github.com/dippyshere/battle-breakers-private-server
+This code is licensed under the [TBD] license.
+
 Handles profile claim daily reward
 """
 
 import sanic
 
+from utils.sanic_gzip import Compress
+from utils.utils import authorized as auth
+
+compress = Compress()
 wex_profile_claim_login = sanic.Blueprint("wex_profile_claim_login")
 
 
 # https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/profile/ec0ebb7e56f6454e86c62299a7b32e21/QueryProfile(profile0).md
-@wex_profile_claim_login.route("/wex/api/game/v2/profile/<accountId>/ClaimLoginReward", methods=["POST"])
-async def claim_login_reward(request, accountId):
+@wex_profile_claim_login.route("/<accountId>/ClaimLoginReward", methods=["POST"])
+@auth(strict=True)
+@compress.compress()
+async def claim_login_reward(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
     """
     Handles the daily reward request
     :param request: The request object
     :param accountId: The account id
     :return: The response object
     """
-    return sanic.response.json({
-        "profileRevision": 40315,
-        "profileId": "profile0",
-        "profileChangesBaseRevision": 40314,
-        "profileChanges": [{
-            "changeType": "itemQuantityChanged",
-            "itemId": "03e1d076-957e-43f2-9702-71d521413717",
-            "quantity": 501
-        }, {
-            "changeType": "statModified",
-            "name": "login_reward",
-            "value": {
-                "last_claim_time": "2022-12-29T05:43:30.806Z",
-                "next_level": 187
-            }
-        }, {
-            "changeType": "statModified",
-            "name": "hammer_quest_energy",
-            "value": {
-                "energy_spent": 0,
-                "energy_required": 100,
-                "claim_count": 0
-            }
-        }, {
-            "changeType": "statModified",
-            "name": "activity",
-            "value": {
-                "a": {
-                    "date": "2022-12-28T00:00:00.000Z",
-                    "claimed": False,
-                    "props": {
-                        "HeroAcquired": 137,
-                        "HeroPromote": 1,
-                        "HeroEvolve": 1,
-                        "MonsterPitLevelUp": 1,
-                        "HeroFoil": 1,
-                        "AccountLevelUp": 2,
-                        "BaseBonus": 10,
-                        "EnergySpent": 187
-                    }
-                },
-                "b": {
-                    "date": "2022-12-29T00:00:00.000Z",
-                    "claimed": False,
-                    "props": {
-                        "BaseBonus": 10
-                    }
-                },
-                "standardGift": 10
-            }
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "f7c3b0c5-d208-4bc4-b6d5-054359784dd0",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "7b899484-837c-4eea-aa0d-a80ce97ae0d7",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "7585df88-2a1e-4ca4-b0ce-33ab0aaac483",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "88721a32-4602-46eb-9662-294610e2e7b5",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "ef81e090-a854-48fd-8924-ef7d07eb0301",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "b8ef336b-e07a-4c41-9b8c-5544746d55d6",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "9b0fffd3-92f3-4018-9799-0bd89c6804c3",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "b83d82de-0cd3-4eac-8cb5-9cfec3360853",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "8b1d13e5-6ee3-4265-96a8-c3e62646a87d",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "dff1fe19-d477-4249-8e2d-258c0df83c78",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "ab0cd5f2-2a8f-47df-8470-0de41c526669",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "881eefbe-f2a5-4646-abb3-c3b74500e94b",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "96f38f41-74dd-4483-a65c-89f2926bd399",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "157e63f4-ba1e-4b3e-9852-bc03eb70087d",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "67ef7c06-d6a8-46fa-9b97-3aa7ea7eca5b",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "37434995-4e63-4c10-ad4c-d19342ed1caa",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "f312dfdf-6d50-42ed-898f-024e45726e7a",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "ac2854b7-ecb2-4451-b683-ff303e98b605",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "517052fe-383b-4c69-97ef-2a7c850e6429",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "ebcfcb8e-7e70-4e05-a0a5-e50b561158d2",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "d922c670-e4c9-4b84-9601-c5f9ec5f3a87",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "b545182f-9443-4a03-a212-95b7d6083067",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "c97235e4-3aab-499c-8b45-9b0c0a2e9a4b",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "e213cc8c-7356-40f7-bef6-9fbadc44efc7",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "1221e7d1-1852-4e8e-9d15-bc29255abb1d",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "372c4622-1b84-4c48-980e-9c42b03ca30b",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "68686864-8ba4-460c-9d89-a7e6b95309ba",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "58c04ea5-b601-4af4-ab83-0e89b7387e15",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "d59ca1b7-3ce9-4053-956b-44d4c0977500",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "cbc1e014-8d1f-434d-8a6b-34bb6128eb4a",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "04535e24-3fb5-4e77-b188-8cf979da47ef",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "736887db-c0b6-459f-af0a-4e6d6a568de2",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }, {
-            "changeType": "itemAttrChanged",
-            "itemId": "f25baf81-2fc3-4e2d-940b-b50453ade9c0",
-            "attributeName": "sealed_days",
-            "attributeValue": 0
-        }],
-        "profileCommandRevision": 24007,
-        "serverTime": "2022-12-29T05:43:30.810Z",
-        "responseVersion": 1
+    current_day = (await request.ctx.profile.get_stat("login_reward"))["next_level"]
+    if current_day >= 1800:
+        await request.ctx.profile.modify_stat("login_reward", {
+            "last_claim_time": "2099-12-31T23:59:99.999Z",  # Disable future login rewards as this is the limit
+            "next_level": 1800
+        })
+    else:
+        # ugly but it works
+        version_info = (await request.app.ctx.extract_version_info(request.headers.get("User-Agent")))[0]
+        if version_info <= 1:
+            datatable = "Content/Loot/DataTables/LoginRewards 1.0"
+        elif 2 <= version_info <= 71:
+            if version_info == 6:
+                version_info = 7
+            datatable = f"Content/Loot/DataTables/LoginRewards 1.{version_info}"
+        elif 80 <= version_info <= 81:
+            datatable = "Content/Loot/DataTables/LoginRewards 1.80"
+        elif 82 <= version_info <= 84:
+            datatable = "Content/Loot/DataTables/LoginRewards 1.82"
+        elif version_info == 85:
+            datatable = "Content/Loot/DataTables/LoginRewards 1.85"
+        else:
+            datatable = "Content/Loot/DataTables/LoginRewards 1.86"
+        login_reward = (await request.app.ctx.load_datatable(datatable))[0]["Rows"][str(current_day)]
+        reward_path = login_reward['ItemDefinition']
+        reward_quantity = login_reward['ItemCount']
+        try:
+            reward_path = reward_path["AssetPathName"]
+        except:
+            pass  # Backwards compat for datatables in the UE4.16 format
+        reward_template_id = await request.app.ctx.get_template_id_from_path(reward_path)
+        if reward_template_id.split(':')[0] == "Character":
+            await request.ctx.profile.add_item({"templateId": reward_template_id,
+                                                "attributes": {"gear_weapon_item_id": "", "weapon_unlocked": False,
+                                                               "sidekick_template_id": "", "is_new": True, "level": 1,
+                                                               "num_sold": 0, "skill_level": 1,
+                                                               "sidekick_unlocked": False,
+                                                               "upgrades": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                                               "used_as_sidekick": False, "gear_armor_item_id": "",
+                                                               "skill_xp": 0, "armor_unlocked": False, "foil_lvl": -1,
+                                                               "xp": 0, "rank": 0, "sidekick_item_id": ""},
+                                                "quantity": 1})
+        else:
+            current_item = await request.ctx.profile.find_item_by_template_id(reward_template_id)
+            if current_item:
+                current_quantity = (await request.ctx.profile.get_item_by_guid(current_item[0]))["quantity"]
+                await request.ctx.profile.change_item_quantity(current_item[0], current_quantity + reward_quantity)
+            else:
+                await request.ctx.profile.add_item(
+                    {"templateId": reward_template_id, "attributes": {}, "quantity": reward_quantity})
+        await request.ctx.profile.modify_stat("login_reward", {
+            "last_claim_time": await request.app.ctx.format_time(),
+            "next_level": current_day + 1
+        })
+    await request.ctx.profile.modify_stat("hammer_quest_energy", {
+        "energy_spent": 0,
+        "energy_required": 100,
+        "claim_count": 0
     })
+    # TODO: Add gift chest activity
+    giftboxes = await request.ctx.profile.find_items_by_type("Giftbox")
+    for giftbox in giftboxes:
+        await request.ctx.profile.change_item_attribute(giftbox, "sealed_days", 0)
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions)
+    )
+    #     {
+    #         "changeType": "statModified",
+    #         "name": "activity",
+    #         "value": {
+    #             "a": {
+    #                 "date": "2022-12-28T00:00:00.000Z",
+    #                 "claimed": False,
+    #                 "props": {
+    #                     "HeroAcquired": 137,
+    #                     "HeroPromote": 1,
+    #                     "HeroEvolve": 1,
+    #                     "MonsterPitLevelUp": 1,
+    #                     "HeroFoil": 1,
+    #                     "AccountLevelUp": 2,
+    #                     "BaseBonus": 10,
+    #                     "EnergySpent": 187
+    #                 }
+    #             },
+    #             "b": {
+    #                 "date": "2022-12-29T00:00:00.000Z",
+    #                 "claimed": False,
+    #                 "props": {
+    #                     "BaseBonus": 10
+    #                 }
+    #             },
+    #             "standardGift": 10
+    #         }

@@ -1,33 +1,76 @@
 """
+Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2023 by Alex Hanson (Dippyshere).
+Please do not skid my hard work.
+https://github.com/dippyshere/battle-breakers-private-server
+This code is licensed under the [TBD] license.
+
 Handles the service status for Battle Breakers
 """
 
 import sanic
 
+from utils.utils import authorized as auth
+
+from utils.sanic_gzip import Compress
+
+compress = Compress()
 status = sanic.Blueprint("lightswitch_status")
 
 
 # https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/lightswitch-public-service-prod.ol.epicgames.com/lightswitch/api/service/bulk/status.md
-@status.route("/lightswitch/api/service/bulk/status", methods=["GET"])
-async def lightswitch(request):
+@status.route("/api/service/bulk/status", methods=["GET"])
+@auth(allow_basic=True)
+@compress.compress()
+async def lightswitch_bulk(request: sanic.request.Request) -> sanic.response.JSONResponse:
     """
-    Handles the lightswitch status request
+    Handles the lightswitch bulk status request
     :param request: The request object
     :return: The response object
     """
-    service_id = request.args.get("serviceId")
-    headers = {"Date": "Thu, 29 Dec 2022 06:07:55 GMT", "X-Epic-Device-ID": "68009daed09498667a8039cce09983ed", "X-Epic-Correlation-ID": "UE4-2f4c92e44a8a8420a867089329526852-F210356F48A4A08AF14720B3AE34B5B9-27A444314652A4B2519DBEA580BCAFE6"}
+    service_id = request.args.getlist("serviceId")
+    services = []
+    if not service_id:
+        service_id = ["WorldExplorersLive"]
+    for service in service_id:
+        services.append({
+            "serviceInstanceId": service.lower(),
+            "status": "UP",
+            "message": "Battle Breakers is back :D",
+            "maintenanceUri": "https://discord.gg/stw-dailies-757765475823517851",
+            "overrideCatalogIds": ["ae402a2cb61b4c5fa199ce5311cca724"],
+            "allowedActions": ["PLAY", "DOWNLOAD"],
+            "banned": False,
+            "launcherInfoDTO": {
+                "appName": service,
+                # not bothered / required to fix this for other services
+                "catalogItemId": "a53e821fbdc24181877243a8dbb63463",
+                "namespace": "wex"
+            }
+        })
+    return sanic.response.json(services)
+
+
+# undocumented
+@status.route("/api/service/<serviceId>/status", methods=["GET"])
+@compress.compress()
+async def lightswitch_service(request: sanic.request.Request, serviceId: str) -> sanic.response.JSONResponse:
+    """
+    Handles the lightswitch status request
+    :param request: The request object
+    :param serviceId: The service id
+    :return: The response object
+    """
     return sanic.response.json([{
-        "serviceInstanceId": service_id.lower(),
+        "serviceInstanceId": serviceId.lower(),
         "status": "UP",
         "message": "Battle Breakers is back :D",
-        "maintenanceUri": None,
+        "maintenanceUri": "https://discord.gg/stw-dailies-757765475823517851",
         "overrideCatalogIds": ["ae402a2cb61b4c5fa199ce5311cca724"],
         "allowedActions": ["PLAY", "DOWNLOAD"],
         "banned": False,
         "launcherInfoDTO": {
-            "appName": service_id,
+            "appName": serviceId,
             "catalogItemId": "a53e821fbdc24181877243a8dbb63463",
             "namespace": "wex"
         }
-    }], headers=headers)
+    }])

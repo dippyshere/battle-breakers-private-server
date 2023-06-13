@@ -2,3 +2,8 @@ orjson
 sanic[ext]
 colorama
 tomli
+pyjwt
+py-cpuinfo
+sanic-gzip
+brotlipy
+aiofiles

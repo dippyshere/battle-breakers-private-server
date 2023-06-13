@@ -1,19 +1,35 @@
 """
-Handles level abandon/exit profile mcp
+Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2023 by Alex Hanson (Dippyshere).
+Please do not skid my hard work.
+https://github.com/dippyshere/battle-breakers-private-server
+This code is licensed under the [TBD] license.
+
+Handles marking an item as seen
 """
 
 import sanic
 
+from utils.utils import authorized as auth
+
+from utils.sanic_gzip import Compress
+
+compress = Compress()
 wex_profile_mark_item_seen = sanic.Blueprint("wex_profile_mark_item_seen")
 
 
 # https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/profile/ec0ebb7e56f6454e86c62299a7b32e21/MarkItemSeen.md
-@wex_profile_mark_item_seen.route("/wex/api/game/v2/profile/<accountId>/MarkItemSeen", methods=["POST"])
-async def mark_item_seen(request, accountId):
+@wex_profile_mark_item_seen.route("/<accountId>/MarkItemSeen", methods=["POST"])
+@auth(strict=True)
+@compress.compress()
+async def mark_item_seen(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
     """
-    This endpoint is used to abandon the level
+    This endpoint is used to mark an item as seen
     :param request: The request object
     :param accountId: The account id
-    :return: The response object (204)
+    :return: The modified profile
     """
-    return sanic.response.empty()
+    await request.ctx.profile.change_item_attribute(request.json.get("itemId"), "is_new", False, request.ctx.profile_id)
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions)
+    )

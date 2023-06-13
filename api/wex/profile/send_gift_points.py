@@ -1,15 +1,27 @@
 """
-Handles profile queries
+Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2023 by Alex Hanson (Dippyshere).
+Please do not skid my hard work.
+https://github.com/dippyshere/battle-breakers-private-server
+This code is licensed under the [TBD] license.
+
+Handles sending gifts.
 """
 
 import sanic
 
+from utils.utils import authorized as auth
+
+from utils.sanic_gzip import Compress
+
+compress = Compress()
 wex_profile_send_gift = sanic.Blueprint("wex_profile_send_gift")
 
 
 # https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/profile/ec0ebb7e56f6454e86c62299a7b32e21/QueryProfile(profile0).md
-@wex_profile_send_gift.route("/wex/api/game/v2/profile/<accountId>/SendGiftPoints", methods=["POST"])
-async def send_gift_points(request, accountId: str):
+@wex_profile_send_gift.route("/<accountId>/SendGiftPoints", methods=["POST"])
+@auth(strict=True)
+@compress.compress()
+async def send_gift_points(request: sanic.request.Request, accountId: str):
     """
     Handles the send gift point request
     :param request: The request object

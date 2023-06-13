@@ -1,0 +1,83 @@
+"""
+Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2023 by Alex Hanson (Dippyshere).
+Please do not skid my hard work.
+https://github.com/dippyshere/battle-breakers-private-server
+This code is licensed under the [TBD] license.
+
+Should handle sending friend requests
+
+I am hella not bothered to make a whole other class for just friends, so json it is
+nvm
+"""
+
+import sanic
+
+from utils.utils import authorized as auth
+
+from utils.sanic_gzip import Compress
+
+compress = Compress()
+friend_request = sanic.Blueprint("friend_request")
+
+
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/friends-public-service-prod.ol.epicgames.com/friends/api/v1/ec0ebb7e56f6454e86c62299a7b32e21/friends/47c782fa8b0144afb42e0f8d2f6ca41b.md
+@friend_request.route("/api/v1/<accountId>/friends/<friendId>", methods=["POST", "DELETE"])
+@auth(strict=True)
+@compress.compress()
+async def send_friend_request(request: sanic.request.Request, accountId: str,
+                              friendId: str) -> sanic.response.HTTPResponse:
+    """
+    Sends a friend request to the specified account id
+    :param request: The request object
+    :param accountId: The account id
+    :param friendId: The friend id
+    :return: The response object
+    """
+    if request.method == "DELETE":
+        delete_request = await request.ctx.friends.remove_friend(request, friendId)
+        if delete_request is not None:
+            raise sanic.exceptions.BadRequest(context=delete_request)
+        return sanic.response.empty()
+    sent_request = await request.ctx.friends.send_friend_request(request, friendId)
+    # TODO: add info to wex friend profile
+    if sent_request is not None:
+        raise sanic.exceptions.BadRequest(context=sent_request)
+    return sanic.response.empty()
+
+
+@friend_request.route("/api/public/friends/<accountId>/<friendId>", methods=["POST", "DELETE"])
+@auth(strict=True)
+@compress.compress()
+async def send_friend_request_deprecated(request: sanic.request.Request, accountId: str,
+                                         friendId: str) -> sanic.response.HTTPResponse:
+    """
+    Identical to above, but serves as backwards compatability for old clients
+    :param request: The request object
+    :param accountId: The account id
+    :param friendId: The friend id
+    :return: The response object
+    """
+    if request.method == "DELETE":
+        delete_request = await request.ctx.friends.remove_friend(request, friendId)
+        if delete_request.get("errorCode") is not None:
+            raise sanic.exceptions.BadRequest(context=delete_request)
+        return sanic.response.empty()
+    sent_request = await request.ctx.friends.send_friend_request(request, friendId)
+    if sent_request.get("errorCode") is not None:
+        raise sanic.exceptions.BadRequest(context=sent_request)
+    return sanic.response.empty()
+
+
+@friend_request.route("/api/v1/<accountId>/incoming/accept", methods=["POST"])
+@auth(strict=True)
+@compress.compress()
+async def accept_bulk_requests(request: sanic.request.Request, accountId: str) -> sanic.response.HTTPResponse:
+    """
+    Accepts all specified incoming friend requests
+    :param request: The request object
+    :param accountId: The account id
+    :return: The response object
+    """
+    for friendId in request.args.getlist("targetIds"):
+        await request.ctx.friends.send_friend_request(request, friendId)
+    return sanic.response.empty()

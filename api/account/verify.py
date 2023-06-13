@@ -1,97 +1,196 @@
 """
+Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2023 by Alex Hanson (Dippyshere).
+Please do not skid my hard work.
+https://github.com/dippyshere/battle-breakers-private-server
+This code is licensed under the [TBD] license.
+
 verify if a token is valid
 """
-
+import jwt
 import sanic
 import datetime
+from utils.utils import authorized as auth
 
+from utils.sanic_gzip import Compress
+
+compress = Compress()
 verify = sanic.Blueprint("account_verify")
 
 
 # https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/account-public-service-prod.ol.epicgames.com/account/api/oauth/verify.md
-@verify.route("/account/api/oauth/verify", methods=["GET"])
-async def verify_auth(request):
+@verify.route("/api/oauth/verify", methods=["GET"])
+@auth(allow_basic=True)
+@compress.compress()
+async def verify_auth(request: sanic.request.Request) -> sanic.response.JSONResponse:
     """
     verify game auth
     :param request: The request object
     :return: The response object
     """
+    if request.headers.get("Authorization", "").startswith("basic "):
+        token = jwt.decode(request.headers.get("Authorization", "").replace("basic ", "").replace("eg1~", ""),
+                           request.app.ctx.public_key,
+                           algorithms=["RS256"], leeway=20)
+        # yes, i know this should be handled by the middleware, but it isn't with the compression :(
+        if request.args.get("includePerms"):
+            return sanic.response.json({
+                "token": f"{request.token}",
+                "session_id": token["jti"],
+                "token_type": "basic",
+                "client_id": token["clid"],
+                "internal_client": token["ic"],
+                "client_service": token["clsvc"],
+                "expires_in": token["exp"] - token["iat"],
+                "expires_at": datetime.datetime.fromtimestamp(token["exp"]).strftime("%Y-%m-%dT%H:%M:%S.000Z"),
+                "auth_method": token["am"],
+                "app": token["clsvc"],
+                "perms": [{
+                    "resource": "wexp:cloudstorage:system",
+                    "action": 2
+                }, {
+                    "resource": "account:public:account:*",
+                    "action": 2
+                }, {
+                    "resource": "account:oauth:exchangeTokenCode",
+                    "action": 15
+                }, {
+                    "resource": "account:public:account",
+                    "action": 2
+                }, {
+                    "resource": "priceengine:shared:offer:price",
+                    "action": 2
+                }, {
+                    "resource": "wexp:wexp_role:client",
+                    "action": 15
+                }, {
+                    "resource": "account:public:account:externalAuths",
+                    "action": 15
+                }, {
+                    "resource": "wexp:calendar",
+                    "action": 2
+                }, {
+                    "resource": "account:token:otherSessionsForAccountClient",
+                    "action": 8
+                }, {
+                    "resource": "account:token:otherSessionsForAccountClientService",
+                    "action": 8
+                }, {
+                    "resource": "account:public:account:deviceAuths",
+                    "action": 11
+                }, {
+                    "resource": "wexp:cloudstorage:system:*",
+                    "action": 2
+                }, {
+                    "resource": "serviceinstance",
+                    "action": 2
+                }, {
+                    "resource": "wexp:storefront",
+                    "action": 2
+                }]
+            })
+        return sanic.response.json({
+            "token": f"{request.token}",
+            "session_id": token["jti"],
+            "token_type": "basic",
+            "client_id": token["clid"],
+            "internal_client": token["ic"],
+            "client_service": token["clsvc"],
+            "expires_in": token["exp"] - token["iat"],
+            "expires_at": datetime.datetime.fromtimestamp(token["exp"]).strftime("%Y-%m-%dT%H:%M:%S.000Z"),
+            "auth_method": token["am"],
+            "app": token["clsvc"]
+        })
+    token = jwt.decode(request.headers.get("Authorization", "").replace("bearer ", "").replace("eg1~", ""),
+                       request.app.ctx.public_key,
+                       algorithms=["RS256"], leeway=20)
+    if request.args.get("includePerms"):
+        return sanic.response.json({
+            "token": f"{request.token}",
+            "session_id": token["jti"],
+            "token_type": "bearer",
+            "client_id": token["clid"],
+            "internal_client": token["ic"],
+            "client_service": token["clsvc"],
+            "account_id": token["sub"],
+            "expires_in": token["exp"] - token["iat"],
+            "expires_at": datetime.datetime.fromtimestamp(token["exp"]).strftime("%Y-%m-%dT%H:%M:%S.000Z"),
+            "auth_method": token["am"],
+            "display_name": token["dn"],
+            "app": token["clsvc"],
+            "in_app_id": token["sub"],
+            "device_id": token["dvid"],
+            "perms": [{
+                "resource": f"blockList:{token['sub']}",
+                "action": 14
+            }, {
+                "resource": "wexp:cloudstorage:system",
+                "action": 2
+            }, {
+                "resource": "account:public:account:*",
+                "action": 2
+            }, {
+                "resource": "account:oauth:exchangeTokenCode",
+                "action": 15
+            }, {
+                "resource": "account:public:account",
+                "action": 2
+            }, {
+                "resource": "priceengine:shared:offer:price",
+                "action": 2
+            }, {
+                "resource": f"xmpp:session:*:{token['sub']}",
+                "action": 1
+            }, {
+                "resource": "wexp:wexp_role:client",
+                "action": 15
+            }, {
+                "resource": f"wexp:profile:{token['sub']}:*",
+                "action": 15
+            }, {
+                "resource": "account:public:account:externalAuths",
+                "action": 15
+            }, {
+                "resource": "wexp:calendar",
+                "action": 2
+            }, {
+                "resource": "account:token:otherSessionsForAccountClient",
+                "action": 8
+            }, {
+                "resource": "account:token:otherSessionsForAccountClientService",
+                "action": 8
+            }, {
+                "resource": "account:public:account:deviceAuths",
+                "action": 11
+            }, {
+                "resource": "wexp:cloudstorage:system:*",
+                "action": 2
+            }, {
+                "resource": "serviceinstance",
+                "action": 2
+            }, {
+                "resource": "wexp:storefront",
+                "action": 2
+            }, {
+                "resource": f"wexp:push:devices:{token['sub']}",
+                "action": 15
+            }, {
+                "resource": f"friends:{token['sub']}",
+                "action": 15
+            }]
+        })
     return sanic.response.json({
         "token": f"{request.token}",
-        "session_id": "9bcccd0920424ce9b110b2e50bf05ce6",
+        "session_id": token["jti"],
         "token_type": "bearer",
-        "client_id": "3cf78cd3b00b439a8755a878b160c7ad",
-        "internal_client": True,
-        "client_service": "wex",
-        "account_id": "ec0ebb7e56f6454e86c62299a7b32e21",
-        "expires_in": 28738,
-        "expires_at": (datetime.datetime.utcnow() + datetime.timedelta(seconds=28738)).strftime(
-            "%Y-%m-%dT%H:%M:%S.000Z"),
-        "auth_method": "exchange_code",
-        "display_name": "Dippyshere MbnM",
-        "ext_auth_id": "1123",
-        "ext_auth_type": "exchange_code",
-        "ext_auth_method": "google_id_token",
-        "ext_auth_display_name": "A",
-        "app": "wex",
-        "in_app_id": "ec0ebb7e56f6454e86c62299a7b32e21",
-        "device_id": "68009daed09498667a8039cce09983ec",
-        "perms": [{
-            "resource": "blockList:ec0ebb7e56f6454e86c62299a7b32e21",
-            "action": 14
-        }, {
-            "resource": "wexp:cloudstorage:system",
-            "action": 2
-        }, {
-            "resource": "account:public:account:*",
-            "action": 2
-        }, {
-            "resource": "account:oauth:exchangeTokenCode",
-            "action": 15
-        }, {
-            "resource": "account:public:account",
-            "action": 2
-        }, {
-            "resource": "priceengine:shared:offer:price",
-            "action": 2
-        }, {
-            "resource": "xmpp:session:*:ec0ebb7e56f6454e86c62299a7b32e21",
-            "action": 1
-        }, {
-            "resource": "wexp:wexp_role:client",
-            "action": 15
-        }, {
-            "resource": "wexp:profile:ec0ebb7e56f6454e86c62299a7b32e21:*",
-            "action": 15
-        }, {
-            "resource": "account:public:account:externalAuths",
-            "action": 15
-        }, {
-            "resource": "wexp:calendar",
-            "action": 2
-        }, {
-            "resource": "account:token:otherSessionsForAccountClient",
-            "action": 8
-        }, {
-            "resource": "account:token:otherSessionsForAccountClientService",
-            "action": 8
-        }, {
-            "resource": "account:public:account:deviceAuths",
-            "action": 11
-        }, {
-            "resource": "wexp:cloudstorage:system:*",
-            "action": 2
-        }, {
-            "resource": "serviceinstance",
-            "action": 2
-        }, {
-            "resource": "wexp:storefront",
-            "action": 2
-        }, {
-            "resource": "wexp:push:devices:ec0ebb7e56f6454e86c62299a7b32e21",
-            "action": 15
-        }, {
-            "resource": "friends:ec0ebb7e56f6454e86c62299a7b32e21",
-            "action": 15
-        }]
+        "client_id": token["clid"],
+        "internal_client": token["ic"],
+        "client_service": token["clsvc"],
+        "account_id": token["sub"],
+        "expires_in": token["exp"] - token["iat"],
+        "expires_at": datetime.datetime.fromtimestamp(token["exp"]).strftime("%Y-%m-%dT%H:%M:%S.000Z"),
+        "auth_method": token["am"],
+        "display_name": token["dn"],
+        "app": token["clsvc"],
+        "in_app_id": token["sub"],
+        "device_id": token["dvid"]
     })

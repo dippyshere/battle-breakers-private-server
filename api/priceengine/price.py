@@ -1,20 +1,107 @@
 """
+Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2023 by Alex Hanson (Dippyshere).
+Please do not skid my hard work.
+https://github.com/dippyshere/battle-breakers-private-server
+This code is licensed under the [TBD] license.
+
 Handles the tax calculation
 """
 
 import sanic
-import orjson
 
+from utils.utils import authorized as auth
+
+from utils.sanic_gzip import Compress
+
+compress = Compress()
 price = sanic.Blueprint("priceengine_price")
 
 
 # https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/catalog-public-service-prod.ol.epicgames.com/catalog/api/shared/bulk/offers.md
-@price.route("/priceengine/api/shared/offers/price", methods=["POST"])
-async def price_request(request):
+@price.route("/api/shared/offers/price", methods=["POST"])
+@auth(allow_basic=True)
+@compress.compress()
+async def price_request(request: sanic.request.Request) -> sanic.response.JSONResponse:
     """
-    Get price
+    Get price information
     :param request: The request object
     :return: The response object
     """
-    with open(f"res/priceengine/api/shared/offers/price.json", "r", encoding='utf-8') as file:
-        return sanic.response.json(orjson.loads(file.read()))
+    offers = await request.app.ctx.read_file("res/priceengine/api/shared/offers/price.json")
+    line_offers = []
+    line_id = 0
+    totals = {
+        "currencyCode": "AUD",
+        "discountPrice": 0,
+        "originalPrice": 0,
+        "discountPercentage": 100,
+        "discount": 0,
+        "voucherDiscount": 0,
+        "sellerVat": 0,
+        "vat": 0,
+        "vatRate": 0.1,
+        "convenienceFee": 0,
+        "basePayoutPrice": 0,
+        "basePayoutCurrencyCode": "USD",
+        "revenueWithoutTax": 0,
+        "revenueWithoutTaxCurrencyCode": "USD",
+        "payoutCurrencyExchangeRate": 0.674685939256375
+    }
+    for offer in request.json["lineOffers"]:
+        line_id += 1
+        line_offers.append({
+            "lineId": str(line_id),
+            "quantity": offer["quantity"],
+            "taxSkuId": "FR_Game",
+            "price": {
+                "currencyCode": offers[offer["offerId"]]["currencyCode"],
+                "discountPrice": offers[offer["offerId"]]["discountPrice"],
+                "unitPrice": offers[offer["offerId"]]["unitPrice"],
+                "originalPrice": offers[offer["offerId"]]["originalPrice"],
+                "originalUnitPrice": offers[offer["offerId"]]["originalUnitPrice"],
+                "discountPercentage": offers[offer["offerId"]]["discountPercentage"],
+                "discount": offers[offer["offerId"]]["discount"],
+                "voucherDiscount": offers[offer["offerId"]]["voucherDiscount"],
+                "sellerVat": offers[offer["offerId"]]["sellerVat"],
+                "vat": offers[offer["offerId"]]["vat"],
+                "vatRate": offers[offer["offerId"]]["vatRate"],
+                "convenienceFee": offers[offer["offerId"]]["convenienceFee"],
+                "basePayoutPrice": offers[offer["offerId"]]["basePayoutPrice"],
+                "basePayoutCurrencyCode": offers[offer["offerId"]]["basePayoutCurrencyCode"],
+                "revenueWithoutTax": offers[offer["offerId"]]["revenueWithoutTax"],
+                "revenueWithoutTaxCurrencyCode": offers[offer["offerId"]]["revenueWithoutTaxCurrencyCode"],
+                "payoutCurrencyExchangeRate": offers[offer["offerId"]]["payoutCurrencyExchangeRate"],
+            },
+            "offerId": offer["offerId"],
+            "appliedRules": [],
+            "ref": offer["offerId"]
+        })
+        totals["discountPrice"] += offers[offer["offerId"]]["discountPrice"]
+        totals["originalPrice"] += offers[offer["offerId"]]["originalPrice"]
+        totals["discount"] += offers[offer["offerId"]]["discount"]
+        totals["voucherDiscount"] += offers[offer["offerId"]]["voucherDiscount"]
+        totals["sellerVat"] += offers[offer["offerId"]]["sellerVat"]
+        totals["vat"] += offers[offer["offerId"]]["vat"]
+        totals["convenienceFee"] += offers[offer["offerId"]]["convenienceFee"]
+        totals["basePayoutPrice"] += offers[offer["offerId"]]["basePayoutPrice"]
+        totals["revenueWithoutTax"] += offers[offer["offerId"]]["revenueWithoutTax"]
+    return sanic.response.json({
+        "accountId": request.json["accountId"],
+        "identityId": request.json["accountId"],
+        "namespace": "wex",
+        "country": request.json["country"],
+        "taxType": "Tax",
+        "taxCalculationStatus": "SUCCEEDED",
+        "totalPrice": totals,
+        "totalPaymentPrice": {
+            "paymentCurrencyExchangeRate": 1.0,
+            "paymentCurrencyCode": "AUD",
+            "paymentCurrencySymbol": "$",
+            "paymentCurrencyAmount": totals["discountPrice"],
+            "paymentCurrencyDecimal": 2
+        },
+        "coupons": [],
+        "lineOffers": line_offers,
+        "isB2bVatReverseCharge": True,
+        "vatEnabled": True
+    })
