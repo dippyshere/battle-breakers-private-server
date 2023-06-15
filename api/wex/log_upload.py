@@ -27,7 +27,7 @@ async def logupload(request: sanic.request.Request, file: str) -> sanic.response
     :param file: The file name
     :return: The response object (204)
     """
-    if request.headers.get("Content-Length") > 5242880:
+    if int(request.headers.get("Content-Length")) > 5242880:
         raise sanic.exceptions.PayloadTooLarge("File is too large, I'm not a free s3 bucket >_<")
     await request.app.ctx.write_file(f"res/wex/api/feedback/log-upload/{file}", request.body, False)
     return sanic.response.empty()
