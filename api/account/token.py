@@ -58,7 +58,7 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                                                                                  token['sub'])))
             else:
                 raise sanic.exceptions.Unauthorized(context={
-                    "errorCode": "errors.com.epicgames.common.oauth.invalid_token",
+                    "errorCode": "errors.com.epicgames.account.oauth.expired_authorization_code",
                     "errorMessage": "Your authorisation code is invalid or expired"})
         elif request.form.get('grant_type') == 'refresh_token':
             token = await request.app.ctx.parse_eg1(request.form.get('refresh_token'))
@@ -68,7 +68,7 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                                                                                  token['sub'])))
             else:
                 raise sanic.exceptions.Unauthorized(context={
-                    "errorCode": "errors.com.epicgames.common.oauth.invalid_token",
+                    "errorCode": "errors.com.epicgames.account.oauth.expired_exchange_code_session",
                     "errorMessage": "Your refresh token has expired. Please log in again"})
         elif request.form.get('grant_type') == 'password':  # backwards compatibility for old clients
             account_id = await request.app.ctx.get_account_id_from_display_name(
@@ -94,7 +94,7 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                                                                                  token['sub'])))
             else:
                 raise sanic.exceptions.Unauthorized(context={
-                    "errorCode": "errors.com.epicgames.common.oauth.invalid_token",
+                    "errorCode": "errors.com.epicgames.account.oauth.expired_exchange_code",
                     "errorMessage": "Your exchange code has expired. Please login again"})
         elif request.form.get('grant_type') == 'device_auth':
             if request.form.get('account_id'):
