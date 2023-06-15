@@ -6,6 +6,7 @@ This code is licensed under the [TBD] license.
 
 Error handler module for the server
 """
+from typing import Optional
 
 from .error_details import error_details
 
@@ -19,8 +20,8 @@ class EpicError:
     Epic error class
     """
 
-    def __init__(self, error_code: str | None = None, error_message: str | None = None,
-                 numeric_error_code: int | None = None) -> None:
+    def __init__(self, error_code: Optional[str] = None, error_message: Optional[str] = None,
+                 numeric_error_code: Optional[int] = None) -> None:
         """
         Initialises the EpicError class
         :param error_code: The error code

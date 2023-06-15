@@ -81,7 +81,7 @@ app.ctx.profiles = {}
 
 
 @app.main_process_stop
-async def main_stop(*_) -> None:
+async def main_stop(*_: Any) -> None:
     """
     Called when the server is stopped
     :param _: The loop

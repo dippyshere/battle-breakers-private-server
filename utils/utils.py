@@ -17,7 +17,7 @@ import traceback
 import uuid
 import zlib
 from inspect import isawaitable
-from typing import Any, Tuple
+from typing import Any, Tuple, Optional, Callable
 
 import jwt
 import orjson
@@ -76,7 +76,7 @@ async def write_file(filename: str, contents: Any, json: bool = True, raw: bool 
     return
 
 
-async def format_time(time: datetime.datetime | float | int | str | None = None) -> str:
+async def format_time(time: Optional[datetime.datetime | float | int | str] = None) -> str:
     """
     Formats the current time in the correct format for the MCP headers
 
@@ -125,8 +125,8 @@ async def token_generator() -> str:
     return uuid.UUID(bytes=random.randbytes(16)).hex
 
 
-async def generate_eg1(sub: str | None = None, dn: str | None = None, clid: str | None = None,
-                       dvid: str | None = None) -> str:
+async def generate_eg1(sub: Optional[str] = None, dn: Optional[str] = None, clid: Optional[str] = None,
+                       dvid: Optional[str] = None) -> str:
     """
     Generates an eg1 JWT token for an account
     :param sub: The account id to generate the token for
@@ -167,7 +167,7 @@ async def generate_eg1(sub: str | None = None, dn: str | None = None, clid: str 
     }, private_key, "RS256", headers)
 
 
-async def generate_client_eg1(clid: str | None = None) -> str:
+async def generate_client_eg1(clid: Optional[str] = None) -> str:
     """
     Generates an eg1 JWT token for client credentials
     :param clid: The client id to generate the token for
@@ -191,8 +191,8 @@ async def generate_client_eg1(clid: str | None = None) -> str:
     }, private_key, "RS256", headers)
 
 
-async def generate_refresh_eg1(sub: str | None = None, dn: str | None = None, clid: str | None = None,
-                               dvid: str | None = None) -> str:
+async def generate_refresh_eg1(sub: Optional[str] = None, dn: Optional[str] = None, clid: Optional[str] = None,
+                               dvid: Optional[str] = None) -> str:
     """
     Generates an eg1 JWT token for an account
     :param sub: The account id to generate the token for
@@ -220,7 +220,8 @@ async def generate_refresh_eg1(sub: str | None = None, dn: str | None = None, cl
     }, private_key, "RS256", headers)
 
 
-async def generate_authorisation_eg1(sub: str | None = None, dn: str | None = None, clid: str | None = None) -> str:
+async def generate_authorisation_eg1(sub: Optional[str] = None, dn: Optional[str] = None,
+                                     clid: Optional[str] = None) -> str:
     """
     Generates an eg1 JWT token for an account to use as an auth code
     :param sub: The account id to generate the token for
@@ -244,7 +245,7 @@ async def generate_authorisation_eg1(sub: str | None = None, dn: str | None = No
     }, private_key, "RS256", headers)
 
 
-async def parse_eg1(token: str) -> dict | None:
+async def parse_eg1(token: str) -> Optional[dict]:
     """
     Parses an eg1 JWT token
     :param token: The token to parse
@@ -270,8 +271,10 @@ async def verify_owner(request: sanic.request.Request, token: dict) -> bool:
     if account_id is None:
         account_id = request.args.get("accountId")
     if account_id is None:
-        if request.json is not None:
+        try:
             account_id = request.json.get("accountId")
+        except:
+            pass
     if account_id is None:
         return False
     if token.get("sub") != account_id:
@@ -307,13 +310,13 @@ async def verify_request_auth(request: sanic.request.Request, strict: bool = Fal
         return False
 
 
-def authorized(maybe_func=None, *, allow_basic: bool = False, strict: bool = False):
+def authorized(maybe_func: Any = None, *, allow_basic: bool = False, strict: bool = False) -> Callable:
     """
     Decorator to check if a request is authorized
     :return: The decorator
     """
 
-    def decorator(f):
+    def decorator(f: Callable) -> Callable:
         """
         The decorator
         :param f: The function to decorate
@@ -321,7 +324,8 @@ def authorized(maybe_func=None, *, allow_basic: bool = False, strict: bool = Fal
         """
 
         @functools.wraps(f)
-        async def decorated_function(request: sanic.request.Request, *args, **kwargs):
+        async def decorated_function(request: sanic.request.Request, *args,
+                                     **kwargs) -> sanic.response.HTTPResponse | sanic.response.JSONResponse:
             """
             The decorated function
 
@@ -377,7 +381,7 @@ async def to_insecure_hash(s: str) -> int:
     return hash_val
 
 
-async def get_account_id_from_display_name(display_name: str) -> str | None:
+async def get_account_id_from_display_name(display_name: str) -> Optional[str]:
     """
     Gets an account id from a display name
     :param display_name: The display name to get the account id for
@@ -393,7 +397,7 @@ async def get_account_id_from_display_name(display_name: str) -> str | None:
     return None
 
 
-async def get_account_id_from_email(email: str) -> str | None:
+async def get_account_id_from_email(email: str) -> Optional[str]:
     """
     Gets an account id from an email
     :param email: The email to get the account id for
@@ -421,8 +425,8 @@ async def check_if_display_name_exists(display_name: str) -> bool:
     return False
 
 
-async def oauth_response(client_id: str = "3cf78cd3b00b439a8755a878b160c7ad", dn: str | None = None,
-                         dvid: str | None = None, sub: str | None = None) -> dict:
+async def oauth_response(client_id: str = "3cf78cd3b00b439a8755a878b160c7ad", dn: Optional[str] = None,
+                         dvid: Optional[str] = None, sub: Optional[str] = None) -> dict:
     """
     Generates an oauth response
     :param client_id: The client id
@@ -470,7 +474,7 @@ async def oauth_client_response(client_id: str) -> dict:
     }
 
 
-async def create_account(displayName: str | None = None, password: str | int | None = None) -> str:
+async def create_account(displayName: Optional[str] = None, password: Optional[str | int] = None) -> str:
     """
     Creates an account and prepares all the files
     :param displayName: The display name
@@ -482,7 +486,7 @@ async def create_account(displayName: str | None = None, password: str | int | N
     return account_id
 
 
-async def normalise_string(input_string: str | None) -> str | None:
+async def normalise_string(input_string: Optional[str]) -> Optional[str]:
     """
     Normalises a string
     :param input_string: The string to normalise
@@ -494,7 +498,7 @@ async def normalise_string(input_string: str | None) -> str | None:
     return ""
 
 
-async def load_datatable(datatable: str | None) -> dict | None:
+async def load_datatable(datatable: Optional[str]) -> Optional[dict]:
     """
     Loads a datatable. As datatables are both static and large, this could be cached, but async cache sucks :(
     :param datatable: The datatable path to load
@@ -505,7 +509,7 @@ async def load_datatable(datatable: str | None) -> dict | None:
     return None
 
 
-async def get_template_id_from_path(path: str | None) -> str | None:
+async def get_template_id_from_path(path: Optional[str]) -> Optional[str]:
     """
     Gets a template id from a path
     :param path: The path to get the template id for

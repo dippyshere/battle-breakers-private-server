@@ -10,6 +10,7 @@ import asyncio
 import os
 import random
 from concurrent.futures.thread import ThreadPoolExecutor
+from typing import Optional
 
 import aiofiles
 import orjson
@@ -30,7 +31,7 @@ class PlayerFriends:
         :param account_id: The account ID of the profile
         """
         self.account_id: str = account_id
-        self.friends: dict | None = None
+        self.friends: Optional[dict] = None
         try:
             asyncio.get_running_loop()
             with ThreadPoolExecutor() as pool:

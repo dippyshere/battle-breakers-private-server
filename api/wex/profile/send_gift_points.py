@@ -21,7 +21,7 @@ wex_profile_send_gift = sanic.Blueprint("wex_profile_send_gift")
 @wex_profile_send_gift.route("/<accountId>/SendGiftPoints", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def send_gift_points(request: sanic.request.Request, accountId: str):
+async def send_gift_points(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
     """
     Handles the send gift point request
     :param request: The request object
