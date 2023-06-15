@@ -11,6 +11,7 @@ import asyncio
 import uuid
 import enum
 from concurrent.futures.thread import ThreadPoolExecutor
+from typing import Any
 
 import aiofiles
 import orjson
@@ -21,11 +22,11 @@ class ProfileType(enum.Enum):
     """
     Enum for the profile types
     """
-    PROFILE0 = "profile0"
-    LEVELS = "levels"
-    FRIENDS = "friends"
-    MONSTERPIT = "monsterpit"
-    MULTIPLAYER = "multiplayer"
+    PROFILE0: str = "profile0"
+    LEVELS: str = "levels"
+    FRIENDS: str = "friends"
+    MONSTERPIT: str = "monsterpit"
+    MULTIPLAYER: str = "multiplayer"
 
     @classmethod
     def from_string(cls, s: str) -> "ProfileType":
@@ -40,6 +41,29 @@ class ProfileType(enum.Enum):
             raise sanic.exceptions.BadRequest(f"{s} is not a valid profile")
 
 
+class McpProfile:
+    """
+    Class for the MCP profile
+    """
+
+    def __init__(self, account_id: str, profile_type: ProfileType) -> None:
+        """
+        Initialise the MCP profile
+        :param account_id: The account ID of the profile
+        """
+        self.account_id: str = account_id
+        self.profile = None
+        self.profile_changes = []
+        self.profile_notifications = []
+        self.profile_revisions = None
+        try:
+            asyncio.get_running_loop()
+            with ThreadPoolExecutor() as pool:
+                pool.submit(lambda: asyncio.run(self.load_profile())).result()
+        except RuntimeError:
+            asyncio.run(self.load_profile())
+
+
 class PlayerProfile:
     """
     Class based system to handle the profile management for wex mcp service
@@ -51,7 +75,7 @@ class PlayerProfile:
         This will load the profile from the res folder and setup the variables
         :param account_id: The account ID of the profile
         """
-        self.account_id = account_id
+        self.account_id: str = account_id
         self.friends = None
         self.friends_changes = []
         self.friends_notifications = []
@@ -67,7 +91,8 @@ class PlayerProfile:
         self.profile0 = None
         self.profile0_changes = []
         self.profile0_notifications = []
-        self.profile_revisions = None
+        self.profile_revisions: list[dict[str, str | int], dict[str, str | int], dict[str, str | int], dict[
+            str, str | int], dict[str, str | int]] | None = None
         try:
             asyncio.get_running_loop()
             with ThreadPoolExecutor() as pool:
@@ -129,7 +154,7 @@ class PlayerProfile:
         :return: The item
         """
         if isinstance(guid, list):
-            guid = guid[0]
+            guid: str = guid[0]
         return (await self.get_profile(profile_id)).get("items").get(guid)
 
     async def find_item_by_template_id(self, template_id: str, profile_id: ProfileType = ProfileType.PROFILE0) -> list:
@@ -139,7 +164,7 @@ class PlayerProfile:
         :param profile_id: The profile ID to get
         :return: A list of GUIDs of the items with the specified template ID
         """
-        guids = []
+        guids: list = []
         for guid, item in (await self.get_profile(profile_id)).get("items").items():
             if item["templateId"] == template_id:
                 guids.append(guid)
@@ -153,7 +178,7 @@ class PlayerProfile:
         :param profile_id: The profile ID to get
         :return: A list of GUIDs of the items with the specified template ID
         """
-        guids = []
+        guids: list = []
         for guid, item in (await self.get_profile(profile_id)).get("items").items():
             if item["templateId"].split(":")[-1] == template_id:
                 guids.append(guid)
@@ -166,7 +191,7 @@ class PlayerProfile:
         :param profile_id: The profile ID to get
         :return: A list of GUIDs of the items with the specified template ID
         """
-        guids = []
+        guids: list = []
         for guid, item in (await self.get_profile(profile_id)).get("items").items():
             if item["templateId"].split(":")[0] == template_id:
                 guids.append(guid)
@@ -192,7 +217,7 @@ class PlayerProfile:
         :raise AttributeError: If the profile ID is invalid
         :return: None
         """
-        profile_changes = getattr(self, f"{profile_id.value}_changes", [])
+        profile_changes: list = getattr(self, f"{profile_id.value}_changes", [])
         profile_changes.append({"changeType": "statModified", "name": stat_name, "value": new_value})
         setattr(self, f"{profile_id.value}_changes", profile_changes)
 
@@ -204,7 +229,7 @@ class PlayerProfile:
         :raise AttributeError: If the profile ID is invalid
         :return: None
         """
-        profile_changes = getattr(self, f"{profile_id.value}_changes", [])
+        profile_changes: list = getattr(self, f"{profile_id.value}_changes", [])
         profile_changes.append({"changeType": "itemRemoved", "itemId": item_id})
         setattr(self, f"{profile_id.value}_changes", profile_changes)
 
@@ -219,7 +244,7 @@ class PlayerProfile:
         :raise AttributeError: If the profile ID is invalid
         :return: None
         """
-        profile_changes = getattr(self, f"{profile_id.value}_changes", [])
+        profile_changes: list = getattr(self, f"{profile_id.value}_changes", [])
         profile_changes.append({"changeType": "itemAttrChanged", "itemId": item_id, "attributeName": attribute_name,
                                 "attributeValue": new_value})
         setattr(self, f"{profile_id.value}_changes", profile_changes)
@@ -235,8 +260,8 @@ class PlayerProfile:
         :return: None
         """
         if item_id is None:
-            item_id = str(uuid.uuid4())
-        profile_changes = getattr(self, f"{profile_id.value}_changes", [])
+            item_id: str = str(uuid.uuid4())
+        profile_changes: list = getattr(self, f"{profile_id.value}_changes", [])
         profile_changes.append({"changeType": "itemAdded", "itemId": item_id, "item": item_data})
         setattr(self, f"{profile_id.value}_changes", profile_changes)
         return item_id
@@ -251,7 +276,7 @@ class PlayerProfile:
         :raise AttributeError: If the profile ID is invalid
         :return: None
         """
-        profile_changes = getattr(self, f"{profile_id.value}_changes", [])
+        profile_changes: list = getattr(self, f"{profile_id.value}_changes", [])
         profile_changes.append({"changeType": "itemQuantityChanged", "itemId": item_id, "quantity": new_quantity})
         setattr(self, f"{profile_id.value}_changes", profile_changes)
 
@@ -270,7 +295,7 @@ class PlayerProfile:
         :param profile_id: The ID of the profile to add to
         :return: The notifications
         """
-        profile_notifications = getattr(self, f"{profile_id.value}_notifications", [])
+        profile_notifications: list = getattr(self, f"{profile_id.value}_notifications", [])
         profile_notifications.append(notification)
         setattr(self, f"{profile_id.value}_notifications", profile_notifications)
         return profile_notifications
@@ -281,7 +306,7 @@ class PlayerProfile:
         :param profile_id: The ID of the profile to clear
         :return: The notifications
         """
-        profile_types = ProfileType if profile_id is None else [profile_id]
+        profile_types: "ProfileType" | list[ProfileType] = ProfileType if profile_id is None else [profile_id]
 
         for p_type in profile_types:
             setattr(self, f"{p_type.value}_notifications", [])
@@ -292,7 +317,7 @@ class PlayerProfile:
 
         :param profile_type: (Optional) Enum of the profile to flush. If None, all profiles will be flushed.
         """
-        profile_types = ProfileType if profile_type is None else [profile_type]
+        profile_types: "ProfileType" | list[ProfileType] = ProfileType if profile_type is None else [profile_type]
 
         for p_type in profile_types:
             profile = await self.get_profile(p_type)
@@ -325,18 +350,22 @@ class PlayerProfile:
         """
         from utils.utils import format_time
         if client_command_revision is None:
-            client_command_revision = self.profile_revisions
+            client_command_revision: list[
+                dict[str, str | int], dict[str, str | int], dict[str, str | int], dict[str, str | int], dict[
+                    str, str | int]] = self.profile_revisions
         else:
-            client_command_revision = ast.literal_eval(client_command_revision)
+            client_command_revision: list[
+                dict[str, str | int], dict[str, str | int], dict[str, str | int], dict[str, str | int], dict[
+                    str, str | int]] = ast.literal_eval(client_command_revision)
         for item in client_command_revision:
             if item["profileId"] == profile_id.value:
-                client_revision = item["clientCommandRevision"]
+                client_revision: int = item["clientCommandRevision"]
                 break
         else:
-            client_revision = -1
+            client_revision: int = -1
         if client_revision <= 0:
-            client_revision = (await self.get_profile(profile_id))["commandRevision"]
-        response = {
+            client_revision: int = (await self.get_profile(profile_id))["commandRevision"]
+        response: dict[str, int | list | str | list[dict[str, int | list | str | Any]] | Any] = {
             "profileRevision": (await self.get_profile(profile_id))["rvn"],
             "profileId": profile_id.value,
             "profileChangesBaseRevision": (await self.get_profile(profile_id))["rvn"],
@@ -349,7 +378,7 @@ class PlayerProfile:
         if rvn != (await self.get_profile(profile_id))["rvn"]:
             # Full profile update requested
             await self.flush_changes(profile_id)
-            response['profileChanges'] = [
+            response['profileChanges']: list[dict[str, str | dict | int]] = [
                 {
                     "changeType": "fullProfileUpdate",
                     "profile": await self.get_profile(profile_id)
@@ -357,28 +386,28 @@ class PlayerProfile:
             ]
         else:
             # Partial profile update requested
-            profile_changes = getattr(self, f"{profile_id.value}_changes", [])
+            profile_changes: list = getattr(self, f"{profile_id.value}_changes", [])
             if profile_changes:
-                response['profileChanges'] = profile_changes
+                response['profileChanges']: list = profile_changes
                 await self.bump_revision(profile_id, response)
 
         # Check for other profiles with changes
-        other_changes = []
+        other_changes: list = []
         for profile in ProfileType:
             if profile == profile_id:
                 continue
-            profile_changes = getattr(self, f"{profile.value}_changes", [])
+            profile_changes: list = getattr(self, f"{profile.value}_changes", [])
             if profile_changes:
-                profile_notifications = getattr(self, f"{profile.value}_notifications", [])
+                profile_notifications: list = getattr(self, f"{profile.value}_notifications", [])
                 for item in client_command_revision:
                     if item["profileId"] == profile.value:
-                        client_revision = item["clientCommandRevision"]
+                        client_revision: int = item["clientCommandRevision"]
                         break
                 else:
-                    client_revision = -1
+                    client_revision: int = -1
                 if client_revision <= 0:
-                    client_revision = (await self.get_profile(profile))["commandRevision"]
-                base_rvn = (await self.get_profile(profile))["rvn"]
+                    client_revision: int = (await self.get_profile(profile))["commandRevision"]
+                base_rvn: int = (await self.get_profile(profile))["rvn"]
                 await self.bump_revision(profile)
                 other_changes.append({
                     "profileRevision": (await self.get_profile(profile))["rvn"],
@@ -388,13 +417,13 @@ class PlayerProfile:
                     "profileCommandRevision": client_revision,
                 })
                 if profile_notifications:
-                    other_changes[-1]["notifications"] = profile_notifications
+                    other_changes[-1]["notifications"]: list = profile_notifications
 
         if other_changes:
-            response['multiUpdate'] = other_changes
+            response['multiUpdate']: list = other_changes
         notifications = getattr(self, f"{profile_id.value}_notifications", [])
         if notifications:
-            response["notifications"] = notifications
+            response["notifications"]: list = notifications
 
         if clear_notification:
             await self.clear_notifications(profile_id)
@@ -429,7 +458,7 @@ class PlayerProfile:
         Save the modified profiles to disk
         :return: None
         """
-        save_profile = False
+        save_profile: bool = False
         if save_profile:
             for profile_type in ProfileType:
                 profile = await self.get_profile(profile_type)

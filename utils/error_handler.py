@@ -14,12 +14,31 @@ import sanic
 from sanic.handlers import ErrorHandler
 
 
+class EpicError:
+    """
+    Epic error class
+    """
+
+    def __init__(self, error_code: str | None = None, error_message: str | None = None,
+                 numeric_error_code: int | None = None) -> None:
+        """
+        Initialises the EpicError class
+        :param error_code: The error code
+        :param error_message: The error message
+        :param numeric_error_code: The numeric error code
+        """
+        self.error_code = error_code
+        self.error_message = error_message
+        self.numeric_error_code = numeric_error_code
+
+
 class CustomErrorHandler(ErrorHandler):
     """
     Custom error handler to handle all exceptions
     """
 
-    def default(self, request, exception):
+    def default(self, request: sanic.request.Request,
+                exception: sanic.exceptions.SanicException | Exception) -> sanic.response.JSONResponse:
         """
         Handles all exceptions
         :param request: The request object
@@ -39,16 +58,16 @@ class CustomErrorHandler(ErrorHandler):
         error_code = error["error_code"]
         error_message = error["error_message"]
         numeric_error_code = error["numeric_error_code"]
+        if getattr(exception, "context", None) is not None:
+            error_code = exception.context.get("errorCode", error_code)
+            error_message = exception.context.get("errorMessage", error_message)
+            numeric_error_code = exception.context.get("numericErrorCode", numeric_error_code)
         if True:  # request.app.debug
             if status_code == 500:
                 error_message = ""
                 for message in message_vars:
                     error_message += f"{message}"
             error_message += f" ({exception.__class__.__name__})"
-        if getattr(exception, "context", None) is not None:
-            error_code = exception.context.get("errorCode", error_code)
-            error_message = exception.context.get("errorMessage", error_message)
-            numeric_error_code = exception.context.get("numericErrorCode", numeric_error_code)
         headers = {
             "X-Epic-Error-Code": numeric_error_code,
             "X-Epic-Error-Name": error_code,

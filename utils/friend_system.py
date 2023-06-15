@@ -29,8 +29,8 @@ class PlayerFriends:
         This will load the profile from the res folder and setup the variables
         :param account_id: The account ID of the profile
         """
-        self.account_id = account_id
-        self.friends = None
+        self.account_id: str = account_id
+        self.friends: dict | None = None
         try:
             asyncio.get_running_loop()
             with ThreadPoolExecutor() as pool:
@@ -58,7 +58,7 @@ class PlayerFriends:
         :return: None
         """
         async with aiofiles.open(f"res/friends/api/v1/{self.account_id}.json", "rb") as file:
-            self.friends = orjson.loads(await file.read())
+            self.friends: dict = orjson.loads(await file.read())
 
     async def get_friends(self) -> dict:
         """
@@ -80,7 +80,7 @@ class PlayerFriends:
         Get the legacy friends data for old clients
         :return: The friend data
         """
-        friends = []
+        friends: list = []
         for friend in self.friends["friends"]:
             friends.append({
                 "accountId": friend["accountId"],
@@ -121,8 +121,8 @@ class PlayerFriends:
         for friend in self.friends["incoming"]:
             if friend["accountId"] == friendId:
                 if friendId not in request.app.ctx.friends:
-                    request.app.ctx.friends[friendId] = PlayerFriends(friendId)
-                other_friend = request.app.ctx.friends[friendId]
+                    request.app.ctx.friends[friendId]: PlayerFriends = PlayerFriends(friendId)
+                other_friend: PlayerFriends = request.app.ctx.friends[friendId]
                 await other_friend.add_friend(self.account_id)
                 await self.add_friend(friendId)
                 return
@@ -132,8 +132,8 @@ class PlayerFriends:
                         "errorMessage": "You have already sent a friend request to this user.",
                         "numericErrorCode": 16004}
         if friendId not in request.app.ctx.friends:
-            request.app.ctx.friends[friendId] = PlayerFriends(friendId)
-        other_friend = request.app.ctx.friends[friendId]
+            request.app.ctx.friends[friendId]: PlayerFriends = PlayerFriends(friendId)
+        other_friend: PlayerFriends = request.app.ctx.friends[friendId]
         if other_friend.friends["settings"]["acceptInvites"] != "public":
             return {"errorCode": "errors.com.epicgames.friends.cannot_friend_due_to_target_settings",
                     "errorMessage": "This person is not accepting friend requests.", "numericErrorCode": 16003}
@@ -226,8 +226,8 @@ class PlayerFriends:
         await self.save_friends()
         try:
             if friendId not in request.app.ctx.friends:
-                request.app.ctx.friends[friendId] = PlayerFriends(friendId)
-            other_friend = request.app.ctx.friends[friendId]
+                request.app.ctx.friends[friendId]: PlayerFriends = PlayerFriends(friendId)
+            other_friend: PlayerFriends = request.app.ctx.friends[friendId]
             for friend in other_friend.friends["friends"]:
                 if friend["accountId"] == self.account_id:
                     other_friend.friends["friends"].remove(friend)
@@ -247,7 +247,7 @@ class PlayerFriends:
         :param friends: The new friends data
         :return: None
         """
-        self.friends = friends
+        self.friends: dict = friends
         await self.save_friends()
 
     async def save_friends(self) -> None:
@@ -255,7 +255,7 @@ class PlayerFriends:
         Save the new friends data to the res folder
         :return: None
         """
-        save_friends = False
+        save_friends: bool = False
         if save_friends:
             async with aiofiles.open(f"res/friends/api/v1/{self.account_id}.json", "wb") as file:
                 await file.write(orjson.dumps(self.friends))
@@ -266,9 +266,9 @@ class PlayerFriends:
         :param request: The request object
         :return: The response of the request
         """
-        suggested_accounts = []
-        accounts_list = os.listdir("res/account/api/public/account")
-        accounts_list = [account.split(".")[0] for account in accounts_list]
+        suggested_accounts: list = []
+        accounts_list: list[str] = os.listdir("res/account/api/public/account")
+        accounts_list: list[str] = [account.split(".")[0] for account in accounts_list]
         if "ec0ebb7e56f6454e86c62299a7b32e20" in accounts_list:
             accounts_list.remove("ec0ebb7e56f6454e86c62299a7b32e20")
             # accounts_list.insert(0, "ec0ebb7e56f6454e86c62299a7b32e20")
@@ -276,7 +276,7 @@ class PlayerFriends:
             accounts_list.remove(self.account_id)
         for account in accounts_list:
             if account not in request.app.ctx.friends:
-                request.app.ctx.friends[account] = PlayerFriends(account)
+                request.app.ctx.friends[account]: PlayerFriends = PlayerFriends(account)
             if request.app.ctx.friends[account].friends["settings"]["acceptInvites"] != "public":
                 accounts_list.remove(account)
         for _ in range(10):
