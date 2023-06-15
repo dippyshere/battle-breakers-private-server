@@ -11,11 +11,13 @@ import asyncio
 import uuid
 import enum
 from concurrent.futures.thread import ThreadPoolExecutor
-from typing import Any
+from typing import Any, Union, Optional, Type
 
 import aiofiles
 import orjson
 import sanic
+
+MCPItem: Type = Union[str, int, float, list, dict, bool]
 
 
 class ProfileType(enum.Enum):
@@ -51,17 +53,163 @@ class McpProfile:
         Initialise the MCP profile
         :param account_id: The account ID of the profile
         """
-        self.account_id: str = account_id
-        self.profile = None
-        self.profile_changes = []
-        self.profile_notifications = []
-        self.profile_revisions = None
+        self._id: Optional[str] = None
+        self._profile_type: ProfileType = profile_type
+        self.accountId: str = account_id
+        self.created: Optional[str] = None
+        self.updated: Optional[str] = None
+        self.rvn: Optional[int] = None
+        self.wipeNumber: Optional[int] = None
+        self.version: Optional[str] = None
+        self.items: Optional[dict[str, dict[str, dict[str, MCPItem]]]] = None
+        self.stats: Optional[dict[str, dict[str, MCPItem]]] = None
+        self.commandRevision: Optional[int] = None
         try:
             asyncio.get_running_loop()
             with ThreadPoolExecutor() as pool:
                 pool.submit(lambda: asyncio.run(self.load_profile())).result()
         except RuntimeError:
             asyncio.run(self.load_profile())
+
+    def __repr__(self) -> str:
+        """
+        Get the representation of the MCP profile
+        :return: The representation of the MCP profile
+        """
+        return f"<McpProfile account_id={self.accountId} profile_type={self.profile_type} rvn={self.rvn} " \
+               f"items={len(self.items)}>"
+
+    def __str__(self) -> str:
+        """
+        Get the string of the MCP profile
+        :return: The string of the MCP profile
+        """
+        return self.__repr__()
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Check if the MCP profile is equal to another object
+        :param other: The other object to check
+        :return: Whether the MCP profile is equal to the other object
+        """
+        if not isinstance(other, McpProfile):
+            return NotImplemented
+        return self.accountId == other.accountId and self.profile_type == other.profile_type
+
+    def __ne__(self, other: object) -> bool:
+        """
+        Check if the MCP profile is not equal to another object
+        :param other: The other object to check
+        :return: Whether the MCP profile is not equal to the other object
+        """
+        if not isinstance(other, McpProfile):
+            return NotImplemented
+        return self.accountId != other.accountId or self.profile_type != other.profile_type
+
+    def __bool__(self) -> bool:
+        """
+        Check if the MCP profile is valid
+        :return: Whether the MCP profile is valid
+        """
+        return self.accountId is not None and self.profile_type is not None
+
+    def __dict__(self) -> dict[str, Any]:
+        """
+        Get the dictionary of the MCP profile
+        :return: The dictionary of the MCP profile
+        """
+        return self.profile
+
+    def __getitem__(self, key: str) -> MCPItem:
+        return self.profile[key]
+
+    def __setitem__(self, key: str, value: MCPItem) -> None:
+        print(key, value)
+        setattr(self, key, value)
+
+    @property
+    def id(self) -> str:
+        """
+        Get the ID of the profile
+        :return: The ID of the profile
+        """
+        return self._id
+
+    @id.setter
+    def id(self, value: str) -> None:
+        """
+        Set the ID of the profile
+        :param value: The value to set the ID to
+        """
+        self._id = value
+
+    @property
+    def profile_type(self) -> str:
+        """
+        Get the profile type
+        :return: The profile type
+        """
+        return self._profile_type.value
+
+    @property
+    def profile(self) -> dict[str, Any]:
+        """
+        Get the profile
+        :return: The profile
+        """
+        return {
+            "_id": self._id,
+            "created": self.created,
+            "updated": self.updated,
+            "rvn": self.rvn,
+            "wipeNumber": self.wipeNumber,
+            "accountId": self.accountId,
+            "profileType": self.profile_type,
+            "version": self.version,
+            "items": self.items,
+            "stats": self.stats,
+            "commandRevision": self.commandRevision
+        }
+
+    @profile.setter
+    def profile(self, value: dict[str, Any]) -> None:
+        """
+        Set the profile
+        :param value: The value to set the profile to
+        """
+        self.updated = value.get("updated", self.updated)
+        self.rvn = value.get("rvn", self.rvn)
+        self.items = value.get("items", self.items)
+        self.stats = value.get("stats", self.stats)
+        self.commandRevision = value.get("commandRevision", self.commandRevision)
+
+    def get(self, key: str, default: Any = None) -> Any:
+        """
+        Get a value from the profile
+        :param key: The key to get the value from
+        :param default: The default value to return if the key doesn't exist
+        :return: The value from the profile
+        """
+        return self.profile.get(key, default)
+
+    async def load_profile(self) -> None:
+        """
+        Load the profile
+        """
+        # TODO: move to database
+        async with aiofiles.open(
+                f"res/wex/api/game/v2/profile/{self.accountId}/QueryProfile/{self.profile_type}.json",
+                "rb") as f:
+            profile: dict[str, str | int | dict] = orjson.loads(await f.read())
+        self._id: str = profile["_id"]
+        self.created: str = profile["created"]
+        self.updated: str = profile["updated"]
+        self.rvn: int = profile["rvn"]
+        self.wipeNumber: int = profile["wipeNumber"]
+        self.version: str = profile["version"]
+        self.items: dict[str, dict[str, dict[str, MCPItem]]] = profile["items"]
+        self.stats: dict[str, dict[str, MCPItem]] = profile["stats"]
+        self.commandRevision: int = profile["commandRevision"]
 
 
 class PlayerProfile:
@@ -76,67 +224,30 @@ class PlayerProfile:
         :param account_id: The account ID of the profile
         """
         self.account_id: str = account_id
-        self.friends = None
-        self.friends_changes = []
-        self.friends_notifications = []
-        self.levels = None
-        self.levels_changes = []
-        self.levels_notifications = []
-        self.monsterpit = None
-        self.monsterpit_changes = []
-        self.monsterpit_notifications = []
-        self.multiplayer = None
-        self.multiplayer_changes = []
-        self.multiplayer_notifications = []
-        self.profile0 = None
-        self.profile0_changes = []
-        self.profile0_notifications = []
-        self.profile_revisions: list[dict[str, str | int], dict[str, str | int], dict[str, str | int], dict[
-            str, str | int], dict[str, str | int]] | None = None
-        try:
-            asyncio.get_running_loop()
-            with ThreadPoolExecutor() as pool:
-                pool.submit(lambda: asyncio.run(self.load_profile())).result()
-        except RuntimeError:
-            asyncio.run(self.load_profile())
-
-    def __str__(self) -> str:
-        """
-        Return the account ID of the profile
-        :return: The account ID of the profile
-        """
-        return self.account_id
+        self.profile_revisions: list[
+            dict[str, str | int], dict[str, str | int], dict[str, str | int], dict[str, str | int], dict[
+                str, str | int]] = []
+        for profile_type in ProfileType:
+            mcp_profile: McpProfile = McpProfile(account_id, profile_type)
+            setattr(self, f"_{profile_type.value}", mcp_profile)
+            setattr(self, f"{profile_type.value}_changes", [])
+            setattr(self, f"{profile_type.value}_notifications", [])
+            self.profile_revisions.append(
+                {"profileId": profile_type.value, "clientCommandRevision": mcp_profile.commandRevision})
 
     def __repr__(self) -> str:
         """
         Return the account ID of the profile
         :return: The account ID of the profile
         """
-        return self.account_id
+        return f"<PlayerProfile account_id={self.account_id}>"
 
-    async def load_profile(self) -> None:
+    def __str__(self) -> str:
         """
-        Load the profile based on the account ID and setup the variables
-        :return: None
+        Return the account ID of the profile
+        :return: The account ID of the profile
         """
-        for filename in ProfileType:
-            async with aiofiles.open(
-                    f"res/wex/api/game/v2/profile/{self.account_id}/QueryProfile/{filename.value}.json", "rb") as file:
-                profile = orjson.loads(await file.read())
-            # Migrate the profile to the correct format
-            if profile.get("profileChanges") is not None:
-                profile = profile["profileChanges"][0]["profile"]
-                async with aiofiles.open(
-                        f"res/wex/api/game/v2/profile/{self.account_id}/QueryProfile/{filename.value}.json",
-                        "wb") as file:
-                    await file.write(orjson.dumps(profile))
-            setattr(self, filename.value, profile)
-        self.profile_revisions = [
-            {"profileId": "profile0", "clientCommandRevision": self.profile0["commandRevision"]},
-            {"profileId": "levels", "clientCommandRevision": self.levels["commandRevision"]},
-            {"profileId": "friends", "clientCommandRevision": self.friends["commandRevision"]},
-            {"profileId": "monsterpit", "clientCommandRevision": self.monsterpit["commandRevision"]},
-            {"profileId": "multiplayer", "clientCommandRevision": self.multiplayer["commandRevision"]}]
+        return self.__repr__()
 
     async def get_profile(self, profile_id: ProfileType = ProfileType.PROFILE0) -> dict:
         """
@@ -144,7 +255,7 @@ class PlayerProfile:
         :param profile_id: The profile ID to get
         :return: The profile data
         """
-        return getattr(self, profile_id.value)
+        return getattr(self, f"_{profile_id.value}")
 
     async def get_item_by_guid(self, guid: str, profile_id: ProfileType = ProfileType.PROFILE0) -> dict:
         """
@@ -197,8 +308,7 @@ class PlayerProfile:
                 guids.append(guid)
         return guids
 
-    async def get_stat(self, stat_name: str,
-                       profile_id: ProfileType = ProfileType.PROFILE0) -> str | int | float | dict | list:
+    async def get_stat(self, stat_name: str, profile_id: ProfileType = ProfileType.PROFILE0) -> MCPItem:
         """
         Get the specified stat from the profile
         :param stat_name: The name of the stat to get
@@ -207,7 +317,7 @@ class PlayerProfile:
         """
         return (await self.get_profile(profile_id)).get("stats").get("attributes").get(stat_name)
 
-    async def modify_stat(self, stat_name: str, new_value: str | int | dict | list | float,
+    async def modify_stat(self, stat_name: str, new_value: MCPItem,
                           profile_id: ProfileType = ProfileType.PROFILE0) -> None:
         """
         Modify the specified stat to the new value
@@ -233,7 +343,7 @@ class PlayerProfile:
         profile_changes.append({"changeType": "itemRemoved", "itemId": item_id})
         setattr(self, f"{profile_id.value}_changes", profile_changes)
 
-    async def change_item_attribute(self, item_id: str, attribute_name: str, new_value: str | int | dict | list | float,
+    async def change_item_attribute(self, item_id: str, attribute_name: str, new_value: MCPItem,
                                     profile_id: ProfileType = ProfileType.PROFILE0) -> None:
         """
         Change the specified attribute of the specified item to the new value
@@ -249,7 +359,7 @@ class PlayerProfile:
                                 "attributeValue": new_value})
         setattr(self, f"{profile_id.value}_changes", profile_changes)
 
-    async def add_item(self, item_data: dict, item_id: str | None = None,
+    async def add_item(self, item_data: dict, item_id: Optional[str] = None,
                        profile_id: ProfileType = ProfileType.PROFILE0) -> str:
         """
         Add the specified item to the profile
@@ -300,7 +410,7 @@ class PlayerProfile:
         setattr(self, f"{profile_id.value}_notifications", profile_notifications)
         return profile_notifications
 
-    async def clear_notifications(self, profile_id: ProfileType | None = None) -> None:
+    async def clear_notifications(self, profile_id: Optional[ProfileType] = None) -> None:
         """
         Clears notifications for the current account and profile
         :param profile_id: The ID of the profile to clear
@@ -311,7 +421,7 @@ class PlayerProfile:
         for p_type in profile_types:
             setattr(self, f"{p_type.value}_notifications", [])
 
-    async def flush_changes(self, profile_type: ProfileType | None = None) -> None:
+    async def flush_changes(self, profile_type: Optional[ProfileType] = None) -> None:
         """
         Apply all changes to the original profiles.
 
@@ -324,22 +434,24 @@ class PlayerProfile:
             for change in getattr(self, f"{p_type.value}_changes"):
                 change_type = change["changeType"]
                 if change_type == "statModified":
-                    profile["stats"]["attributes"][change["name"]] = change["value"]
+                    profile["stats"]["attributes"][change["name"]]: MCPItem = change["value"]
                 elif change_type == "itemRemoved":
                     del profile["items"][change["itemId"]]
                 elif change_type == "itemAttrChanged":
-                    profile["items"][change["itemId"]]["attributes"][change["attributeName"]] = change["attributeValue"]
+                    profile["items"][change["itemId"]]["attributes"][change["attributeName"]]: \
+                        MCPItem = change["attributeValue"]
                 elif change_type == "itemAdded":
-                    profile["items"][change["itemId"]] = change["item"]
+                    profile["items"][change["itemId"]]: MCPItem = change["item"]
                 elif change_type == "itemQuantityChanged":
-                    profile["items"][change["itemId"]]["quantity"] = change["quantity"]
-            setattr(self, f"{p_type.value}", profile)
+                    profile["items"][change["itemId"]]["quantity"]: MCPItem = change["quantity"]
+            setattr(self, f"_{p_type.value}", profile)
 
             # Clear the changes list for this profile
             setattr(self, f"{p_type.value}_changes", [])
 
     async def construct_response(self, profile_id: ProfileType = ProfileType.PROFILE0, rvn: int = -1,
-                                 client_command_revision: str | None = None, clear_notification: bool = False) -> dict:
+                                 client_command_revision: Optional[str] = None,
+                                 clear_notification: bool = False) -> dict:
         """
         Construct a response for the specified profile
         :param profile_id: The profile to construct a response for
@@ -433,7 +545,8 @@ class PlayerProfile:
 
         return response
 
-    async def bump_revision(self, profile_id: ProfileType = ProfileType.PROFILE0, response: dict | None = None) -> None:
+    async def bump_revision(self, profile_id: ProfileType = ProfileType.PROFILE0,
+                            response: Optional[dict] = None) -> None:
         """
         Bump the revision of the specified profile
         :param profile_id: The profile to bump the revision of

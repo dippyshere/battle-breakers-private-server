@@ -4,15 +4,18 @@ Please do not skid my hard work.
 https://github.com/dippyshere/battle-breakers-private-server
 This code is licensed under the [TBD] license.
 """
+from typing import Any
 
 from api import api
 from utils import utils, error_handler
+from utils.profile_system import McpProfile
 import middleware.mcp_middleware
 
 import orjson
 import sanic
 import sanic_ext
 import colorama
+
 
 try:
     import tomllib as toml
@@ -21,7 +24,21 @@ except ModuleNotFoundError:
 
 colorama.init()
 
-app = sanic.app.Sanic('dippy_breakers', dumps=orjson.dumps, loads=orjson.loads)
+
+def custom_serialise(obj: Any) -> dict[str, Any]:
+    """
+    Custom serialiser for orjson to handle the custom objects
+    :param obj: The object to serialize
+    :return: The serialisable object
+    """
+    if isinstance(obj, McpProfile):
+        return obj.profile
+    # Handle other custom serialization logic here
+    raise TypeError(f"Object of type '{obj.__class__.__name__}' is not JSON serializable")
+
+
+app = sanic.app.Sanic("dippy_breakers", dumps=lambda obj: orjson.dumps(obj, default=custom_serialise),
+                      loads=orjson.loads)
 app.config.CORS_ORIGINS = "*"
 app.config.CORS_ALWAYS_SEND = True
 app.blueprint(api)
