@@ -124,7 +124,6 @@ class McpProfile:
         return self.profile[key]
 
     def __setitem__(self, key: str, value: MCPItem) -> None:
-        print(key, value)
         setattr(self, key, value)
 
     @property

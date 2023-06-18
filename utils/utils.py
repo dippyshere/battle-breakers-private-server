@@ -13,7 +13,6 @@ import functools
 import os
 import random
 import re
-import traceback
 import uuid
 import zlib
 from inspect import isawaitable
@@ -304,9 +303,7 @@ async def verify_request_auth(request: sanic.request.Request, strict: bool = Fal
             return True
         else:
             return False
-    except Exception as e:
-        # print with traceback
-        traceback.print_exc()
+    except:
         return False
 
 
