@@ -126,6 +126,26 @@ async def cloudstorage_system_get_file(request: sanic.request.Request, filename:
     return sanic.response.raw(data, content_type="application/octet-stream")
 
 
+@wex_cloud.route("/api/cloudstorage/storage/<accountId>/info", methods=['GET'])
+@auth(strict=True)
+async def cloudstorage_storage_info(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+    """
+    Handles the cloudstorage storage info request
+    :param request: The request object
+    :param accountId: The account id
+    :return: The response object
+    """
+    total_used = 0
+    for file in os.listdir("res/wex/api/cloudstorage/user"):
+        data = await request.app.ctx.read_file(f"res/wex/api/cloudstorage/user/{file}")
+        total_used += len(data)
+    return sanic.response.json({
+        "accountId": accountId,
+        "totalStorage": 0,
+        "totalUsed": total_used
+    })
+
+
 @wex_cloud.route("/api/cloudstorage/user/<accountId>", methods=['GET'])
 @auth(strict=True)
 async def cloudstorage_user(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
@@ -182,4 +202,56 @@ async def cloudstorage_user_put_file(request: sanic.request.Request, accountId: 
     :param filename: The filename
     :return: The response object
     """
-    raise sanic.exceptions.SanicException("How about no", status_code=418)
+    raise sanic.exceptions.SanicException("How about no", status_code=400)
+
+
+@wex_cloud.route("/api/cloudstorage/user/config", methods=["GET"])
+@auth(allow_basic=True)
+@compress.compress()
+async def cloudstorage_user_config(request: sanic.request.Request) -> sanic.response.JSONResponse:
+    """
+    Handles the cloudstorage system configuration request
+    :param request: The request object
+    :return: The response object
+    """
+    return sanic.response.json({
+        "lastUpdated": await request.app.ctx.format_time(os.path.getmtime("api/wex/cloud_storage.py")),
+        "disableV2": False,
+        "isAuthenticated": True,
+        "enumerateFilesPath": "/api/cloudstorage/user",
+        "enableMigration": False,
+        "enableWrites": False,
+        "epicAppName": "Live",
+        "transports": {
+            "McpProxyTransport": {
+                "name": "McpProxyTransport",
+                "type": "ProxyStreamingFile",
+                "appName": "worldexplorers",
+                "isEnabled": False,
+                "isRequired": True,
+                "isPrimary": True,
+                "timeoutSeconds": 30,
+                "priority": 10
+            },
+            "McpSignatoryTransport": {
+                "name": "McpSignatoryTransport",
+                "type": "ProxySignatory",
+                "appName": "worldexplorers",
+                "isEnabled": False,
+                "isRequired": False,
+                "isPrimary": False,
+                "timeoutSeconds": 30,
+                "priority": 20
+            },
+            "DssDirectTransport": {
+                "name": "DssDirectTransport",
+                "type": "DirectDss",
+                "appName": "worldexplorers",
+                "isEnabled": True,
+                "isRequired": False,
+                "isPrimary": False,
+                "timeoutSeconds": 30,
+                "priority": 30
+            }
+        }
+    })
