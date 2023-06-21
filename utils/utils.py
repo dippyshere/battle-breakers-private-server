@@ -80,7 +80,7 @@ async def format_time(time: Optional[datetime.datetime | float | int | str] = No
     Formats the current time in the correct format for the MCP headers
 
     :param time: The time to format
-    :return: The formatted time string in the format of YYYY-MM-DDTHH:MM:SS.mmmZ
+    :return: The formatted time string in the format of YYYY-MM-DDTHH:MM:SS.mmmZ (ISO8601)
     """
     if time is None:
         return datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
