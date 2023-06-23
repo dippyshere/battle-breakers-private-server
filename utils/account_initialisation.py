@@ -68,6 +68,9 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
         "extra": {
             "pwhash": password,
             "deviceAuths": []
+        },
+        "metadata": {
+            "FGOnboarded": "true"
         }
     })
     # catalog service is shared
