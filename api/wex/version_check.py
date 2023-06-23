@@ -25,4 +25,8 @@ async def version_check(request: sanic.request.Request, platform: str) -> sanic.
     :param platform: The platform
     :return: The response object
     """
+    # We want to allow all clients to connect, regardless of platform or version
+    # If we wanted to force a specific version / platform, we would just check the version query parameter
+    # and return a SOFT_UPDATE for a content update, or a HARD_UPDATE for a client update
+    # The client supports NO_UPDATE, NOT_ENABLED, SOFT_UPDATE, HARD_UPDATE, APP_REDIRECT (mobile only)
     return sanic.response.json({"type": "NO_UPDATE"})

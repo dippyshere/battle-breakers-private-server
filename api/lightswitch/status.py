@@ -34,9 +34,9 @@ async def lightswitch_bulk(request: sanic.request.Request) -> sanic.response.JSO
     for service in service_id:
         services.append({
             "serviceInstanceId": service.lower(),
-            "status": "UP",
+            "status": "UP",  # "UP" for online, "DOWN" for maintenance, "RESTRICTED" for partial access
             "message": "Battle Breakers is back :D",
-            "maintenanceUri": "https://discord.gg/stw-dailies-757765475823517851",
+            "maintenanceUri": None,
             "overrideCatalogIds": ["ae402a2cb61b4c5fa199ce5311cca724"],
             "allowedActions": ["PLAY", "DOWNLOAD"],
             "banned": False,
@@ -45,7 +45,8 @@ async def lightswitch_bulk(request: sanic.request.Request) -> sanic.response.JSO
                 # not bothered / required to fix this for other services
                 "catalogItemId": "a53e821fbdc24181877243a8dbb63463",
                 "namespace": "wex"
-            }
+            },
+            "timeToShutdownInMs": -1
         })
     return sanic.response.json(services)
 
@@ -62,9 +63,9 @@ async def lightswitch_service(request: sanic.request.Request, serviceId: str) ->
     """
     return sanic.response.json([{
         "serviceInstanceId": serviceId.lower(),
-        "status": "UP",
+        "status": "UP",  # "UP" for online, "DOWN" for maintenance, "RESTRICTED" for partial access
         "message": "Battle Breakers is back :D",
-        "maintenanceUri": "https://discord.gg/stw-dailies-757765475823517851",
+        "maintenanceUri": None,
         "overrideCatalogIds": ["ae402a2cb61b4c5fa199ce5311cca724"],
         "allowedActions": ["PLAY", "DOWNLOAD"],
         "banned": False,
@@ -72,5 +73,6 @@ async def lightswitch_service(request: sanic.request.Request, serviceId: str) ->
             "appName": serviceId,
             "catalogItemId": "a53e821fbdc24181877243a8dbb63463",
             "namespace": "wex"
-        }
+        },
+        "timeToShutdownInMs": -1
     }])
