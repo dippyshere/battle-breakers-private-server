@@ -73,28 +73,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
     # catalog service is shared
     # initialise entitlement service
     # TODO: This could be hardcoded in the response if storage is an issue
-    await write_file(f"res/entitlement/api/account/{account_id}.json", [
-        {
-            "id": await token_generator(),
-            "entitlementName": "WorldExplorers_Free",
-            "namespace": "wex",
-            "catalogItemId": "e458e71024404176addca212860f9ef2",
-            "accountId": account_id,
-            "identityId": account_id,
-            "entitlementType": "AUDIENCE",
-            "grantDate": await format_time(),
-            "consumed": False,
-            "status": "ACTIVE",
-            "active": True,
-            "useCount": 0,
-            "originalUseCount": 0,
-            "platformType": "EPIC",
-            "created": "2019-11-08T10:47:00.476Z",
-            "updated": "2019-11-08T10:47:00.476Z",
-            "groupEntitlement": False,
-            "country": None
-        }
-    ])
+    await write_file(f"res/entitlement/api/account/{account_id}.json", [])
     # initialise friends service
     await write_file(f"res/friends/api/v1/{account_id}.json", {
         "friends": [],
