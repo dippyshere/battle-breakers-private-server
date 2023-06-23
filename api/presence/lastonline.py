@@ -6,9 +6,12 @@ This code is licensed under the [TBD] license.
 
 Handles the last online presence request
 """
+import os
 
 import sanic
 
+from utils.friend_system import PlayerFriends
+from utils.profile_system import ProfileType, PlayerProfile
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -19,7 +22,7 @@ lastonline = sanic.Blueprint("presence_lastonline")
 
 # undocumented
 @lastonline.route("/api/v1/_/<accountId>/last-online", methods=["GET"])
-@auth(allow_basic=True)
+@auth(strict=True)
 @compress.compress()
 async def last_online(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
     """
@@ -29,6 +32,20 @@ async def last_online(request: sanic.request.Request, accountId: str) -> sanic.r
     :param accountId: The account id
     :return: The response object
     """
-    return sanic.response.json({
-        accountId: [{"lastOnline": "2017-09-10T00:00:00.000Z"}]
-    })
+    if accountId not in request.app.ctx.friends:
+        request.app.ctx.friends[accountId] = PlayerFriends(accountId)
+    request.ctx.friends = request.app.ctx.friends[accountId]
+    accounts_list = os.listdir("res/account/api/public/account")
+    accounts_list = [account.split(".")[0] for account in accounts_list]
+    response = {}
+    for friend in (await request.ctx.friends.get_friends())["friends"]:
+        if friend["accountId"] in accounts_list:
+            if friend["accountId"] not in request.app.ctx.profiles:
+                request.app.ctx.profiles[friend["accountId"]] = PlayerProfile(friend["accountId"])
+            wex_data = await request.app.ctx.profiles[friend["accountId"]].get_profile(ProfileType.PROFILE0)
+            response[friend["accountId"]] = [
+                {
+                    "last_online": wex_data["updated"]
+                }
+            ]
+    return sanic.response.json(response)
