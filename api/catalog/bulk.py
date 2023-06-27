@@ -27,4 +27,5 @@ async def offers(request: sanic.request.Request) -> sanic.response.JSONResponse:
     :param request: The request object
     :return: The response object
     """
+    # Nothing changes for includemaingamedetails or includedlcdetails for bb
     return sanic.response.json(await request.app.ctx.read_file(f"res/catalog/api/shared/bulk/offers.json"))
