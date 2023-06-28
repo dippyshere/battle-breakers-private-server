@@ -72,9 +72,18 @@ async def version_route(request: sanic.request.Request) -> sanic.response.JSONRe
                 "GitPython": git.__version__,
                 "PyJWT": jwt.__version__,
                 "Orjson": orjson.__version__,
+                "Platform": f"{platform.python_implementation()} {platform.python_version()}",
                 "OS": f"{re.sub(r'-', ' ', platform.platform(aliased=True))}"
                       f" {platform.win32_edition() if platform.system() == 'Windows' else ''}",
+                "Distribution": f"{platform.linux_distribution() if platform.system() == 'Linux' else ''}",
                 "CPU": f"{cpu_info}",
+                "Architecture": f"{platform.machine()}",
+                "System": f"{platform.system()}",
+                "Release": f"{platform.release()}",
+                "Node": f"{platform.node()}",
+                "Processor": f"{platform.processor()}",
+                "Executable": f"{sys.executable}",
+                "Flags": f"{sys.flags}"
             }
         }
     })
