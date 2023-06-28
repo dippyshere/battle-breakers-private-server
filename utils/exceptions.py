@@ -6,7 +6,7 @@ This code is licensed under the [TBD] license.
 
 Error exceptions class for formatting error responses
 """
-from typing import Any, Union
+from typing import Any
 
 
 class EpicException(Exception):
@@ -21,9 +21,9 @@ class EpicException(Exception):
     intent: str = "prod"
     trackingId: str = None
     statusCode: int = 400
-    errorName: str = None
-    errorDescription: str = None
-    validationFailures: dict = None
+    error_description: str = None
+    error: str = None
+    validationFailures: dict[str, dict[str, str | dict[str, str]]] = None
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         if self.errorCode is None:
@@ -34,9 +34,9 @@ class EpicException(Exception):
             self.errorMessage: str = self.errorMessage.format(*args)
         if self.errorMessage:
             self.messageVars: list = list(args)
-        if self.errorName is None:
-            self.errorName: str = type(self).__name__
-        self.errorDescription: str = self.errorMessage
+        if self.error is None:
+            self.error: str = type(self).__name__
+        self.error_description: str = self.errorMessage
         super().__init__(self.errorMessage)
 
     # noinspection IncorrectFormatting
@@ -46,7 +46,7 @@ class EpicException(Exception):
             for attr, value in cls.__dict__.items():
                 if not callable(getattr(self, attr)) and getattr(self, attr, None) is not None and not attr.startswith(
                         "__") and attr != "args":
-                    error[attr]: Union[str, int, list] = getattr(self, attr)
+                    error[attr]: str | int | list | dict = getattr(self, attr)
         return error
 
     def __repr__(self) -> str:

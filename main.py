@@ -37,15 +37,15 @@ def custom_serialise(obj: Any) -> dict[str, Any]:
     raise TypeError(f"Object of type '{obj.__class__.__name__}' is not JSON serializable")
 
 
-app = sanic.app.Sanic("dippy_breakers", dumps=lambda obj: orjson.dumps(obj, default=custom_serialise),
-                      loads=orjson.loads)
+app: sanic.app.Sanic = sanic.app.Sanic("dippy_breakers", dumps=lambda obj: orjson.dumps(obj, default=custom_serialise),
+                                       loads=orjson.loads)
 app.config.CORS_ORIGINS = "*"
 app.config.CORS_ALWAYS_SEND = True
 app.blueprint(api)
 sanic_ext.Extend(app)
 
 with open("utils/config.toml", "rb") as config_file:
-    config = toml.load(config_file)
+    config: dict[str, Any] = toml.load(config_file)
     config_file.close()
 
 app.ctx.read_file = utils.read_file

@@ -11,13 +11,14 @@ import asyncio
 import uuid
 import enum
 from concurrent.futures.thread import ThreadPoolExecutor
-from typing import Any, Union, Optional, Type
+from types import UnionType
+from typing import Any, Optional
 
 import aiofiles
 import orjson
 import sanic
 
-MCPItem: Type = Union[str, int, float, list, dict, bool]
+MCPItem: UnionType = str | int | float | list | dict | bool
 
 
 class ProfileType(enum.Enum):
