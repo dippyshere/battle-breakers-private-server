@@ -78,7 +78,7 @@ class errors:
             Parent class for all Epic Games error classes
             """
             errorCode: str = "errors.com.epicgames."
-            errorMessage: str = "An error has occurred"
+            errorMessage: str = "There was an error"
 
             class account:
                 """
@@ -91,7 +91,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class account_created_but_banned(EpicException):
@@ -100,7 +100,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class account_creation_disabled(EpicException):
@@ -109,7 +109,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class account_locked(EpicException):
@@ -118,7 +118,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class account_locked_for_update(EpicException):
@@ -127,26 +127,26 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class account_not_active(EpicException):
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
-                    statusCode: int = 400
+                    errorMessage: str = "Sorry the account you are using is not active."
+                    numericErrorCode: int = 18006
+                    originatingService: str = "com.epicgames.account.public"
+                    statusCode: int = 401
 
                 class account_not_found(EpicException):
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
-                    statusCode: int = 400
+                    errorMessage: str = "Sorry, we couldn't find an account for {0}"
+                    numericErrorCode: int = 18007
+                    originatingService: str = "com.epicgames.account.public"
+                    statusCode: int = 404
 
                 class account_permission_not_found(EpicException):
                     """
@@ -154,7 +154,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class account_updated_but_banned(EpicException):
@@ -163,7 +163,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class address:
@@ -177,7 +177,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class auth_app:
@@ -191,7 +191,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class internal_client_forbidden(EpicException):
@@ -200,7 +200,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class not_authorized_for_account(EpicException):
@@ -209,7 +209,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class auth_token:
@@ -223,7 +223,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class invalid_platform_token(EpicException):
@@ -232,7 +232,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class invalid_refresh_token(EpicException):
@@ -241,7 +241,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class not_own_session_removal(EpicException):
@@ -250,7 +250,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class unknown_oauth_session(EpicException):
@@ -259,7 +259,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class unknown_oauth_session_refresh(EpicException):
@@ -268,7 +268,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class banned_by_whitelist_entry(EpicException):
@@ -277,7 +277,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class bulk_pwd_max_items_limit(EpicException):
@@ -286,7 +286,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class cannot_change_account_status(EpicException):
@@ -295,7 +295,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class client:
@@ -309,7 +309,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class client_secret_limit_exceeded(EpicException):
@@ -318,7 +318,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class client_secret_not_found(EpicException):
@@ -327,7 +327,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class duplicate_client(EpicException):
@@ -336,7 +336,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class duplicate_client_permission(EpicException):
@@ -345,7 +345,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class duplicate_client_permissions(EpicException):
@@ -354,7 +354,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class unknown_client(EpicException):
@@ -363,16 +363,16 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class client_disabled(EpicException):
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    errorMessage: str = "Sorry the client you are using has been disabled"
+                    numericErrorCode: int = 18014
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class client_locked_for_update(EpicException):
@@ -381,7 +381,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class client_missing_redirect_url(EpicException):
@@ -390,7 +390,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class country_unchanged(EpicException):
@@ -399,7 +399,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class device_auth:
@@ -413,17 +413,16 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class invalid_device_info(EpicException):
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
-                        statusCode: int = 400
+                        errorMessage: str = "Invalid device info JSON value"
+                        numericErrorCode: int = 18130
+                        originatingService: str = "com.epicgames.account.public"
 
                 class display_name_already_set(EpicException):
                     """
@@ -431,7 +430,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class display_name_change_timeframe(EpicException):
@@ -440,7 +439,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class display_name_was_used(EpicException):
@@ -449,7 +448,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class duplicate_account_permission(EpicException):
@@ -458,7 +457,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class duplicate_display_name(EpicException):
@@ -467,7 +466,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class duplicate_email(EpicException):
@@ -476,7 +475,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class duplicate_external_auth_type(EpicException):
@@ -485,7 +484,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class duplicate_username(EpicException):
@@ -494,7 +493,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class email:
@@ -508,7 +507,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class email_already_on_account(EpicException):
@@ -517,7 +516,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class email_change_timeframe(EpicException):
@@ -526,7 +525,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class email_code:
@@ -540,7 +539,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class code_not_found(EpicException):
@@ -549,7 +548,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class code_not_valid(EpicException):
@@ -558,7 +557,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class email_code_expired(EpicException):
@@ -567,7 +566,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class validation_code_not_found(EpicException):
@@ -576,7 +575,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class email_not_found(EpicException):
@@ -585,7 +584,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class ext_auth:
@@ -599,7 +598,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class invalid_cert(EpicException):
@@ -608,7 +607,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class invalid_external_auth_token(EpicException):
@@ -617,7 +616,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class invalid_token(EpicException):
@@ -625,9 +624,9 @@ class errors:
                         docstring
                         """
                         errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
-                        statusCode: int = 400
+                        numericErrorCode: int = 1014
+                        originatingService: str = "com.epicgames.account.public"
+                        statusCode: int = 403
 
                     class linking_restricted(EpicException):
                         """
@@ -635,7 +634,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class login_not_allowed(EpicException):
@@ -644,7 +643,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class missing_data(EpicException):
@@ -653,7 +652,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class missing_scope(EpicException):
@@ -662,7 +661,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class token_expired(EpicException):
@@ -671,7 +670,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class unknown_external_auth_type(EpicException):
@@ -680,7 +679,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class external_auth:
@@ -704,7 +703,7 @@ class errors:
                                     """
                                     errorMessage: str = "message"
                                     numericErrorCode: int = 0
-                                    originatingService: str = "WEX"
+                                    originatingService: str = "com.epicgames.account.public"
                                     statusCode: int = 400
 
                                 class last_trusted_ext_auth_google(EpicException):
@@ -713,7 +712,7 @@ class errors:
                                     """
                                     errorMessage: str = "message"
                                     numericErrorCode: int = 0
-                                    originatingService: str = "WEX"
+                                    originatingService: str = "com.epicgames.account.public"
                                     statusCode: int = 400
 
                                 class last_trusted_ext_auth_vk(EpicException):
@@ -722,7 +721,7 @@ class errors:
                                     """
                                     errorMessage: str = "message"
                                     numericErrorCode: int = 0
-                                    originatingService: str = "WEX"
+                                    originatingService: str = "com.epicgames.account.public"
                                     statusCode: int = 400
 
                 class external_auth_account_id_mismatch(EpicException):
@@ -731,7 +730,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class external_auth_not_found(EpicException):
@@ -740,7 +739,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class external_auth_restriction_not_found(EpicException):
@@ -749,7 +748,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class external_auth_validate_failed(EpicException):
@@ -758,7 +757,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class full_account_auth_data_required(EpicException):
@@ -767,35 +766,33 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class invalid_account_credentials(EpicException):
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    errorMessage: str = "Sorry the account credentials you are using are invalid"
+                    numericErrorCode: int = 18031
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class invalid_account_id_count(EpicException):
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
-                    statusCode: int = 400
+                    errorMessage: str = "Sorry, the number of account id should be at least one and not more than {0}."
+                    numericErrorCode: int = 18066
+                    originatingService: str = "com.epicgames.account.public"
 
                 class invalid_client_credentials(EpicException):
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
-                    statusCode: int = 400
+                    errorMessage: str = "Sorry the client credentials you are using are invalid"
+                    numericErrorCode: int = 18033
+                    originatingService: str = "com.epicgames.account.public"
 
                 class invalid_count(EpicException):
                     """
@@ -803,7 +800,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class invalid_start(EpicException):
@@ -812,7 +809,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class keyring(EpicException):
@@ -826,7 +823,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class key:
@@ -840,7 +837,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class merge:
@@ -854,7 +851,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class external_auth_conflict(EpicException):
@@ -863,7 +860,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class invalid_account_status(EpicException):
@@ -872,7 +869,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class invalid_apps(EpicException):
@@ -881,7 +878,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class not_internal_client(EpicException):
@@ -890,7 +887,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class source_account_not_headless(EpicException):
@@ -899,7 +896,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class metadata:
@@ -913,7 +910,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class metadata_key_not_found(EpicException):
@@ -922,7 +919,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class no_account_found_for_external_auth(EpicException):
@@ -931,7 +928,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class oauth:
@@ -945,25 +942,27 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class authorization_code_not_found(EpicException):
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        errorMessage: str = "Sorry the authorization code you supplied was not found. It is possible " \
+                                            "that it was no longer valid"
+                        numericErrorCode: int = 18059
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class authorization_pending(EpicException):
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        errorMessage: str = "The authorization server request is still pending as the end user has " \
+                                            "yet to visit and enter the verification code."
+                        numericErrorCode: int = 1012
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class code_not_valid_for_login_type(EpicException):
@@ -972,16 +971,17 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class exchange_code_not_found(EpicException):
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        errorMessage: str = "Sorry the exchange code you supplied was not found. It is possible that" \
+                                            " it was no longer valid"
+                        numericErrorCode: int = 18057
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class expired_authorization_code(EpicException):
@@ -990,35 +990,35 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class expired_exchange_code(EpicException):
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
-                        statusCode: int = 400
+                        errorMessage: str = "Sorry the exchange_code has expired."
+                        numericErrorCode: int = 18128
+                        originatingService: str = "com.epicgames.account.public"
+                        statusCode: int = 401
 
                     class expired_exchange_code_session(EpicException):
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
-                        statusCode: int = 400
+                        errorMessage: str = "Sorry the originating session for the exchange_code has expired."
+                        numericErrorCode: int = 18128
+                        originatingService: str = "com.epicgames.account.public"
+                        statusCode: int = 401
 
                     class missing_real_id_association(EpicException):
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
-                        statusCode: int = 400
+                        errorMessage: str = "Real ID association is required to proceed"
+                        numericErrorCode: int = 18109
+                        originatingService: str = "com.epicgames.account.public"
+                        statusCode: int = 403
 
                     class parental_control(EpicException):
                         """
@@ -1031,7 +1031,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "com.epicgames.account.public"
                             statusCode: int = 400
 
                     class password_reset_required(EpicException):
@@ -1040,7 +1040,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class single_use_code_expired(EpicException):
@@ -1049,7 +1049,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class single_use_code_not_found(EpicException):
@@ -1058,7 +1058,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class token_exchange_not_allowed(EpicException):
@@ -1067,17 +1067,18 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class too_many_sessions(EpicException):
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
-                        statusCode: int = 400
+                        errorMessage: str = "Sorry too many sessions have been issued for your account. Please try " \
+                                            "again later"
+                        numericErrorCode: int = 18048
+                        originatingService: str = "com.epicgames.account.public"
+                        statusCode: int = 403
 
                 class old_password_reuse(EpicException):
                     """
@@ -1085,7 +1086,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class password_required(EpicException):
@@ -1094,7 +1095,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class real_id(EpicException):
@@ -1108,7 +1109,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class remove_default_email(EpicException):
@@ -1117,7 +1118,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class role:
@@ -1131,7 +1132,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class duplicate_role_mapping(EpicException):
@@ -1140,7 +1141,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class invalid_role_assignment(EpicException):
@@ -1149,7 +1150,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class role_in_use_cannot_be_deleted(EpicException):
@@ -1158,7 +1159,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class role_not_found(EpicException):
@@ -1167,7 +1168,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class role_permission_not_deleted_not_found(EpicException):
@@ -1176,7 +1177,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class role_locked_for_delete(EpicException):
@@ -1185,7 +1186,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class role_locked_for_update(EpicException):
@@ -1194,7 +1195,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class sdn:
@@ -1208,7 +1209,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class disabled(EpicException):
@@ -1217,7 +1218,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class link_github_failed(EpicException):
@@ -1226,7 +1227,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class sync_failed(EpicException):
@@ -1235,7 +1236,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class update_failed_due_to_sdn(EpicException):
@@ -1244,7 +1245,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class update_not_allowed(EpicException):
@@ -1253,7 +1254,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class single_use_password:
@@ -1267,7 +1268,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class not_found(EpicException):
@@ -1276,25 +1277,27 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class throttled(EpicException):
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
-                    statusCode: int = 400
+                    errorMessage: str = "Operation access is limited by throttling policy, please try again in {0} " \
+                                        "second(s)."
+                    numericErrorCode: int = 1041
+                    originatingService: str = "com.epicgames.account.public"
+                    statusCode: int = 429
 
                 class token_account_id_does_not_match_url_accountId(EpicException):
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    errorMessage: str = "The accountId supplied in the url does not match the accountId for the " \
+                                        "OAuth token."
+                    numericErrorCode: int = 18055
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class white_list:
@@ -1308,7 +1311,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class white_list_entry_not_found(EpicException):
@@ -1317,7 +1320,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class xbl:
@@ -1331,7 +1334,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class invalid_token_date(EpicException):
@@ -1340,7 +1343,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
             class bad_request(EpicException):
@@ -1529,10 +1532,9 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
-                    redemptionCode: str = None
+                    errorMessage: str = "Code used; code:{0}"
+                    numericErrorCode: int = 19010
+                    originatingService: str = "com.epicgames.coderedemption.public"
                     statusCode: int = 400
 
             class common:
@@ -1563,10 +1565,9 @@ class errors:
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
-                        statusCode: int = 400
+                        errorMessage: str = "Authentication failed for {0}"
+                        numericErrorCode: int = 1032
+                        statusCode: int = 401
 
                     class invalid_client_service(EpicException):
                         """
@@ -1581,8 +1582,8 @@ class errors:
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
+                        errorMessage: str = "Sorry we couldn't validate your token {0}. Please try with a new token."
+                        numericErrorCode: int = 1031
                         originatingService: str = "WEX"
                         statusCode: int = 400
 
@@ -1644,46 +1645,65 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
-                    statusCode: int = 400
+                    errorMessage: str = "Json mapping failed."
+                    numericErrorCode: int = 1019
 
                 class json_parse_error(EpicException):
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
-                    statusCode: int = 400
+                    errorMessage: str = "Json parse failed."
+                    numericErrorCode: int = 1019
 
                 class json_payload_required(EpicException):
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
-                    statusCode: int = 400
+                    errorMessage: str = "Json payload is required."
+                    numericErrorCode: int = 1020
 
                 class method_not_allowed(EpicException):
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
+                    errorMessage: str = "Sorry the resource you were trying to access cannot be accessed with the " \
+                                        "HTTP method you used."
+                    numericErrorCode: int = 1009
                     originatingService: str = "WEX"
-                    statusCode: int = 400
+                    statusCode: int = 405
 
                 class missing_permission(EpicException):
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
-                    statusCode: int = 400
+                    errorMessage: str = "Sorry your login does not posses the permissions '{0} {1}' needed to " \
+                                        "perform the requested operation"
+                    numericErrorCode: int = 1023
+                    statusCode: int = 403
+
+                class missing_action(EpicException):
+                    """
+                    docstring
+                    """
+                    errorMessage: str = "Login is banned or does not posses the action '{0}' needed to perform the " \
+                                        "requested operation for platform '{1}'"
+                    numericErrorCode: int = 1023
+                    statusCode: int = 403
+
+                class mongo_execution_timeout_error(EpicException):
+                    """
+                    docstring
+                    """
+                    errorMessage: str = "Sorry, there was a timeout utilizing the database."
+                    numericErrorCode: int = 1045
+
+                class not_found(EpicException):
+                    """
+                    docstring
+                    """
+                    errorMessage: str = "Sorry the resource you were trying to find could not be found"
+                    numericErrorCode: int = 1004
+                    statusCode: int = 404
 
                 class oauth:
                     """
@@ -1694,10 +1714,9 @@ class errors:
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
-                        statusCode: int = 400
+                        errorMessage: str = "Sorry the client credentials you are using are invalid"
+                        numericErrorCode: int = 18033
+                        originatingService: str = "com.epicgames.account.public"
 
                     class invalid_grant(EpicException):
                         """
@@ -1739,18 +1758,18 @@ class errors:
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        errorMessage: str = "Sorry your client is not allowed to use the grant type token_to_token"
+                        numericErrorCode: int = 1015
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                     class unsupported_grant_type(EpicException):
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        errorMessage: str = "Sorry, your client does not have the proper grant_type for access."
+                        numericErrorCode: int = 1016
+                        originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
 
                 class oauth_account_authentication_required(EpicException):
@@ -1759,7 +1778,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class oauth_authentication_required(EpicException):
@@ -1768,7 +1787,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
 
                 class request_not_acceptable(EpicException):
@@ -1784,10 +1803,9 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
-                    originatingService: str = "WEX"
-                    statusCode: int = 400
+                    errorMessage: str = "Server have no capacity to serve request for API group {0}."
+                    numericErrorCode: int = 1041
+                    statusCode: int = 429
 
                 class timeout(EpicException):
                     """
@@ -1974,10 +1992,10 @@ class errors:
                 """
                 docstring
                 """
-                errorMessage: str = "message"
-                numericErrorCode: int = 0
-                originatingService: str = "WEX"
-                statusCode: int = 400
+                errorMessage: str = "Sorry your login does not posses the permissions '{0} {1}' needed to " \
+                                    "perform the requested operation"
+                numericErrorCode: int = 1023
+                statusCode: int = 403
 
             class friends:
                 """
@@ -2302,10 +2320,8 @@ class errors:
                             """
                             docstring
                             """
-                            errorMessage: str = "message"
-                            numericErrorCode: int = 0
-                            originatingService: str = "WEX"
-                            statusCode: int = 400
+                            errorMessage: str = "Unable to decrypt verification result: [{0}] by reason of : [{1}]"
+                            numericErrorCode: int = 43001
 
                         class invalid_birthday(EpicException):
                             """
@@ -2356,10 +2372,10 @@ class errors:
                             """
                             docstring
                             """
-                            errorMessage: str = "message"
-                            numericErrorCode: int = 0
-                            originatingService: str = "WEX"
-                            statusCode: int = 400
+                            errorMessage: str = "Sorry an error occurred and we were unable to resolve it (tracking " \
+                                                "id: [{0}])"
+                            numericErrorCode: int = 1000
+                            statusCode: int = 500
 
                     class timetable:
                         """
@@ -2434,6 +2450,19 @@ class errors:
                             originatingService: str = "WEX"
                             statusCode: int = 400
 
+            class launcher:
+                """
+                docstring
+                """
+
+                class not_entitled(EpicException):
+                    """
+                    docstring
+                    """
+                    errorMessage: str = "missing entitlement."
+                    numericErrorCode: int = 30000
+                    originatingService: str = "launcher-service"
+
             class links:
                 """
                 docstring
@@ -2498,6 +2527,15 @@ class errors:
                         numericErrorCode: int = 0
                         originatingService: str = "WEX"
                         statusCode: int = 400
+
+                    class purchase_not_allowed(EpicException):
+                        """
+                        docstring
+                        """
+                        errorMessage: str = "Could not purchase catalog offer {0}, item {1} x {2} (exceeding the " \
+                                            "limit of {3})"
+                        numericErrorCode: int = 28004
+                        originatingService: str = "WEX"
 
                     class validation_info_expired(EpicException):
                         """
@@ -2590,19 +2628,17 @@ class errors:
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
+                        errorMessage: str = "Unable to parse command {0}. {1}"
+                        numericErrorCode: int = 12806
                         originatingService: str = "WEX"
-                        statusCode: int = 400
 
                     class invalid_profile_command(EpicException):
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
+                        errorMessage: str = "{0} is not valid on {1} profiles ({2})"
+                        numericErrorCode: int = 12801
                         originatingService: str = "WEX"
-                        statusCode: int = 400
 
                     class invalid_profile_id_param(EpicException):
                         """
@@ -2617,10 +2653,9 @@ class errors:
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
+                        errorMessage: str = "Operation {0} not found"
+                        numericErrorCode: int = 12813
                         originatingService: str = "WEX"
-                        statusCode: int = 400
 
                     class profile_not_found(EpicException):
                         """
@@ -2644,10 +2679,9 @@ class errors:
                 """
                 docstring
                 """
-                errorMessage: str = "message"
-                numericErrorCode: int = 0
-                originatingService: str = "WEX"
-                statusCode: int = 400
+                errorMessage: str = "Sorry the resource you were trying to find could not be found"
+                numericErrorCode: int = 1004
+                statusCode: int = 404
 
             class ogf:
                 """
@@ -3275,7 +3309,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class bad_request:
@@ -3289,7 +3323,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                     class conflict:
@@ -3303,7 +3337,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class subscriptions_limit_reached(EpicException):
@@ -3312,7 +3346,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                     class execution_failed(EpicException):
@@ -3321,7 +3355,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class forbidden:
@@ -3335,7 +3369,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class activity_access_forbidden(EpicException):
@@ -3344,7 +3378,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class channel_post_forbidden(EpicException):
@@ -3353,7 +3387,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class delete_non_post_activity_forbidden(EpicException):
@@ -3362,7 +3396,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class delete_post_forbidden(EpicException):
@@ -3371,7 +3405,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class own_channel_unsubscription_forbidden(EpicException):
@@ -3380,7 +3414,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                     class friend_not_found(EpicException):
@@ -3389,7 +3423,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class friendship_exist(EpicException):
@@ -3398,7 +3432,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class invalid_arguments(EpicException):
@@ -3407,7 +3441,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class invalid_credential(EpicException):
@@ -3416,7 +3450,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class not_found(EpicException):
@@ -3425,7 +3459,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                         class activity_not_found(EpicException):
@@ -3434,7 +3468,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class subscription_not_found(EpicException):
@@ -3443,7 +3477,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class unknown_channel(EpicException):
@@ -3452,7 +3486,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                 class group:
@@ -3471,7 +3505,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                 class groups:
@@ -3490,7 +3524,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class user_not_identified(EpicException):
@@ -3499,7 +3533,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                     class conflict:
@@ -3513,7 +3547,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class concurrent_group_details_modification(EpicException):
@@ -3522,7 +3556,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class concurrent_job_modification(EpicException):
@@ -3531,7 +3565,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class concurrent_member_info_modification(EpicException):
@@ -3540,7 +3574,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class concurrent_metadata_modification(EpicException):
@@ -3549,7 +3583,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class concurrent_profile_modification(EpicException):
@@ -3558,7 +3592,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class duplicate_name(EpicException):
@@ -3567,7 +3601,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class existing_member(EpicException):
@@ -3576,7 +3610,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class headcount_limit_exceeded(EpicException):
@@ -3585,7 +3619,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class invite_only_group(EpicException):
@@ -3594,7 +3628,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class membership_limit_exceeded(EpicException):
@@ -3603,7 +3637,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class pending_application(EpicException):
@@ -3612,7 +3646,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class pending_invitation(EpicException):
@@ -3621,7 +3655,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                     class forbidden:
@@ -3635,7 +3669,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class job_state(EpicException):
@@ -3644,7 +3678,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class private_group(EpicException):
@@ -3653,7 +3687,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                     class not_found:
@@ -3667,7 +3701,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class application(EpicException):
@@ -3676,7 +3710,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class block(EpicException):
@@ -3685,7 +3719,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class group(EpicException):
@@ -3694,7 +3728,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class invitation(EpicException):
@@ -3703,7 +3737,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class member(EpicException):
@@ -3712,7 +3746,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                         class metadata(EpicException):
@@ -3721,7 +3755,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                 class party(EpicException):
@@ -3730,7 +3764,7 @@ class errors:
                     """
                     errorMessage: str = "message"
                     numericErrorCode: int = 0
-                    originatingService: str = "WEX"
+                    originatingService: str = "party"
                     statusCode: int = 400
 
                     class account_not_found(EpicException):
@@ -3739,7 +3773,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class appid_does_not_match(EpicException):
@@ -3748,7 +3782,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class applicant_not_found(EpicException):
@@ -3757,7 +3791,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class connection_not_found(EpicException):
@@ -3766,7 +3800,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class invalid_connection_offline_ttl(EpicException):
@@ -3775,7 +3809,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class invite_already_exists(EpicException):
@@ -3784,7 +3818,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class invite_forbidden(EpicException):
@@ -3793,7 +3827,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class invite_not_found(EpicException):
@@ -3802,7 +3836,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class invite_status_change_forbidden(EpicException):
@@ -3811,7 +3845,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class member_not_found(EpicException):
@@ -3820,7 +3854,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class member_state_change_forbidden(EpicException):
@@ -3829,7 +3863,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class party_change_forbidden(EpicException):
@@ -3838,7 +3872,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class party_is_full(EpicException):
@@ -3847,16 +3881,16 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class party_join_forbidden(EpicException):
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        errorMessage: str = "The user {0} has no right to join party {1}."
+                        numericErrorCode: int = 51006
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class party_not_found(EpicException):
@@ -3865,7 +3899,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class party_query_forbidden(EpicException):
@@ -3874,7 +3908,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class ping_forbidden(EpicException):
@@ -3883,7 +3917,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class ping_not_found(EpicException):
@@ -3892,7 +3926,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class response:
@@ -3906,7 +3940,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
                     class self_ping(EpicException):
@@ -3915,7 +3949,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class stale_revision(EpicException):
@@ -3924,7 +3958,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class too_many_connections(EpicException):
@@ -3933,7 +3967,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class user_already_in_party(EpicException):
@@ -3942,16 +3976,16 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class user_has_no_party(EpicException):
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
+                        errorMessage: str = "User [{0}] is already in a party with deployment id [{1}]."
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class user_has_party(EpicException):
@@ -3960,17 +3994,16 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                     class user_is_offline(EpicException):
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
-                        numericErrorCode: int = 0
-                        originatingService: str = "WEX"
-                        statusCode: int = 400
+                        errorMessage: str = "User [{0}] is offline."
+                        numericErrorCode: int = 51024
+                        originatingService: str = "party"
 
                     class user_operation_forbidden(EpicException):
                         """
@@ -3978,7 +4011,7 @@ class errors:
                         """
                         errorMessage: str = "message"
                         numericErrorCode: int = 0
-                        originatingService: str = "WEX"
+                        originatingService: str = "party"
                         statusCode: int = 400
 
                 class repolink:
@@ -3997,7 +4030,7 @@ class errors:
                             """
                             errorMessage: str = "message"
                             numericErrorCode: int = 0
-                            originatingService: str = "WEX"
+                            originatingService: str = "party"
                             statusCode: int = 400
 
             class unauthorized(EpicException):
@@ -4014,20 +4047,14 @@ class errors:
                 An unknown error has occurred
                 """
                 errorMessage: str = "An unknown server error has occurred. Please report to admin."
-                errorName: str = "UnknownError"
-                originatingService: str = None
                 intent: str = None
-                statusCode: int = 400
 
                 class v2(EpicException):
                     """
                     An unknown error has occurred
                     """
                     errorMessage: str = "An unknown server error has occurred. Please report to admin."
-                    errorName: str = "UnknownError"
-                    originatingService: str = None
                     intent: str = None
-                    statusCode: int = 400
 
             class unsupported_media_type(EpicException):
                 """
@@ -4049,7 +4076,6 @@ class errors:
                     """
                     errorMessage: str = "Validation Failed. Invalid fields were {0}"
                     numericErrorCode: int = 1040
-                    statusCode: int = 400
                     validationFailures: dict = {}
 
             class world_explorers:
@@ -4065,6 +4091,14 @@ class errors:
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
+
+                class banned_access_found_when_granting(EpicException):
+                    """
+                    docstring
+                    """
+                    errorMessage: str = "Client requested access grant but has banned access entitlement."
+                    numericErrorCode: int = 16156
+                    originatingService: str = "WEX"
 
                 class friend_limit_exceeded(EpicException):
                     """
