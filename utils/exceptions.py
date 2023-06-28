@@ -13,6 +13,9 @@ class EpicException(Exception):
     """
     The base exception class for all Epic exceptions
     """
+
+    _quiet: bool = True
+
     errorCode: str = None
     errorMessage: str = None
     messageVars: list = []
@@ -45,7 +48,7 @@ class EpicException(Exception):
         for cls in reversed(self.__class__.__mro__):
             for attr, value in cls.__dict__.items():
                 if not callable(getattr(self, attr)) and getattr(self, attr, None) is not None and not attr.startswith(
-                        "__") and attr != "args":
+                        "_") and attr not in ["args", "quiet"]:
                     error[attr]: str | int | list | dict = getattr(self, attr)
         return error
 
@@ -61,6 +64,14 @@ class EpicException(Exception):
         Returns the exception as a dictionary
         """
         return self.__dict__()
+
+    @property
+    def quiet(self) -> bool:
+        """
+        Returns whether the exception should be quiet or not
+        :return: Whether the exception should be quiet or not
+        """
+        return self._quiet
 
 
 class errors:
@@ -464,7 +475,7 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
+                    errorMessage: str = "This Name is already taken."
                     numericErrorCode: int = 0
                     originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 400
@@ -1350,8 +1361,8 @@ class errors:
                 """
                 docstring
                 """
-                errorMessage: str = "message"
-                numericErrorCode: int = 0
+                errorMessage: str = "Sorry the request you made was invalid"
+                numericErrorCode: int = 1006
                 originatingService: str = "WEX"
                 statusCode: int = 400
 
@@ -2495,6 +2506,15 @@ class errors:
                 originatingService: str = "WEX"
                 statusCode: int = 400
 
+                class no_service_permissions(EpicException):
+                    """
+                    dosctring
+                    """
+                    errorMessage: str = "Unable to find service permissions for server."
+                    numericErrorCode: int = 0
+                    originatingService: str = "WEX"
+                    statusCode: int = 400
+
             class modules:
                 """
                 docstring
@@ -2509,7 +2529,7 @@ class errors:
                         """
                         docstring
                         """
-                        errorMessage: str = "message"
+                        errorMessage: str = "Insufficient materials to foil this character."
                         numericErrorCode: int = 0
                         originatingService: str = "WEX"
                         statusCode: int = 400
@@ -4087,8 +4107,8 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
+                    errorMessage: str = "Does not meet minimum requirements."
+                    numericErrorCode: int = 92014
                     originatingService: str = "WEX"
                     statusCode: int = 400
 
@@ -4104,7 +4124,7 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
+                    errorMessage: str = "You've exceeded your friend limit."
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
@@ -4113,7 +4133,8 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
+                    errorMessage: str = "Unable load level due to missing Friend Commander, perhaps they unfriended " \
+                                        "you?"
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
@@ -4122,7 +4143,7 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
+                    errorMessage: str = "You already have another level in progress."
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
@@ -4131,7 +4152,7 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
+                    errorMessage: str = "Mcp does not recognize this level."
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
@@ -4140,7 +4161,7 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
+                    errorMessage: str = "You do not meet the requirements to play this level."
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
@@ -4149,8 +4170,8 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
-                    numericErrorCode: int = 0
+                    errorMessage: str = "{0} day login reward not available until {1}"
+                    numericErrorCode: int = 92030
                     originatingService: str = "WEX"
                     statusCode: int = 400
 
@@ -4158,7 +4179,8 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
+                    errorMessage: str = "A content update is required before starting a mew level. May we apply it " \
+                                        "meow?"
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
@@ -4167,7 +4189,7 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
+                    errorMessage: str = "Opponent has not joined matchmaking yet"
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
@@ -4176,7 +4198,7 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
+                    errorMessage: str = "You do not have enough energy to play this level."
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
@@ -4185,7 +4207,8 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
+                    # We're sorry, but we were unable to sell your item as it was not found in your inventory.
+                    errorMessage: str = "Sorry, we were unable to find any friends with that search criteria"
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
@@ -4194,7 +4217,8 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
+                    errorMessage: str = "You have too many heroes in your inventory. Please remove some before " \
+                                        "attempting to play this level."
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
@@ -4203,10 +4227,18 @@ class errors:
                     """
                     docstring
                     """
-                    errorMessage: str = "message"
+                    errorMessage: str = "Unable to purchase {0} x +{1} limit increase. This would exceed the max of {2}"
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
+
+                class service_not_required(EpicException):
+                    """
+                    docstring
+                    """
+                    errorMessage: str = "Already joined matchmaking."
+                    numericErrorCode: int = 92006
+                    originatingService: str = "WEX"
 
             class xmpp:
                 """
