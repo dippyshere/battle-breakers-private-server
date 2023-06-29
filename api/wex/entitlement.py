@@ -120,6 +120,14 @@ async def real_game_access(request: sanic.request.Request, accountId: str) -> sa
     This endpoint is used for something, who knows
     :param request: The request object
     :param accountId: The account id
-    :return: The response object (204)
+    :return: The response object
     """
-    return sanic.response.empty()
+    entitlements = await request.app.ctx.read_file(f"res/entitlement/api/account/{request.ctx.owner}.json")
+    for entitlement in entitlements:
+        if entitlement.get("catalogItemId") == "e458e71024404176addca212860f9ef2":
+            return sanic.response.json({
+                "play": True,
+                "isBanned": False,
+            })
+    # TODO: Check for bans
+    raise errors.com.epicgames.common.missing_action("PLAY")
