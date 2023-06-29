@@ -9,6 +9,7 @@ Handles level abandon/exit profile mcp
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -28,4 +29,4 @@ async def roll_hammer_chests(request: sanic.request.Request, accountId: str) -> 
     :param accountId: The account id
     :return: The modified profile
     """
-    raise sanic.exceptions.SanicException("Not implemented", 501, quiet=True)
+    raise errors.com.epicgames.service_unavailable()

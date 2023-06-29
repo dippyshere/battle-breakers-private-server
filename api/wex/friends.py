@@ -9,6 +9,7 @@ Handles the manifest
 import aiofiles
 import sanic
 
+from utils.exceptions import errors
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -26,3 +27,4 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
     :return: The response object
     """
     # TODO: Implement this
+    raise errors.com.epicgames.service_unavailable()

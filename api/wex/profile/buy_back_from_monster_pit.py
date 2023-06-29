@@ -9,6 +9,7 @@ Handles monster pit buy back
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -29,4 +30,4 @@ async def buy_back_from_monster_pit(request: sanic.request.Request, accountId: s
     :return: The modified profile
     """
     # TODO: Buy back from monster pit
-    raise sanic.exceptions.SanicException("Not implemented", 501, quiet=True)
+    raise errors.com.epicgames.service_unavailable()

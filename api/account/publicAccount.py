@@ -10,6 +10,7 @@ import urllib.parse
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -59,10 +60,7 @@ async def account_displayname(request: sanic.request.Request, displayName: str) 
     displayName = urllib.parse.unquote(displayName)
     requested_id = await request.app.ctx.get_account_id_from_display_name(displayName)
     if requested_id is None:
-        raise sanic.exceptions.NotFound(f"{displayName}", context={
-            "errorCode": "errors.com.epicgames.account.account_not_found",
-            "errorMessage": f"Sorry, we couldn't find an account for {displayName}",
-            "numericErrorCode": 18007})
+        raise errors.com.epicgames.account.account_not_found(displayName)
     account_info = await request.app.ctx.read_file(f"res/account/api/public/account/{requested_id}.json")
     if requested_id == request.ctx.owner:
         return sanic.response.json({
@@ -113,10 +111,7 @@ async def account_email(request: sanic.request.Request, email: str) -> sanic.res
     """
     requested_id = await request.app.ctx.get_account_id_from_email(email)
     if requested_id is None:
-        raise sanic.exceptions.NotFound(f"{email}", context={
-            "errorCode": "errors.com.epicgames.account.account_not_found",
-            "errorMessage": f"Sorry, we couldn't find an account for {email}",
-            "numericErrorCode": 18007})
+        raise errors.com.epicgames.account.account_not_found(email)
     account_info = await request.app.ctx.read_file(f"res/account/api/public/account/{requested_id}.json")
     if requested_id == request.ctx.owner:
         return sanic.response.json({

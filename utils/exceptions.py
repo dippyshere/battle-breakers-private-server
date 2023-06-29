@@ -3226,7 +3226,7 @@ class errors:
                     Parent class for gameaccess errors
                     *errors.com.epicgames.oss.gameaccess*
                     """
-                    errorMessage: str = "An error occurred with gameaccess while processing your request."
+                    errorMessage: str = "You do not have permission to access this game."
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400

@@ -9,6 +9,7 @@ Handles generating a match with a friend for a profile.
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -28,4 +29,4 @@ async def generate_match_with_friend(request: sanic.request.Request, accountId: 
     :param accountId: The account id
     :return: The modified profile
     """
-    raise sanic.exceptions.SanicException("Not implemented", 501, quiet=True)
+    raise errors.com.epicgames.service_unavailable()

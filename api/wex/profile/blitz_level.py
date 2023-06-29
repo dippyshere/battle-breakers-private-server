@@ -9,6 +9,7 @@ Handles level blitz for burny mines
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -29,4 +30,4 @@ async def blitz_level(request: sanic.request.Request, accountId: str) -> sanic.r
     :return: The modified profile
     """
     # TODO: Blitz level
-    raise sanic.exceptions.SanicException("Not implemented", 501, quiet=True)
+    raise errors.com.epicgames.service_unavailable()

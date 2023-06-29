@@ -9,6 +9,7 @@ Handles the manifest
 import aiofiles
 import sanic
 
+from utils.exceptions import errors
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -53,4 +54,4 @@ async def wex_cloudv3_manifests(request: sanic.request.Request, manifest: str) -
         async with aiofiles.open(f"res/wex/api/game/v2/manifests/CL_{changelist}/{manifest}", "rb") as file:
             return sanic.response.raw(await file.read(), content_type="text/text")
     except:
-        raise sanic.exceptions.FileNotFound("Manifest not found")
+        raise errors.com.epicgames.common.not_found()

@@ -9,6 +9,7 @@ Handles the motd of old versions
 
 import sanic
 
+from utils.exceptions import errors
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -24,4 +25,4 @@ async def motd(request: sanic.request.Request) -> sanic.response.HTTPResponse:
     :param request: The request object
     :return: The response object
     """
-    raise sanic.exceptions.SanicException("Not implemented", 501, quiet=True)
+    raise errors.com.epicgames.service_unavailable()

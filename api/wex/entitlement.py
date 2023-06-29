@@ -9,6 +9,7 @@ Handles entitlement check
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 wex_entitlement = sanic.Blueprint("wex_entitlement")
@@ -27,8 +28,7 @@ async def entitlement_check(request: sanic.request.Request) -> sanic.response.HT
     for entitlement in entitlements:
         if entitlement.get("catalogItemId") == "e458e71024404176addca212860f9ef2":
             return sanic.response.empty()
-    raise sanic.exceptions.Forbidden(context={"errorCode": "errors.com.epicgames.common.missing_permission",
-                                              "errorMessage": "You do not have access to this game."})
+    raise errors.com.epicgames.oss.gameaccess()
 
 
 @wex_entitlement.route("/api/storeaccess/v1/request_access/<accountId>", methods=["POST"])
@@ -66,6 +66,8 @@ async def request_access(request: sanic.request.Request, accountId: str) -> sani
     })
     await request.app.ctx.write_file(f"res/entitlement/api/account/{request.ctx.owner}.json", entitlements)
     return sanic.response.empty()
+    # TODO Check for bans
+    # raise errors.com.epicgames.world_explorers.banned_access_found_when_granting()
 
 
 @wex_entitlement.route("/api/storeaccess/v1/redeem_access/<accountId>", methods=["POST"])
@@ -103,6 +105,8 @@ async def redeem_access(request: sanic.request.Request, accountId: str) -> sanic
     })
     await request.app.ctx.write_file(f"res/entitlement/api/account/{request.ctx.owner}.json", entitlements)
     return sanic.response.empty()
+    # TODO Check for bans
+    # raise errors.com.epicgames.world_explorers.banned_access_found_when_granting()
 
 
 @wex_entitlement.route("/api/accesscontrol/status", methods=["GET"])

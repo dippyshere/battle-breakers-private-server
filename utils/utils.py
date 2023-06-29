@@ -26,6 +26,8 @@ import aiofiles
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
 from cryptography.hazmat.backends import default_backend
 
+from utils.exceptions import errors
+
 # Load the private key
 with open('utils/crypto/bb_private_key.pem', 'rb') as f:
     private_key_data = f.read()
@@ -294,8 +296,7 @@ async def verify_request_auth(request: sanic.request.Request, strict: bool = Fal
             token = jwt.decode(token, public_key, algorithms=["RS256"], leeway=20)
             if strict:
                 if not (await verify_owner(request, token)):
-                    raise sanic.exceptions.Forbidden("You are not authorized to access this account",
-                                                     context={"errorCode": "errors.com.epicgames.account.forbidden"})
+                    raise errors.com.epicgames.account.auth_app.not_authorized_for_account()
             else:
                 request.ctx.is_owner = await verify_owner(request, token)
             request.ctx.owner = token.get("sub")

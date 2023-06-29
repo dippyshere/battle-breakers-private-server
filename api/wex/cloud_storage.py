@@ -12,6 +12,7 @@ import os
 
 import sanic
 
+from utils.exceptions import errors
 from utils.sanic_gzip import Compress
 from utils.utils import authorized as auth
 
@@ -121,7 +122,7 @@ async def cloudstorage_system_get_file(request: sanic.request.Request, filename:
     elif filename == "b91b0a42b48740bfaaf0acae1df48cb1":
         filename = "DefaultGame.ini"
     if not os.path.exists(f"res/wex/api/cloudstorage/system/{filename}"):
-        raise sanic.exceptions.FileNotFound(f"File {filename} not found")
+        raise errors.com.epicgames.cloudstorage.file_not_found()
     data = await request.app.ctx.read_file(f"res/wex/api/cloudstorage/system/{filename}")
     return sanic.response.raw(data, content_type="application/octet-stream")
 
@@ -185,7 +186,7 @@ async def cloudstorage_user_get_file(request: sanic.request.Request, accountId: 
     :return: The response object
     """
     if not os.path.exists(f"res/wex/api/cloudstorage/user/{filename}"):
-        raise sanic.exceptions.FileNotFound(f"File {filename} not found")
+        raise errors.com.epicgames.cloudstorage.file_not_found()
     with open(f"res/wex/api/cloudstorage/user/{filename}", "rb") as f:
         data = f.read()
     return sanic.response.raw(data, content_type="application/octet-stream")
@@ -202,7 +203,7 @@ async def cloudstorage_user_put_file(request: sanic.request.Request, accountId: 
     :param filename: The filename
     :return: The response object
     """
-    raise sanic.exceptions.SanicException("How about no", status_code=400)
+    raise errors.com.epicgames.couldstorage.out_of_user_space()
 
 
 @wex_cloud.route("/api/cloudstorage/user/config", methods=["GET"])

@@ -8,6 +8,7 @@ Handles the account endpoint
 """
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -39,10 +40,7 @@ async def account_route(request: sanic.request.Request, accountId: str) -> sanic
                 "externalAuths": account_info["externalAuths"]
             })
         except FileNotFoundError:
-            raise sanic.exceptions.NotFound(accountId,
-                                            context={"errorCode": "errors.com.epicgames.account.account_not_found",
-                                                     "errorMessage": f"Sorry, we couldn't find an account for {accountId}",
-                                                     "numericErrorCode": 18007})
+            raise errors.com.epicgames.account.account_not_found(accountId)
     account = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
     return sanic.response.json({
         "id": account["id"],

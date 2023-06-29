@@ -16,7 +16,8 @@ from typing import Any, Optional
 
 import aiofiles
 import orjson
-import sanic
+
+from utils.exceptions import errors
 
 MCPItem: UnionType = str | int | float | list | dict | bool
 
@@ -41,7 +42,7 @@ class ProfileType(enum.Enum):
         try:
             return cls[s.upper()]
         except KeyError:
-            raise sanic.exceptions.BadRequest(f"{s} is not a valid profile")
+            raise errors.com.epicgames.modules.profile.invalid_profile_id_param()
 
 
 class McpProfile:
