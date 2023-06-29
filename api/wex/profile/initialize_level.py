@@ -10,6 +10,7 @@ import uuid
 
 import sanic
 
+from utils.exceptions import errors
 from utils.profile_system import ProfileType
 from utils.utils import authorized as auth
 
@@ -33,9 +34,7 @@ async def initialize_level(request: sanic.request.Request, accountId: str) -> sa
     level_info = (await request.app.ctx.load_datatable("Content/World/Datatables/LevelInfo"))[0]["Rows"].get(
         request.json.get("levelId"))
     if level_info is None:
-        raise sanic.exceptions.NotFound("Level not found", context={
-            "errorCode": "errors.com.epicgames.world_explorers.level_not_found",
-            "errorMessage": "Sorry, the level you tried to load doesn't exist."})
+        raise errors.com.epicgames.world_explorers.level_not_found()
     level_item_id = str(uuid.uuid4())
     await request.ctx.profile.add_item({
         "templateId": "Level:InProgress",

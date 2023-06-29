@@ -28,7 +28,7 @@ async def entitlement_check(request: sanic.request.Request) -> sanic.response.HT
     for entitlement in entitlements:
         if entitlement.get("catalogItemId") == "e458e71024404176addca212860f9ef2":
             return sanic.response.empty()
-    raise errors.com.epicgames.oss.gameaccess()
+    raise errors.com.epicgames.common.missing_action("PLAY")
 
 
 @wex_entitlement.route("/api/storeaccess/v1/request_access/<accountId>", methods=["POST"])
@@ -68,6 +68,10 @@ async def request_access(request: sanic.request.Request, accountId: str) -> sani
     return sanic.response.empty()
     # TODO Check for bans
     # raise errors.com.epicgames.world_explorers.banned_access_found_when_granting()
+    # raise errors.com.epicgames.bad_request(
+    #     errorMessage = "Client requested access grant but has banned access entitlement.",
+    #     numericErrorCode = 1001
+    # )
 
 
 @wex_entitlement.route("/api/storeaccess/v1/redeem_access/<accountId>", methods=["POST"])

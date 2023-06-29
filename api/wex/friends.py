@@ -27,4 +27,4 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
     :return: The response object
     """
     # TODO: Implement this
-    raise errors.com.epicgames.service_unavailable()
+    raise errors.com.epicgames.not_found()

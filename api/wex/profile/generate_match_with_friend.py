@@ -29,4 +29,4 @@ async def generate_match_with_friend(request: sanic.request.Request, accountId: 
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.service_unavailable()
+    raise errors.com.epicgames.not_found()

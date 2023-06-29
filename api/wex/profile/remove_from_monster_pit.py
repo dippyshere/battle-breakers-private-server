@@ -9,6 +9,7 @@ Handles removing a hero from the monster pit
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -31,11 +32,8 @@ async def remove_from_monster_pit(request: sanic.request.Request, accountId: str
     mtx_item_id = (await request.ctx.profile.find_item_by_template_id("Currency:MtxGiveaway"))[0]
     mtx_quantity = (await request.ctx.profile.get_item_by_guid(mtx_item_id))["quantity"]
     if mtx_quantity < 50:  # TODO: dont hardcode this value
-        raise sanic.exceptions.BadRequest("Not enough mtx", context={
-            "errorCode": "errors.com.epicgames.modules.gamesubcatalog.cannot_afford_purchase",
-            "errorMessage": "Sorry, you cannot afford to remove this item from the monster pit",
-            "numericErrorCode": 18005
-        })
+        raise errors.com.epicgames.modules.gamesubcatalog.purchase_not_allowed(
+            errorMessage="Cannot afford to remove item")
     await request.ctx.profile.change_item_quantity(mtx_item_id, mtx_quantity - 50)
     character_item_id = request.json.get("characterItemId")
     character = await request.ctx.profile.get_item_by_guid(character_item_id, request.ctx.profile_id)

@@ -10,6 +10,7 @@ import datetime
 
 import sanic
 
+from utils.exceptions import errors
 from utils.profile_system import PlayerProfile, ProfileType
 from utils.utils import authorized as auth
 
@@ -35,7 +36,9 @@ async def add_epic_friend(request: sanic.request.Request, accountId: str) -> san
         account_data = await request.app.ctx.read_file(
             f"res/account/api/public/account/{request.json.get('friendAccountId')}.json")
     except:
-        raise sanic.exceptions.SanicException("Invalid friend account id")
+        raise errors.com.epicgames.world_explorers.not_found(
+            errorMessage="Could not find friend account"
+        )
     friend = request.json.get("friendAccountId")
     # TODO: resolve duplicated code
     if friend not in request.app.ctx.profiles:

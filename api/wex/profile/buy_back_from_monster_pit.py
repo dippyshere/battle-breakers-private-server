@@ -30,4 +30,4 @@ async def buy_back_from_monster_pit(request: sanic.request.Request, accountId: s
     :return: The modified profile
     """
     # TODO: Buy back from monster pit
-    raise errors.com.epicgames.service_unavailable()
+    raise errors.com.epicgames.not_found()

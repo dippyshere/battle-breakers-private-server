@@ -9,6 +9,7 @@ Handles finalizing levels
 
 import sanic
 
+from utils.exceptions import errors
 from utils.profile_system import ProfileType
 from utils.utils import authorized as auth
 
@@ -39,9 +40,7 @@ async def finalize_level(request: sanic.request.Request, accountId: str) -> sani
                 request.ctx.profile_id)
             level_id = level_item["attributes"]["debug_name"]
         except:
-            raise sanic.exceptions.NotFound("No level in progress", context={
-                "errorCode": "errors.com.epicgames.world_explorers.level_not_found",
-                "errorMessage": "Sorry, the level you completed could not be found. Please try again."})
+            raise errors.com.epicgames.world_explorers.level_not_found(errorMessage="Sorry, the level you completed could not be found.")
     stars = await request.ctx.profile.get_stat("num_levels_completed")
     try:
         difficulty = int(level_id[-1])

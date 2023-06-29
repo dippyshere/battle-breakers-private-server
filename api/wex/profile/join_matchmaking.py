@@ -9,6 +9,7 @@ Handles joining matchmaking.
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -29,8 +30,4 @@ async def join_matchmaking(request: sanic.request.Request, accountId: str) -> sa
     :return: The modified profile
     """
     # TODO: Check eligibility
-    raise sanic.exceptions.BadRequest(context={
-        "errorCode": "errors.com.epicgames.world_explorers.bad_request",
-        "errorMessage": "Does not meet meet minimum requirememts.",
-        "numericErrorCode": 92014,
-    })
+    raise errors.com.epicgames.world_explorers.bad_request()

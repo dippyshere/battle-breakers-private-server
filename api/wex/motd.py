@@ -25,4 +25,4 @@ async def motd(request: sanic.request.Request) -> sanic.response.HTTPResponse:
     :param request: The request object
     :return: The response object
     """
-    raise errors.com.epicgames.service_unavailable()
+    raise errors.com.epicgames.not_found()

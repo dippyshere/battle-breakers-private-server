@@ -29,4 +29,4 @@ async def unlock_hero_gear(request: sanic.request.Request, accountId: str) -> sa
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.service_unavailable()
+    raise errors.com.epicgames.not_found()

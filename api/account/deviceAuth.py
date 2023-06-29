@@ -8,6 +8,7 @@ Handles the device auth creation for mobile
 """
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -76,7 +77,7 @@ async def device_auth_info(request: sanic.request.Request, accountId: str,
     for device in account["extra"]["deviceAuths"]:
         if device["deviceId"] == deviceId:
             return sanic.response.json(device)
-    raise sanic.exceptions.NotFound("Device auth not found")
+    raise errors.com.epicgames.account.device_auth.invalid_device_info()
 
 
 # undocumented
@@ -97,5 +98,7 @@ async def device_auth_deletion(request: sanic.request.Request, accountId: str,
         if device["deviceId"] == deviceId:
             account["extra"]["deviceAuths"].remove(device)
             break
+    else:
+        raise errors.com.epicgames.account.device_auth.invalid_device_info()
     await request.app.ctx.write_file(f"res/account/api/public/account/{accountId}.json", account)
     return sanic.response.empty()

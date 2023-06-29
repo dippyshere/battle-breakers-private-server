@@ -10,6 +10,7 @@ import os
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -35,12 +36,9 @@ async def suggestion_response(request: sanic.request.Request, accountId: str) ->
         friend_instance = await request.ctx.profile.get_item_by_guid(friend_id, request.ctx.profile_id)
         if friend_instance["attributes"].get("status") == "SuggestedLegacy" and friend_instance["attributes"].get(
                 "accountId") not in accounts_list:
-            raise sanic.exceptions.SanicException("Friend not on private server", 410, quiet=True,
-                                                  context={
-                                                      "errorMessage": "Unfortunately, this friend has not imported "
-                                                                      "their saved account to the private server. "
-                                                                      "Mew should ask them to do so :)"
-                                                  })
+            raise errors.com.epicgames.world_explorers.not_found(
+                errorMessage="Unfortunately, this friend has not imported their saved account to the private server. "
+                             "Mew should ask them to do so :)")
         else:
             await request.ctx.profile.remove_item(friend_id, request.ctx.profile_id)
     for friend_id in request.json.get("rejectedFriendInstanceIds"):

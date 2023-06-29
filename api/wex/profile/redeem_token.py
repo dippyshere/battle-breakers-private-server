@@ -29,4 +29,4 @@ async def redeem_token(request: sanic.request.Request, accountId: str) -> sanic.
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.service_unavailable()
+    raise errors.com.epicgames.not_found()
