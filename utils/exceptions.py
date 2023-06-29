@@ -223,6 +223,9 @@ class errors:
                     """
                     This error is thrown when the account is not found
                     *errors.com.epicgames.account.account_not_found*
+
+                    Message Vars:
+                     - Display Name (Epic User)
                     """
                     errorMessage: str = "Sorry, we couldn't find an account for {0}"
                     numericErrorCode: int = 18007
@@ -925,6 +928,9 @@ class errors:
                     """
                     This error is thrown when an account id count is invalid
                     *errors.com.epicgames.account.invalid_account_id_count*
+
+                    Message Vars:
+                     - Count limit (100)
                     """
                     errorMessage: str = "Sorry, the number of account id should be at least one and not more than {0}."
                     numericErrorCode: int = 18066
@@ -1477,6 +1483,9 @@ class errors:
                     """
                     This error is thrown when being ratelimited on the account service
                     *errors.com.epicgames.account.throttled*
+
+                    Message Vars:
+                     - Retry-After seconds (500)
                     """
                     errorMessage: str = "Operation access is limited by throttling policy, please try again in {0} " \
                                         "second(s)."
@@ -1750,6 +1759,9 @@ class errors:
                     """
                     This error is thrown when a code is already used
                     *errors.com.epicgames.coderedemption.code_used*
+
+                    Message Vars:
+                     - The code used (PHKJB92N4UWDGQKKALG3)
                     """
                     errorMessage: str = "Code used; code:{0}"
                     numericErrorCode: int = 19010
@@ -1785,6 +1797,9 @@ class errors:
                         """
                         This error is thrown when an authentication fails
                         *errors.com.epicgames.common.authentication.authentication_failed*
+
+                        Message Vars:
+                         - URL (/api/v1)
                         """
                         errorMessage: str = "Authentication failed for {0}"
                         numericErrorCode: int = 1032
@@ -1804,6 +1819,9 @@ class errors:
                         """
                         This error is thrown when a token verification fails
                         *errors.com.epicgames.common.authentication.token_verification_failed*
+
+                        Message Vars:
+                         - Token used (bearer eg1~...)
                         """
                         errorMessage: str = "Sorry we couldn't validate your token {0}. Please try with a new token."
                         numericErrorCode: int = 1031
@@ -1910,6 +1928,10 @@ class errors:
                     """
                     This error is thrown when a permission is missing
                     *errors.com.epicgames.common.missing_permission*
+
+                    Message Vars:
+                     - Permission (fortnite:profile:<account_id>:commands)
+                     - Scope (ALL)
                     """
                     errorMessage: str = "Sorry your login does not posses the permissions '{0} {1}' needed to " \
                                         "perform the requested operation"
@@ -1920,6 +1942,10 @@ class errors:
                     """
                     This error is thrown when an action is missing
                     *errors.com.epicgames.common.missing_action*
+
+                    Message Vars:
+                     - Action (PLAY)
+                     - Platform (Windows)
                     """
                     errorMessage: str = "Login is banned or does not posses the action '{0}' needed to perform the " \
                                         "requested operation for platform '{1}'"
@@ -2051,6 +2077,9 @@ class errors:
                     """
                     This error is thrown when a request is rate limited
                     *errors.com.epicgames.common.throttled*
+
+                    Message Vars:
+                     - API group (high)
                     """
                     errorMessage: str = "Server have no capacity to serve request for API group {0}."
                     numericErrorCode: int = 1041
@@ -2257,8 +2286,7 @@ class errors:
                 This exception is thrown when the request is forbidden
                 *errors.com.epicgames.forbidden*
                 """
-                errorMessage: str = "Sorry your login does not posses the permissions '{0} {1}' needed to " \
-                                    "perform the requested operation"
+                errorMessage: str = "Forbidden from accessing this resource."
                 numericErrorCode: int = 1023
                 statusCode: int = 403
 
@@ -2623,6 +2651,10 @@ class errors:
                             """
                             This exception is thrown when the real identity result verification has decrypt error
                             *errors.com.epicgames.identity.realid.result_verification.decrypt_error*
+
+                            Message Vars:
+                             - Result ()
+                             - Reason ([com.google.common.io.BaseEncoding$DecodingException: Unrecognized character: {])
                             """
                             errorMessage: str = "Unable to decrypt verification result: [{0}] by reason of : [{1}]"
                             numericErrorCode: int = 43001
@@ -2679,7 +2711,11 @@ class errors:
 
                         class server_error(EpicException):
                             """
-                            docstring
+                            This exception is thrown when the real identity result verification has server error
+                            *errors.com.epicgames.identity.realid.result_verification.server_error*
+
+                            Message Vars:
+                             - Request UUID (31d44b64-4db5-4f1d-8909-b7d5afbb67e3)
                             """
                             errorMessage: str = "Sorry an error occurred and we were unable to resolve it (tracking " \
                                                 "id: [{0}])"
@@ -2864,6 +2900,12 @@ class errors:
                         """
                         This exception is thrown when the purchase is not allowed.
                         *errors.com.epicgames.modules.gamesubcatalog.purchase_not_allowed*
+
+                        Message Vars:
+                         - Offer name ([VIRTUAL]1 x Ninja Style for 300 MtxCurrency)
+                         - Item (AthenaDance:eid_tourbus)
+                         - Quantity (1)
+                         - Limit (0)
                         """
                         errorMessage: str = "Could not purchase catalog offer {0}, item {1} x {2} (exceeding the " \
                                             "limit of {3})"
@@ -2969,6 +3011,10 @@ class errors:
                         """
                         This exception is thrown when the payload is invalid.
                         *errors.com.epicgames.modules.profile.invalid_payload*
+
+                        Message Vars:
+                         - Command (com.epicgames.fortnite.core.game.commands.QueryProfile)
+                         - Reason (Could not deserialize payload for com.epicgames.fortnite.core.game.commands.QueryProfile)
                         """
                         errorMessage: str = "Unable to parse command {0}. {1}"
                         numericErrorCode: int = 12806
@@ -2978,6 +3024,11 @@ class errors:
                         """
                         This exception is thrown when the profile command is invalid.
                         *errors.com.epicgames.modules.profile.invalid_profile_command*
+
+                        Message Vars:
+                         - Command (UnlockRewardNode)
+                         - Profile template (player:profile_common_core)
+                         - Profile ID (common_core)
                         """
                         errorMessage: str = "{0} is not valid on {1} profiles ({2})"
                         numericErrorCode: int = 12801
@@ -2997,6 +3048,9 @@ class errors:
                         """
                         This exception is thrown when the operation is not found.
                         *errors.com.epicgames.modules.profile.operation_not_found*
+
+                        Message Vars:
+                         - Operation (UnlockRewardNode)
                         """
                         errorMessage: str = "Operation {0} not found"
                         numericErrorCode: int = 12813
@@ -3006,6 +3060,9 @@ class errors:
                         """
                         This exception is thrown when the profile is not found.
                         *errors.com.epicgames.modules.profile.profile_not_found*
+
+                        Message Vars:
+                         - Proile ID (profile0)
                         """
                         errorMessage: str = "Profile {0} not found"
                         numericErrorCode: int = 0
@@ -3016,6 +3073,9 @@ class errors:
                         """
                         This exception is thrown when the template is not found.
                         *errors.com.epicgames.modules.profile.template_not_found*
+
+                        Message Vars:
+                         - Profile Template (profile0)
                         """
                         errorMessage: str = "Template {0} not found"
                         numericErrorCode: int = 0
@@ -4289,6 +4349,10 @@ class errors:
                         """
                         This error is returned when the invite already exists
                         *errors.com.epicgames.social.party.invite_already_exists*
+
+                        Message Vars:
+                         - User ID (0fc2397a34c1407ca539d39c0921d647)
+                         - Party ID (9c76a6c9ebcc41bc9fe990337646c94e)
                         """
                         errorMessage: str = "Invite for user [{0}] to party [{1}] already exists."
                         numericErrorCode: int = 0
@@ -4299,6 +4363,10 @@ class errors:
                         """
                         This error is returned when the invite is forbidden
                         *errors.com.epicgames.social.party.invite_forbidden*
+
+                        Message Vars:
+                         - User ID (0fc2397a34c1407ca539d39c0921d647)
+                         - Party ID (9c76a6c9ebcc41bc9fe990337646c94e)
                         """
                         errorMessage: str = "User [{0}] is not authorized to invite to party [{1}]."
                         numericErrorCode: int = 0
@@ -4369,6 +4437,10 @@ class errors:
                         """
                         This error is returned when the party join is forbidden
                         *errors.com.epicgames.social.party.party_join_forbidden*
+
+                        Message Vars:
+                         - User ID (0fc2397a34c1407ca539d39c0921d647)
+                         - Party ID (9c76a6c9ebcc41bc9fe990337646c94e)
                         """
                         errorMessage: str = "The user {0} has no right to join party {1}."
                         numericErrorCode: int = 51006
@@ -4443,6 +4515,9 @@ class errors:
                     class stale_revision(EpicException):
                         """
                         This error is returned when the revision is stale
+
+                        Message Vars:
+                         - Revision ()
                         """
                         errorMessage: str = "Revision {0} is stale."
                         numericErrorCode: int = 0
@@ -4463,6 +4538,10 @@ class errors:
                         """
                         This error is returned when the user is already in a party
                         *errors.com.epicgames.social.party.user_already_in_party*
+
+                        Message Vars:
+                         - User ID (0fc2397a34c1407ca539d39c0921d647)
+                         - Demployment ID (fortnite)
                         """
                         errorMessage: str = "User [{0}] is already in a party with deployment id [{1}]."
                         numericErrorCode: int = 0
@@ -4473,6 +4552,9 @@ class errors:
                         """
                         This error is returned when the user has no party
                         *errors.com.epicgames.social.party.user_has_no_party*
+
+                        Message Vars:
+                         - User ID (0fc2397a34c1407ca539d39c0921d647)
                         """
                         errorMessage: str = "User [{0}] has no party."
                         numericErrorCode: int = 0
@@ -4483,6 +4565,10 @@ class errors:
                         """
                         This error is returned when the user has a party
                         *errors.com.epicgames.social.party.user_has_party*
+
+                        Message Vars:
+                         - User ID (0fc2397a34c1407ca539d39c0921d647)
+                         - Deployment ID (fortnite)
                         """
                         errorMessage: str = "User [{0}] is already in a party with deployment id [{1}]."
                         numericErrorCode: int = 0
@@ -4493,6 +4579,9 @@ class errors:
                         """
                         This error is returned when the user is offline
                         *errors.com.epicgames.social.party.user_is_offline*
+
+                        Message Vars:
+                         - User ID (0fc2397a34c1407ca539d39c0921d647)
                         """
                         errorMessage: str = "User [{0}] is offline."
                         numericErrorCode: int = 51024
@@ -4573,6 +4662,9 @@ class errors:
                     """
                     This error is returned when validation fails.
                     *errors.com.epicgames.validation_failed*
+
+                    Message Vars:
+                     - Invalid Field name (display_name)
                     """
                     errorMessage: str = "Validation Failed. Invalid fields were {0}"
                     numericErrorCode: int = 1040
@@ -4601,6 +4693,7 @@ class errors:
                     errorMessage: str = "Client requested access grant but has banned access entitlement."
                     numericErrorCode: int = 16156
                     originatingService: str = "WEX"
+                    statusCode: int = 403
 
                 class friend_limit_exceeded(EpicException):
                     """
@@ -4657,6 +4750,10 @@ class errors:
                     """
                     This error is returned when the login reward is not available.
                     *errors.com.epicgames.world_explorers.login_reward_not_available*
+
+                    Message Vars:
+                     - Next Day (2)
+                     - Next available time (2022-01-01T00:00:00.000Z)
                     """
                     errorMessage: str = "{0} day login reward not available until {1}"
                     numericErrorCode: int = 92030
@@ -4720,6 +4817,11 @@ class errors:
                     """
                     This error is returned when the user has exceeded the purchase limit.
                     *errors.com.epicgames.world_explorers.purchase_limit_exceeded*
+
+                    Message Vars:
+                     - Item (AthenaDance:eid_tourbus)
+                     - Quantity (1)
+                     - Limit (0)
                     """
                     errorMessage: str = "Unable to purchase {0} x +{1} limit increase. This would exceed the max of {2}"
                     numericErrorCode: int = 0
