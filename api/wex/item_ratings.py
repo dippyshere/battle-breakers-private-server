@@ -35,12 +35,12 @@ async def item_ratings(request: sanic.request.Request, accountId: str, templateI
         "appearanceRating": 0
     }
     data = await request.app.ctx.read_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json")
-    templateId = urllib.parse.unquote(templateId)
-    if templateId in data:
-        my_rating = data[templateId]
+    template_id = urllib.parse.unquote(templateId)
     character_datatable = await request.app.ctx.load_datatable("Content/Characters/Datatables/CharacterStats")
-    rating_key = character_datatable[0]["Rows"].get(f"CD.{templateId.split(':')[1].replace('_', '.')}", {}).get(
-        "RatingsKey", f"CD.{templateId.split(':')[1].replace('_', '.')}")
+    rating_key = character_datatable[0]["Rows"].get(f"CD.{template_id.split(':')[1].replace('_', '.')}", {}).get(
+        "RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")
+    if rating_key in data:
+        my_rating = data[rating_key]
     overall_ratings = await request.app.ctx.read_file("res/wex/api/game/v2/item_ratings/ratings.json")
     ratings = []
     if rating_key in overall_ratings:
@@ -70,9 +70,9 @@ async def item_ratings(request: sanic.request.Request, accountId: str, templateI
         if file == "ratings.json":
             continue
         user_data = await request.app.ctx.read_file(f"res/wex/api/game/v2/item_ratings/{file}")
-        if templateId in user_data and user_data[templateId]["gameplayRating"] != 0:
-            ratings[user_data[templateId]["gameplayRating"] - 1]["gameplayRating"] += 1
-            ratings[user_data[templateId]["appearanceRating"] - 1]["appearanceRating"] += 1
+        if rating_key in user_data and user_data[rating_key]["gameplayRating"] != 0:
+            ratings[user_data[rating_key]["gameplayRating"] - 1]["gameplayRating"] += 1
+            ratings[user_data[rating_key]["appearanceRating"] - 1]["appearanceRating"] += 1
     return sanic.response.json({
         "myRating": my_rating,
         "overallRatings": {
@@ -97,19 +97,19 @@ async def set_item_rating(request: sanic.request.Request, accountId: str,
     :return: The response object (204)
     """
     data = await request.app.ctx.read_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json")
-    templateId = urllib.parse.unquote(templateId)
-    data[templateId] = {
+    template_id = urllib.parse.unquote(templateId)
+    character_datatable = await request.app.ctx.load_datatable("Content/Characters/Datatables/CharacterStats")
+    rating_key = character_datatable[0]["Rows"].get(f"CD.{template_id.split(':')[1].replace('_', '.')}", {}).get(
+        "RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")
+    data[rating_key] = {
         "gameplayRating": request.json["gameplayRating"],
         "appearanceRating": request.json["appearanceRating"]
     }
-    if data[templateId]["gameplayRating"] > 5:
-        data[templateId]["gameplayRating"] = 5
-    if data[templateId]["appearanceRating"] > 5:
-        data[templateId]["appearanceRating"] = 5
+    if data[rating_key]["gameplayRating"] > 5:
+        data[rating_key]["gameplayRating"] = 5
+    if data[rating_key]["appearanceRating"] > 5:
+        data[rating_key]["appearanceRating"] = 5
     await request.app.ctx.write_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json", data)
-    character_datatable = await request.app.ctx.load_datatable("Content/Characters/Datatables/CharacterStats")
-    rating_key = character_datatable[0]["Rows"].get(f"CD.{templateId.split(':')[1].replace('_', '.')}", {}).get(
-        "RatingsKey", f"CD.{templateId.split(':')[1].replace('_', '.')}")
     overall_ratings = await request.app.ctx.read_file("res/wex/api/game/v2/item_ratings/ratings.json")
     ratings = []
     if rating_key in overall_ratings:
@@ -139,9 +139,9 @@ async def set_item_rating(request: sanic.request.Request, accountId: str,
         if file == "ratings.json":
             continue
         user_data = await request.app.ctx.read_file(f"res/wex/api/game/v2/item_ratings/{file}")
-        if templateId in user_data and user_data[templateId]["gameplayRating"] != 0:
-            ratings[user_data[templateId]["gameplayRating"] - 1]["gameplayRating"] += 1
-            ratings[user_data[templateId]["appearanceRating"] - 1]["appearanceRating"] += 1
+        if rating_key in user_data and user_data[rating_key]["gameplayRating"] != 0:
+            ratings[user_data[rating_key]["gameplayRating"] - 1]["gameplayRating"] += 1
+            ratings[user_data[rating_key]["appearanceRating"] - 1]["appearanceRating"] += 1
     return sanic.response.json({
         "myRating": {
             "gameplayRating": request.json["gameplayRating"],
