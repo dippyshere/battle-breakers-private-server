@@ -56,9 +56,8 @@ class CustomErrorHandler(ErrorHandler):
                 "X-Epic-Error-Name": exception_dict["errorCode"],
             }
             ErrorHandler.log(request, exception)
-            if request.app.debug:
-                exception_dict["errorMessage"] += f" ({exception.__class__.__name__})"
-            exception_dict["errorMessage"] += f" ({exception.__class__.__name__})"
+            # if request.app.debug:
+            #     exception_dict["errorMessage"] += f" ({exception.__class__.__name__})"
             return sanic.response.json(exception_dict, status=status_code, headers=headers)
         else:
             ErrorHandler.log(request, exception)
