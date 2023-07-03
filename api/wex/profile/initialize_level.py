@@ -271,19 +271,27 @@ async def initialize_level(request: sanic.request.Request, accountId: str) -> sa
                     })
         elif party_member.get("heroType") in ["LocalHero", "LocalCommander"]:
             hero_data = await request.ctx.profile.get_item_by_guid(party_member.get("heroItemId"))
-            level_notification["heroInfo"].append({
-                "itemId": party_member.get("heroItemId"),
-                # "itemId": str(uuid.uuid4()),
-                "templateId": hero_data["templateId"],
-                # "templateId": "Character:MageKnight_VR2_Water_RegeneratingBarrier_T06",
-                "bIsCommander": False if party_member.get("heroType") == "LocalHero" else True,
-                "level": hero_data["attributes"]["level"],
-                "skillLevel": hero_data["attributes"]["skill_level"],
-                "upgrades": hero_data["attributes"]["upgrades"],
-                "accountInfo": account_info,
-                "foilLevel": hero_data["attributes"]["foil_lvl"],
-                "gearTemplateId": hero_data["attributes"]["sidekick_template_id"],
-            })
+            if hero_data is not None:
+                level_notification["heroInfo"].append({
+                    "itemId": party_member.get("heroItemId"),
+                    # "itemId": str(uuid.uuid4()),
+                    "templateId": hero_data["templateId"],
+                    # "templateId": "Character:MageKnight_VR2_Water_RegeneratingBarrier_T06",
+                    "bIsCommander": False if party_member.get("heroType") == "LocalHero" else True,
+                    "level": hero_data["attributes"]["level"],
+                    "skillLevel": hero_data["attributes"]["skill_level"],
+                    "upgrades": hero_data["attributes"]["upgrades"],
+                    "accountInfo": account_info,
+                    "foilLevel": hero_data["attributes"]["foil_lvl"],
+                    "gearTemplateId": hero_data["attributes"]["sidekick_template_id"],
+                })
+            else:
+                level_notification["heroInfo"].append({
+                    "bIsCommander": False,
+                    "level": 0,
+                    "skillLevel": 0,
+                    "foilLevel": 0
+                })
         elif party_member.get("heroType") == "DefaultCommander":
             if str(level_info.get("DefaultFriendCommander", {}).get("AssetPathName")) != "None":
                 level_notification["heroInfo"].append({
