@@ -30,4 +30,4 @@ async def blitz_level(request: sanic.request.Request, accountId: str) -> sanic.r
     :return: The modified profile
     """
     # TODO: Blitz level
-    raise errors.com.epicgames.not_found()
+    raise errors.com.epicgames.not_implemented()

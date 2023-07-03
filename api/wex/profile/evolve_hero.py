@@ -29,4 +29,4 @@ async def evolve_hero(request: sanic.request.Request, accountId: str) -> sanic.r
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_found()
+    raise errors.com.epicgames.not_implemented()

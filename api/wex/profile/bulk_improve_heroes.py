@@ -30,4 +30,4 @@ async def bulk_improve_heroes(request: sanic.request.Request, accountId: str) ->
     :return: The modified profile
     """
     # TODO: Bulk improve heroes
-    raise errors.com.epicgames.not_found()
+    raise errors.com.epicgames.not_implemented()

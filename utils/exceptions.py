@@ -3091,6 +3091,15 @@ class errors:
                 numericErrorCode: int = 1004
                 statusCode: int = 404
 
+            class not_implemented(EpicException):
+                """
+                This exception is thrown when the resource is not implemented.
+                *errors.com.epicgames.common.not_implemented*
+                """
+                errorMessage: str = "Sorry this resource has not been implemented yet"
+                numericErrorCode: int = 1005
+                statusCode: int = 501
+
             class ogf:
                 """
                 Parent class for all ogf exceptions

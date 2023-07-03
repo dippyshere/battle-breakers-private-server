@@ -29,4 +29,4 @@ async def claim_gift_points(request: sanic.request.Request, accountId: str) -> s
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_found()
+    raise errors.com.epicgames.not_implemented()

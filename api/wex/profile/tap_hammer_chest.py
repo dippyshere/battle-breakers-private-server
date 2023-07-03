@@ -29,4 +29,4 @@ async def tap_hammer_chest(request: sanic.request.Request, accountId: str) -> sa
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_found()
+    raise errors.com.epicgames.not_implemented()
