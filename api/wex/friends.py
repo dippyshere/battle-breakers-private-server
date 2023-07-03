@@ -6,10 +6,9 @@ This code is licensed under the [TBD] license.
 
 Handles the manifest
 """
-import aiofiles
 import sanic
 
-from utils.exceptions import errors
+from utils.profile_system import PlayerProfile, ProfileType
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -26,5 +25,23 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
     :param accountId: The account id
     :return: The response object
     """
-    # TODO: Implement this
-    raise errors.com.epicgames.not_found()
+    account_id = request.match_info.get('accountId')
+    if account_id is not None:
+        if account_id not in request.app.ctx.profiles:
+            request.app.ctx.profiles[account_id] = PlayerProfile(account_id)
+        request.ctx.profile = request.app.ctx.profiles[account_id]
+    else:
+        request.ctx.profile = None
+    if request.args.get("rvn") is None:
+        request.ctx.rvn = -1
+    else:
+        try:
+            request.ctx.rvn = int(request.args.get("rvn"))
+        except:
+            request.ctx.rvn = -1
+    request.ctx.profile_id = ProfileType.from_string("friends")
+    request.ctx.profile_revisions = request.headers.get("X-EpicGames-ProfileRevisions")
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions)
+    )
