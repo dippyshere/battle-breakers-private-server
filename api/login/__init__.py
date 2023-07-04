@@ -7,8 +7,10 @@ This code is licensed under the [TBD] license.
 Handles the account related requests
 """
 import sanic
+from .csrf import csrf
+from .exchange import id_exchange
 from .guided import guided_login
 from .register import register_login
 from .token import login_token
 
-login = sanic.Blueprint.group(guided_login, register_login, login_token)
+login = sanic.Blueprint.group(csrf, id_exchange, guided_login, register_login, login_token)
