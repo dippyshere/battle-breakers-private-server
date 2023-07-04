@@ -19,7 +19,7 @@ import orjson
 
 from utils.exceptions import errors
 
-MCPItem: UnionType = str | int | float | list | dict | bool
+MCPTypes: UnionType = str | int | float | list | dict | bool
 
 
 class ProfileType(enum.Enum):
@@ -45,6 +45,23 @@ class ProfileType(enum.Enum):
             raise errors.com.epicgames.modules.profile.invalid_profile_id_param()
 
 
+class MCPItem:
+    """
+    Class for items in an MCP Profile
+    """
+
+    def __init__(self, item_type: str, item_id: str, item_data: dict[str, MCPTypes]) -> None:
+        """
+        Initialise the MCP item
+        :param item_type: The type of the item
+        :param item_id: The ID of the item
+        :param item_data: The data of the item
+        """
+        self._type: str = item_type
+        self._id: str = item_id
+        self.data: dict[str, MCPTypes] = item_data
+
+
 class McpProfile:
     """
     Class for the MCP profile
@@ -63,8 +80,8 @@ class McpProfile:
         self.rvn: Optional[int] = None
         self.wipeNumber: Optional[int] = None
         self.version: Optional[str] = None
-        self.items: Optional[dict[str, dict[str, dict[str, MCPItem]]]] = None
-        self.stats: Optional[dict[str, dict[str, MCPItem]]] = None
+        self.items: Optional[dict[str, dict[str, dict[str, MCPTypes]]]] = None
+        self.stats: Optional[dict[str, dict[str, MCPTypes]]] = None
         self.commandRevision: Optional[int] = None
         try:
             asyncio.get_running_loop()
@@ -122,10 +139,10 @@ class McpProfile:
         """
         return self.profile
 
-    def __getitem__(self, key: str) -> MCPItem:
+    def __getitem__(self, key: str) -> MCPTypes:
         return self.profile[key]
 
-    def __setitem__(self, key: str, value: MCPItem) -> None:
+    def __setitem__(self, key: str, value: MCPTypes) -> None:
         setattr(self, key, value)
 
     @property
@@ -208,8 +225,8 @@ class McpProfile:
         self.rvn: int = profile["rvn"]
         self.wipeNumber: int = profile["wipeNumber"]
         self.version: str = profile["version"]
-        self.items: dict[str, dict[str, dict[str, MCPItem]]] = profile["items"]
-        self.stats: dict[str, dict[str, MCPItem]] = profile["stats"]
+        self.items: dict[str, dict[str, dict[str, MCPTypes]]] = profile["items"]
+        self.stats: dict[str, dict[str, MCPTypes]] = profile["stats"]
         self.commandRevision: int = profile["commandRevision"]
 
 
@@ -309,7 +326,7 @@ class PlayerProfile:
                 guids.append(guid)
         return guids
 
-    async def get_stat(self, stat_name: str, profile_id: ProfileType = ProfileType.PROFILE0) -> MCPItem:
+    async def get_stat(self, stat_name: str, profile_id: ProfileType = ProfileType.PROFILE0) -> MCPTypes:
         """
         Get the specified stat from the profile
         :param stat_name: The name of the stat to get
@@ -318,7 +335,7 @@ class PlayerProfile:
         """
         return (await self.get_profile(profile_id)).get("stats").get("attributes").get(stat_name)
 
-    async def modify_stat(self, stat_name: str, new_value: MCPItem,
+    async def modify_stat(self, stat_name: str, new_value: MCPTypes,
                           profile_id: ProfileType = ProfileType.PROFILE0) -> None:
         """
         Modify the specified stat to the new value
@@ -344,7 +361,7 @@ class PlayerProfile:
         profile_changes.append({"changeType": "itemRemoved", "itemId": item_id})
         setattr(self, f"{profile_id.value}_changes", profile_changes)
 
-    async def change_item_attribute(self, item_id: str, attribute_name: str, new_value: MCPItem,
+    async def change_item_attribute(self, item_id: str, attribute_name: str, new_value: MCPTypes,
                                     profile_id: ProfileType = ProfileType.PROFILE0) -> None:
         """
         Change the specified attribute of the specified item to the new value
@@ -434,17 +451,18 @@ class PlayerProfile:
             profile = await self.get_profile(p_type)
             for change in getattr(self, f"{p_type.value}_changes"):
                 change_type = change["changeType"]
-                if change_type == "statModified":
-                    profile["stats"]["attributes"][change["name"]]: MCPItem = change["value"]
-                elif change_type == "itemRemoved":
-                    del profile["items"][change["itemId"]]
-                elif change_type == "itemAttrChanged":
-                    profile["items"][change["itemId"]]["attributes"][change["attributeName"]]: \
-                        MCPItem = change["attributeValue"]
-                elif change_type == "itemAdded":
-                    profile["items"][change["itemId"]]: MCPItem = change["item"]
-                elif change_type == "itemQuantityChanged":
-                    profile["items"][change["itemId"]]["quantity"]: MCPItem = change["quantity"]
+                match change_type:
+                    case "statModified":
+                        profile["stats"]["attributes"][change["name"]]: MCPTypes = change["value"]
+                    case "itemRemoved":
+                        del profile["items"][change["itemId"]]
+                    case "itemAttrChanged":
+                        profile["items"][change["itemId"]]["attributes"][change["attributeName"]]: \
+                            MCPTypes = change["attributeValue"]
+                    case "itemAdded":
+                        profile["items"][change["itemId"]]: MCPTypes = change["item"]
+                    case "itemQuantityChanged":
+                        profile["items"][change["itemId"]]["quantity"]: MCPTypes = change["quantity"]
             setattr(self, f"_{p_type.value}", profile)
 
             # Clear the changes list for this profile
