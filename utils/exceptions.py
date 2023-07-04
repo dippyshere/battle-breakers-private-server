@@ -2300,8 +2300,8 @@ class errors:
                     This exception is thrown when the target cannot be friended due to settings
                     *errors.com.epicgames.friends.cannot_friend_due_to_target_settings*
                     """
-                    errorMessage: str = "Sorry, the target cannot be friended due to settings."
-                    numericErrorCode: int = 0
+                    errorMessage: str = "Cannot friend this person due to their privacy settings."
+                    numericErrorCode: int = 16003
                     originatingService: str = "WEX"
                     statusCode: int = 400
 
@@ -2310,8 +2310,8 @@ class errors:
                     This exception is thrown when a duplicate friendship is used
                     *errors.com.epicgames.friends.duplicate_friendship*
                     """
-                    errorMessage: str = "Sorry, a duplicate friendship is used."
-                    numericErrorCode: int = 0
+                    errorMessage: str = "Sorry, a friendship already exists with this user."
+                    numericErrorCode: int = 16004
                     originatingService: str = "WEX"
                     statusCode: int = 400
 
@@ -2330,7 +2330,7 @@ class errors:
                     This exception is thrown when the friend request is already sent
                     *errors.com.epicgames.friends.friend_request_already_sent*
                     """
-                    errorMessage: str = "Sorry, the friend request is already sent."
+                    errorMessage: str = "You have already sent a friend request to this user."
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
@@ -2340,7 +2340,7 @@ class errors:
                     This exception is thrown when the friendship is not found
                     *errors.com.epicgames.friends.friendship_not_found*
                     """
-                    errorMessage: str = "Sorry, the friendship is not found."
+                    errorMessage: str = "Sorry, it appears you are not friends with this person."
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
                     statusCode: int = 400
@@ -3768,8 +3768,12 @@ class errors:
                 """
                 This error is returned when an internal server error occurs
                 *errors.com.epicgames.server_error*
+
+                Message Vars:
+                 - Request UUID (31d44b64-4db5-4f1d-8909-b7d5afbb67e3)
                 """
-                errorMessage: str = "Sorry, the server encountered an error and could not complete your request."
+                errorMessage: str = "Sorry an error occurred and we were unable to resolve it (tracking " \
+                                    "id: [{0}])"
                 numericErrorCode: int = 1000
                 originatingService: str = "unknown"
                 statusCode: int = 500
@@ -4884,6 +4888,6 @@ class errors:
 
 if __name__ == "__main__":
     try:
-        raise errors.com.epicgames.unknown_error.v2("hi")
+        raise errors.com.epicgames.server_error()
     except EpicException as e:
         print(e.as_dict())

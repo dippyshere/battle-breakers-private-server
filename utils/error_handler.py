@@ -6,33 +6,12 @@ This code is licensed under the [TBD] license.
 
 Error handler module for the server
 """
-from typing import Optional
-
+from .exceptions import EpicException
 from .error_details import error_details
 
 import uuid
 import sanic
 from sanic.handlers import ErrorHandler
-
-from .exceptions import EpicException
-
-
-class EpicError:
-    """
-    Epic error class
-    """
-
-    def __init__(self, error_code: Optional[str] = None, error_message: Optional[str] = None,
-                 numeric_error_code: Optional[int] = None) -> None:
-        """
-        Initialises the EpicError class
-        :param error_code: The error code
-        :param error_message: The error message
-        :param numeric_error_code: The numeric error code
-        """
-        self.error_code = error_code
-        self.error_message = error_message
-        self.numeric_error_code = numeric_error_code
 
 
 class CustomErrorHandler(ErrorHandler):
