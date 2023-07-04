@@ -227,7 +227,8 @@ class errors:
                     Message Vars:
                      - Display Name (Epic User)
                     """
-                    errorMessage: str = "Sorry, we couldn't find an account for {0}"
+                    errorMessage: str = "Sorry, we couldn't find an account for {0}. Have an account to import? " \
+                                        "Get in touch with us on Discord!"
                     numericErrorCode: int = 18007
                     originatingService: str = "com.epicgames.account.public"
                     statusCode: int = 404
@@ -332,10 +333,10 @@ class errors:
                         This error is thrown when the account authentication token refresh is invalid
                         *errors.com.epicgames.account.auth_token.invalid_refresh_token*
                         """
-                        errorMessage: str = "Invalid refresh token"
+                        errorMessage: str = "Sorry, your refresh token is invalid. Please log in again."
                         numericErrorCode: int = 0
                         originatingService: str = "com.epicgames.account.public"
-                        statusCode: int = 400
+                        statusCode: int = 401
 
                     class not_own_session_removal(EpicException):
                         """
@@ -813,7 +814,7 @@ class errors:
                         This error is thrown when an account external auth type is unknown
                         *errors.com.epicgames.account.ext_auth.unknown_external_auth_type*
                         """
-                        errorMessage: str = "Unknown external auth type"
+                        errorMessage: str = "Sorry, you are using an external auth type we do not support yet."
                         numericErrorCode: int = 0
                         originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 400
@@ -1156,17 +1157,17 @@ class errors:
                         This error is thrown when an authorization code is expired
                         *errors.com.epicgames.account.oauth.expired_authorization_code*
                         """
-                        errorMessage: str = "Sorry the authorization code has expired."
+                        errorMessage: str = "Sorry, your authorization code has expired. Please log in again."
                         numericErrorCode: int = 0
                         originatingService: str = "com.epicgames.account.public"
-                        statusCode: int = 400
+                        statusCode: int = 401
 
                     class expired_exchange_code(EpicException):
                         """
                         This error is thrown when an exchange code is expired
                         *errors.com.epicgames.account.oauth.expired_exchange_code*
                         """
-                        errorMessage: str = "Sorry the exchange_code has expired."
+                        errorMessage: str = "Sorry, your exchange code has expired. Please log in again."
                         numericErrorCode: int = 18128
                         originatingService: str = "com.epicgames.account.public"
                         statusCode: int = 401
@@ -2011,7 +2012,7 @@ class errors:
                         errorMessage: str = "Sorry the token you are using is invalid"
                         numericErrorCode: int = 0
                         originatingService: str = "WEX"
-                        statusCode: int = 400
+                        statusCode: int = 401
 
                     class oauth_error(EpicException):
                         """

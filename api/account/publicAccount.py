@@ -29,6 +29,8 @@ async def public_account_info(request: sanic.request.Request) -> sanic.response.
     :param request: The request object
     :return: The response object
     """
+    if len(request.args.getlist("accountId")) > 100:
+        raise errors.com.epicgames.account.invalid_account_id_count(100)
     final_accounts = []
     for accountId in request.args.getlist("accountId"):
         # TODO: handle invalid account ids

@@ -16,6 +16,7 @@ import aiofiles
 import orjson
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import format_time
 
 
@@ -117,8 +118,7 @@ class PlayerFriends:
         """
         for friend in self.friends["friends"]:
             if friend["accountId"] == friendId:
-                return {"errorCode": "errors.com.epicgames.friends.duplicate_friendship",
-                        "errorMessage": "You are already friends with this user.", "numericErrorCode": 16004}
+                raise errors.com.epicgames.friends.duplicate_friendship()
         for friend in self.friends["incoming"]:
             if friend["accountId"] == friendId:
                 if friendId not in request.app.ctx.friends:
@@ -129,19 +129,15 @@ class PlayerFriends:
                 return
         for friend in self.friends["outgoing"]:
             if friend["accountId"] == friendId:
-                return {"errorCode": "errors.com.epicgames.friends.friend_request_already_sent",
-                        "errorMessage": "You have already sent a friend request to this user.",
-                        "numericErrorCode": 16004}
+                raise errors.com.epicgames.friends.friend_request_already_sent()
         if friendId not in request.app.ctx.friends:
             request.app.ctx.friends[friendId]: PlayerFriends = PlayerFriends(friendId)
         other_friend: PlayerFriends = request.app.ctx.friends[friendId]
         if other_friend.friends["settings"]["acceptInvites"] != "public":
-            return {"errorCode": "errors.com.epicgames.friends.cannot_friend_due_to_target_settings",
-                    "errorMessage": "This person is not accepting friend requests.", "numericErrorCode": 16003}
+            raise errors.com.epicgames.friends.cannot_friend_due_to_target_settings()
         for blocked in other_friend.friends["blocklist"]:
             if blocked["accountId"] == self.account_id:
-                return {"errorCode": "errors.com.epicgames.friends.cannot_friend_due_to_target_settings",
-                        "errorMessage": "This person is not accepting friend requests.", "numericErrorCode": 16003}
+                raise errors.com.epicgames.friends.cannot_friend_due_to_target_settings()
         self.friends["outgoing"].append({
             "accountId": friendId,
             "mutual": 0,
@@ -218,12 +214,15 @@ class PlayerFriends:
         for friend in self.friends["friends"]:
             if friend["accountId"] == friendId:
                 self.friends["friends"].remove(friend)
+                break
         for friend in self.friends["incoming"]:
             if friend["accountId"] == friendId:
                 self.friends["incoming"].remove(friend)
+                break
         for friend in self.friends["outgoing"]:
             if friend["accountId"] == friendId:
                 self.friends["outgoing"].remove(friend)
+                break
         await self.save_friends()
         try:
             if friendId not in request.app.ctx.friends:
@@ -232,12 +231,15 @@ class PlayerFriends:
             for friend in other_friend.friends["friends"]:
                 if friend["accountId"] == self.account_id:
                     other_friend.friends["friends"].remove(friend)
+                    break
             for friend in other_friend.friends["incoming"]:
                 if friend["accountId"] == self.account_id:
                     other_friend.friends["incoming"].remove(friend)
+                    break
             for friend in other_friend.friends["outgoing"]:
                 if friend["accountId"] == self.account_id:
                     other_friend.friends["outgoing"].remove(friend)
+                    break
             await other_friend.save_friends()
         except:
             pass
@@ -261,18 +263,19 @@ class PlayerFriends:
             async with aiofiles.open(f"res/friends/api/v1/{self.account_id}.json", "wb") as file:
                 await file.write(orjson.dumps(self.friends))
 
-    async def suggest_friends(self, request: sanic.request.Request) -> list[dict]:
+    async def suggest_friends(self, request: sanic.request.Request) -> list[str]:
         """
         Suggest friends for the player
         :param request: The request object
         :return: The response of the request
         """
-        suggested_accounts: list = []
+        suggested_accounts: list[str] = []
         accounts_list: list[str] = os.listdir("res/account/api/public/account")
         accounts_list: list[str] = [account.split(".")[0] for account in accounts_list]
+        # This just forces this account to be the first suggestion :)
         if "ec0ebb7e56f6454e86c62299a7b32e20" in accounts_list:
             accounts_list.remove("ec0ebb7e56f6454e86c62299a7b32e20")
-            # accounts_list.insert(0, "ec0ebb7e56f6454e86c62299a7b32e20")
+        accounts_list.insert(0, "ec0ebb7e56f6454e86c62299a7b32e20")
         if self.account_id in accounts_list:
             accounts_list.remove(self.account_id)
         for account in accounts_list:

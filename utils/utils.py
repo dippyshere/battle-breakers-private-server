@@ -357,9 +357,7 @@ def authorized(maybe_func: Any = None, *, allow_basic: bool = False, strict: boo
                 return response
             else:
                 # the user is not authorised
-                raise sanic.exceptions.Forbidden("Authentication failed :/", context={
-                    "errorCode": "errors.com.epicgames.common.authentication.authentication_failed",
-                    "errorMessage": "Your authentication has expired. Please log in again."})
+                raise errors.com.epicgames.account.oauth.expired_exchange_code()
 
         return decorated_function
 
