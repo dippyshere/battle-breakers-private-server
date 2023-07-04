@@ -9,6 +9,8 @@ Handles the token requests
 import base64
 
 import sanic
+
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -30,102 +32,93 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
     if request.headers.get('Authorization'):
         if request.headers.get('Authorization').startswith('basic'):
             try:
+                # TODO: add supported client ids
                 client_id = base64.b64decode(request.headers.get('Authorization').split(' ')[1]).decode().split(':')[0]
             except:
-                raise sanic.exceptions.Unauthorized(context={
-                    "errorCode": "errors.com.epicgames.common.oauth.invalid_token",
-                    "errorMessage": "Your client token is invalid"})
+                raise errors.com.epicgames.common.oauth.invalid_client()
         elif request.headers.get('Authorization').startswith('bearer'):
             client_id = "3cf78cd3b00b439a8755a878b160c7ad"
         else:
-            raise sanic.exceptions.Unauthorized(context={
-                "errorCode": "errors.com.epicgames.common.oauth.invalid_token",
-                "errorMessage": "No valid authorisation header was found"})
-        if request.form.get('grant_type') == 'client_credentials':
-            return sanic.response.json((await request.app.ctx.oauth_client_response(client_id)))
-        elif request.form.get('grant_type') == 'external_auth':
-            sub = request.form.get('external_auth_token').split(':')[0]
-            # TODO: investigate external auth when there is no linked account
-            account = await request.app.ctx.read_file(f"res/account/api/public/account/{sub}.json")
-            dn = account['displayName']
-            dvid = request.headers.get('X-Epic-Device-ID')
-            return sanic.response.json((await request.app.ctx.oauth_response(client_id, dn, dvid, sub)))
-        elif request.form.get('grant_type') == 'authorization_code':
-            token = await request.app.ctx.parse_eg1(request.form.get('code'))
-            if token is not None:
-                return sanic.response.json((await request.app.ctx.oauth_response(client_id, token['dn'],
-                                                                                 request.headers.get('X-Epic-Device-ID'),
-                                                                                 token['sub'])))
-            else:
-                raise sanic.exceptions.Unauthorized(context={
-                    "errorCode": "errors.com.epicgames.account.oauth.expired_authorization_code",
-                    "errorMessage": "Your authorisation code is invalid or expired"})
-        elif request.form.get('grant_type') == 'refresh_token':
-            token = await request.app.ctx.parse_eg1(request.form.get('refresh_token'))
-            if token is not None:
-                return sanic.response.json((await request.app.ctx.oauth_response(client_id, token['dn'],
-                                                                                 request.headers.get('X-Epic-Device-ID'),
-                                                                                 token['sub'])))
-            else:
-                raise sanic.exceptions.Unauthorized(context={
-                    "errorCode": "errors.com.epicgames.account.oauth.expired_exchange_code_session",
-                    "errorMessage": "Your refresh token has expired. Please log in again"})
-        elif request.form.get('grant_type') == 'password':  # backwards compatibility for old clients
-            account_id = await request.app.ctx.get_account_id_from_display_name(
-                request.form.get('username').split("@")[0].strip())
-            password = await request.app.ctx.to_insecure_hash(request.form.get('password'))
-            if account_id is None:
-                raise sanic.exceptions.InvalidUsage("Invalid username", context={
-                    "errorMessage": "Your username doesn't exist...\nAlready have an account to import? Contact us on "
-                                    "Discord.\nTrying to create an account? Sign up instead."})
-            account = await request.app.ctx.read_file(f"res/account/api/public/account/{account_id}.json")
-            if account["extra"]["pwhash"] != password:
-                raise sanic.exceptions.Unauthorized("Invalid password", context={
-                    "errorMessage": "The password you entered is incorrect"})
-            else:
-                return sanic.response.json((await request.app.ctx.oauth_response(client_id, account['displayName'],
-                                                                                 request.headers.get('X-Epic-Device-ID'),
-                                                                                 account_id)))
-        elif request.form.get('grant_type') == 'exchange_code':
-            token = await request.app.ctx.parse_eg1(request.form.get('exchange_code'))
-            if token is not None:
-                return sanic.response.json((await request.app.ctx.oauth_response(client_id, token['dn'],
-                                                                                 request.headers.get('X-Epic-Device-ID'),
-                                                                                 token['sub'])))
-            else:
-                raise sanic.exceptions.Unauthorized(context={
-                    "errorCode": "errors.com.epicgames.account.oauth.expired_exchange_code",
-                    "errorMessage": "Your exchange code has expired. Please login again"})
-        elif request.form.get('grant_type') == 'device_auth':
-            if request.form.get('account_id'):
-                account = await request.app.ctx.read_file(
-                    f"res/account/api/public/account/{request.form.get('account_id')}.json")
-                for device_auth in account["extra"]["deviceAuths"]:
-                    if device_auth["deviceId"] == request.form.get('device_id'):
-                        if device_auth["secret"] == request.form.get('secret'):
-                            return sanic.response.json(
-                                (await request.app.ctx.oauth_response(client_id, account['displayName'],
-                                                                      request.headers.get(
-                                                                          'X-Epic-Device-ID'),
-                                                                      account["id"])))
-                        else:
-                            raise sanic.exceptions.Unauthorized(context={
-                                "errorCode": "errors.com.epicgames.common.oauth.invalid_token",
-                                "errorMessage": "Your device auth is invalid"})
-                raise sanic.exceptions.Unauthorized(context={
-                    "errorCode": "errors.com.epicgames.common.oauth.invalid_token",
-                    "errorMessage": "Your account doesnt have any device auth"})
-            else:
-                raise sanic.exceptions.Unauthorized(context={
-                    "errorCode": "errors.com.epicgames.common.oauth.invalid_token",
-                    "errorMessage": "Invalid account id"})
-        else:
-            # TODO: misc to implement: continuation_token + device_code + otp + token_to_token
-            # ALl of these except opt are unused by any client / launcher. OTP could be used in the future for 2fa.
-            raise sanic.exceptions.Unauthorized(context={
-                "errorCode": "errors.com.epicgames.common.oauth.invalid_token",
-                "errorMessage": "No supported grant type was specified"})
+            raise errors.com.epicgames.common.oauth.oauth_error()
+        match request.form.get('grant_type'):
+            case 'client_credentials':
+                return sanic.response.json((await request.app.ctx.oauth_client_response(client_id)))
+            case 'external_auth':
+                if request.form.get('external_auth_type') != 'google':
+                    raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()
+                # TODO: Investigate external auth when there is no linked account
+                # TODO: Investigate and implement proper external auth if possible
+                sub = request.form.get('external_auth_token').split(':')[0]
+                account = await request.app.ctx.read_file(f"res/account/api/public/account/{sub}.json")
+                dn = account['displayName']
+                dvid = request.headers.get('X-Epic-Device-ID')
+                return sanic.response.json((await request.app.ctx.oauth_response(client_id, dn, dvid, sub)))
+            case 'authorization_code':
+                token = await request.app.ctx.parse_eg1(request.form.get('code'))
+                if token is not None:
+                    return sanic.response.json((await request.app.ctx.oauth_response(client_id, token['dn'],
+                                                                                     request.headers.get('X-Epic-Device-ID'),
+                                                                                     token['sub'])))
+                else:
+                    raise errors.com.epicgames.account.oauth.expired_authorization_code()
+            case 'refresh_token':
+                token = await request.app.ctx.parse_eg1(request.form.get('refresh_token'))
+                if token is not None:
+                    return sanic.response.json((await request.app.ctx.oauth_response(client_id, token['dn'],
+                                                                                     request.headers.get('X-Epic-Device-ID'),
+                                                                                     token['sub'])))
+                else:
+                    raise errors.com.epicgames.account.auth_token.invalid_refresh_token()
+            case 'password':  # backwards compatibility for old clients
+                account_id = await request.app.ctx.get_account_id_from_display_name(
+                    request.form.get('username').split("@")[0].strip())
+                password = await request.app.ctx.to_insecure_hash(request.form.get('password'))
+                if account_id is None:
+                    raise errors.com.epicgames.account.account_not_found(
+                        request.form.get('username').split("@")[0].strip())
+                account = await request.app.ctx.read_file(f"res/account/api/public/account/{account_id}.json")
+                if account["extra"]["pwhash"] != password:
+                    raise errors.com.epicgames.account.invalid_account_credentials()
+                else:
+                    return sanic.response.json((await request.app.ctx.oauth_response(client_id, account['displayName'],
+                                                                                     request.headers.get(
+                                                                                         'X-Epic-Device-ID'),
+                                                                                     account_id)))
+            case 'exchange_code':
+                token = await request.app.ctx.parse_eg1(request.form.get('exchange_code'))
+                if token is not None:
+                    return sanic.response.json((await request.app.ctx.oauth_response(client_id, token['dn'],
+                                                                                     request.headers.get(
+                                                                                         'X-Epic-Device-ID'),
+                                                                                     token['sub'])))
+                else:
+                    raise errors.com.epicgames.account.oauth.expired_exchange_code()
+            case 'device_auth':
+                if request.form.get('account_id'):
+                    account = await request.app.ctx.read_file(
+                        f"res/account/api/public/account/{request.form.get('account_id')}.json")
+                    for device_auth in account["extra"]["deviceAuths"]:
+                        if device_auth["deviceId"] == request.form.get('device_id'):
+                            if device_auth["secret"] == request.form.get('secret'):
+                                return sanic.response.json(
+                                    (await request.app.ctx.oauth_response(client_id, account['displayName'],
+                                                                          request.headers.get(
+                                                                              'X-Epic-Device-ID'),
+                                                                          account["id"])))
+                            else:
+                                raise errors.com.epicgames.common.authentication.authentication_failed(
+                                    request.form.get('account_id'))
+                    raise errors.com.epicgames.common.authentication.authentication_failed(
+                        request.form.get('account_id'))
+                else:
+                    raise errors.com.epicgames.account.device_auth.invalid_device_info()
+            case _:
+                # TODO: misc to implement: continuation_token + device_code + otp + token_to_token
+                # ALl of these except opt are unused by any client / launcher. OTP could be used in the future for 2fa.
+                # otp fields: otp, challenge
+                # token_to_token fields:
+                # continuation_token fields:
+                # device_code fields:
+                raise errors.com.epicgames.common.oauth.unsupported_grant_type()
     else:
-        raise sanic.exceptions.Unauthorized(context={
-            "errorCode": "errors.com.epicgames.common.oauth.invalid_token",
-            "errorMessage": "No authorisation header was found"})
+        raise errors.com.epicgames.common.oauth.invalid_request()
