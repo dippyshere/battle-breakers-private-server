@@ -6,24 +6,20 @@ This code is licensed under the [TBD] license.
 
 Handles the CSRF code generation
 """
-import os
-import re
-
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
 
 compress = Compress()
-csrf = sanic.Blueprint("csrf")
+csrf_req = sanic.Blueprint("csrf_req")
 
 
 # stub
-@csrf.route("/id/api/csrf", methods=["POST"])
+@csrf_req.route("/id/api/csrf", methods=["POST"])
 @compress.compress()
-async def csrf(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def csrf_route(request: sanic.request.Request) -> sanic.response.JSONResponse:
     """
     Generates a CSRF code
     :param request: The request object
