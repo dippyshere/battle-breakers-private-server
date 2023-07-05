@@ -87,7 +87,7 @@ async def add_epic_friend(request: sanic.request.Request, accountId: str) -> san
                 "isPvPUnlocked": wex_data["stats"]["attributes"].get("is_pvp_unlocked", False)
             },
             "remoteFriendId": "",
-            "status": "EpicFriend",
+            "status": "Friend",
             "gifts": {}
         },
         "quantity": 1
