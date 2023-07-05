@@ -37,6 +37,16 @@ async def device_auth_create(request: sanic.request.Request, accountId: str) -> 
             "location": None,
             "ipAddress": request.ip,
             "dateTime": await request.app.ctx.format_time()
+        },
+        "lastAccess": {
+            "location": None,
+            "ipAddress": request.ip,
+            "dateTime": await request.app.ctx.format_time()
+        },
+        "deviceInfo": {
+            "type": "",
+            "model": "",
+            "os": ""
         }
     }
     account = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
@@ -56,6 +66,7 @@ async def device_auth_get(request: sanic.request.Request, accountId: str) -> san
     :param accountId: The account id
     :return: The response object
     """
+    # TODO: remove secret info from response
     account = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
     return sanic.response.json(account["extra"]["deviceAuths"])
 

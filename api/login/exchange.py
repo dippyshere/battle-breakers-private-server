@@ -6,13 +6,9 @@ This code is licensed under the [TBD] license.
 
 Handles the ID auth exchange handling
 """
-import os
-import re
-
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
 
@@ -29,4 +25,9 @@ async def id_exchange_route(request: sanic.request.Request) -> sanic.response.JS
     :param request: The request object
     :return: The response object
     """
+    # {
+    #     "code": "",
+    # #     "creatingClientId": "",
+    # #     "expiresInSeconds": 14400,
+    # }
     raise errors.com.epicgames.not_found()

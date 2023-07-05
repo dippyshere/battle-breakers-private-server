@@ -150,3 +150,35 @@ async def account_email(request: sanic.request.Request, email: str) -> sanic.res
         "cabinedMode": account_info["cabinedMode"],
         "externalAuths": account_info["externalAuths"]
     })
+
+
+# undocumented
+@public_account.route("/api/public/account/lookup/externalId", methods=["POST"])
+@auth()
+@compress.compress()
+async def external_id_lookup(request: sanic.request.Request) -> sanic.response.JSONResponse:
+    """
+    Look up accounts by external id
+    same response structure as above
+    :param request: The request object
+    :return: The response object
+    """
+    raise errors.com.epicgames.not_implemented()
+
+
+# undocumented
+@public_account.route("/api/public/account/lookup/externalAuth/<externalAuthType>/displayName/<displayName>",
+                      methods=["GET"])
+@auth()
+@compress.compress()
+async def external_id_lookup_by_name(request: sanic.request.Request, externalAuthType: str,
+                                     displayName: str) -> sanic.response.JSONResponse:
+    """
+    Look up accounts by external id
+    same response structure as above
+    :param request: The request object
+    :param externalAuthType: The external auth type
+    :param displayName: The display name
+    :return: The response object
+    """
+    raise errors.com.epicgames.not_implemented()
