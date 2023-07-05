@@ -25,6 +25,17 @@ MCPTypes: UnionType = str | int | float | list | dict | bool
 class ProfileType(enum.Enum):
     """
     Enum for the profile types
+
+    Attributes:
+        PROFILE0: The profile ID for the profile0 profile
+        LEVELS: The profile ID for the levels profile
+        FRIENDS: The profile ID for the friends profile
+        MONSTERPIT: The profile ID for the monsterpit profile
+        MULTIPLAYER: The profile ID for the multiplayer profile
+
+    Methods:
+        from_string(cls, s: str) -> "ProfileType":
+            Get the profile ID from the string
     """
     PROFILE0: str = "profile0"
     LEVELS: str = "levels"
@@ -38,6 +49,7 @@ class ProfileType(enum.Enum):
         Get the profile ID from the string
         :param s: The string to get the profile ID from
         :return: The profile ID
+        :raises: errors.com.epicgames.modules.profile.invalid_profile_id_param: Raised if the profile ID is invalid
         """
         try:
             return cls[s.upper()]
@@ -47,7 +59,50 @@ class ProfileType(enum.Enum):
 
 class MCPItem:
     """
-    Class for items in an MCP Profile
+    Class to handle the MCP item
+
+    :var _guid: The GUID of the item
+    :var templateId: The template ID of the item
+    :var attributes: The attributes of the item
+    :var quantity: The quantity of the item
+
+    Methods:
+        __init__(self, guid: str, template_id: str, attributes: dict[str, MCPTypes] = None, quantity: int = 1) -> None:
+            Initialise the MCP item
+        __repr__(self) -> str:
+            Get the representation of the MCP item
+        __str__(self) -> str:
+            Get the string of the MCP item
+        __eq__(self, other: object) -> bool:
+            Check if the MCP item is equal to another object
+        __ne__(self, other: object) -> bool:
+            Check if the MCP item is not equal to another object
+        __dict__(self) -> dict[str, Any]:
+            Get the dictionary of the MCP item
+        __getitem__(self, item: str) -> MCPTypes:
+            Get the attribute of the MCP item
+        __setitem__(self, key: str, value: MCPTypes) -> None:
+            Set the attribute of the MCP item
+        __delitem__(self, key: str) -> None:
+            Delete the attribute of the MCP item
+        __contains__(self, item: str) -> bool:
+            Check if the MCP item contains an attribute
+        __len__(self) -> int:
+            Get the length of the MCP item
+        __iter__(self) -> iter:
+            Get the iterator of the MCP item
+        __reversed__(self) -> reversed:
+            Get the reversed iterator of the MCP item
+        __copy__(self) -> MCPItem:
+            Get a copy of the MCP item
+
+    Static Methods:
+        get(self, key: str, default: Any = None) -> Any:
+            Get the attribute of the MCP item
+
+    Properties:
+        guid: Get the GUID of the MCP item
+        item: Get the dictionary of the MCP item
     """
 
     def __init__(self, guid: str, template_id: str, attributes: dict[str, MCPTypes] = None,
@@ -207,13 +262,57 @@ class MCPItem:
 
 class MCPProfile:
     """
-    Class for the MCP profile
+    A class to represent an MCP profile
+
+    :var accountId: The account ID of the profile
+    :var created: The date and time the profile was created
+    :var updated: The date and time the profile was last updated
+    :var rvn: The revision number of the profile
+    :var wipeNumber: The wipe number of the profile
+    :var version: The version of the profile
+    :var items: The items in the profile
+    :var stats: The stats in the profile
+    :var commandRevision: The command revision of the profile
+
+    Methods:
+        __init__(account_id, profile_type): Initialise the MCP profile
+        __repr__(): Get the representation of the MCP profile
+        __str__(): Get the string of the MCP profile
+        __eq__(other): Check if the MCP profile is equal to another object
+        __ne__(other): Check if the MCP profile is not equal to another object
+        __dict__(): Get the dictionary of the MCP profile
+        __getitem__(key): Get the item value from the MCP profile
+        __setitem__(key, value): Set the item value in the MCP profile
+        __delitem__(key): Delete an item from the MCP profile
+        __contains__(key): Check if the MCP profile contains the attribute
+        __len__(): Get the length of the MCP profile
+
+    Properties:
+        id: The ID of the profile
+        profile_type: The type of the profile
+        profile: The profile
+
+    Static Methods:
+        get(self, key: str, default: Any = None) -> Any:
+            Get the item value from the MCP profile
     """
 
     def __init__(self, account_id: str, profile_type: ProfileType) -> None:
         """
         Initialise the MCP profile
         :param account_id: The account ID of the profile
+        :param profile_type: The type of the profile
+
+        Attributes:
+            accountId: The account ID of the profile
+            created: The date and time the profile was created
+            updated: The date and time the profile was last updated
+            rvn: The revision number of the profile
+            wipeNumber: The wipe number of the profile
+            version: The version of the profile
+            items: The items in the profile
+            stats: The stats in the profile
+            commandRevision: The command revision of the profile
         """
         self._id: Optional[str] = None
         self._profile_type: ProfileType = profile_type
@@ -384,6 +483,7 @@ class MCPProfile:
         Load the profile
         """
         # TODO: move to database
+        # noinspection IncorrectFormatting
         async with aiofiles.open(
                 f"res/wex/api/game/v2/profile/{self.accountId}/QueryProfile/{self.profile_type}.json",
                 "rb") as f:
@@ -404,9 +504,30 @@ class MCPProfile:
 
 
 class PlayerProfile:
+    # noinspection PyUnresolvedReferences
     """
-    Class based system to handle the profile management for wex mcp service
-    """
+        Class based system to handle the profile management for WEX MCP service
+
+        :param account_id: The account ID of the profile
+
+        :var account_id: The account ID of the profile
+        :var profile_revisions: The profile revisions of the profiles
+        :var profile0: The profile 0 of the profile
+        :var profile0_changes: The profile 0 changes of the profile
+        :var profile0_notifications: The profile 0 notifications of the profile
+        :var levels: The levels of the profile
+        :var levels_changes: The levels changes of the profile
+        :var levels_notifications: The levels notifications of the profile
+        :var friends: The friends of the profile
+        :var friends_changes: The friends changes of the profile
+        :var friends_notifications: The friends notifications of the profile
+        :var monsterpit: The monsterpit of the profile
+        :var monsterpit_changes: The monsterpit changes of the profile
+        :var monsterpit_notifications: The monsterpit notifications of the profile
+        :var multiplayer: The multiplayer of the profile
+        :var multiplayer_changes: The multiplayer changes of the profile
+        :var multiplayer_notifications: The multiplayer notifications of the profile
+        """
 
     def __init__(self, account_id: str) -> None:
         """
@@ -767,6 +888,7 @@ class PlayerProfile:
         if save_profile:
             for profile_type in ProfileType:
                 profile = await self.get_profile(profile_type)
+                # noinspection IncorrectFormatting
                 async with aiofiles.open(
                         f"res/wex/api/game/v2/profile/{self.account_id}/QueryProfile/{profile_type.value}.json",
                         "wb") as file:
