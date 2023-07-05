@@ -6,6 +6,8 @@ This code is licensed under the [TBD] license.
 
 Handles the manifest
 """
+import urllib.parse
+
 import sanic
 
 from utils.profile_system import PlayerProfile, ProfileType
@@ -45,3 +47,43 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
                                                      request.ctx.profile_revisions)
     )
+    # displayName = urllib.parse.unquote(request.args.get("name"))
+    # requested_id = await request.app.ctx.get_account_id_from_display_name(displayName)
+    # if requested_id is None:
+    #     raise errors.com.epicgames.account.account_not_found(displayName)
+    # account_info = await request.app.ctx.read_file(f"res/account/api/public/account/{requested_id}.json")
+    # if requested_id == accountId:
+    #     return sanic.response.json({
+    #         "id": account_info["id"],
+    #         "displayName": account_info["displayName"],
+    #         "minorVerified": account_info["minorVerified"],
+    #         "minorStatus": account_info["minorStatus"],
+    #         "cabinedMode": account_info["cabinedMode"],
+    #         "name": account_info["name"],
+    #         "email": account_info["email"],
+    #         "failedLoginAttempts": account_info["failedLoginAttempts"],
+    #         "lastLogin": account_info["lastLogin"],
+    #         "numberOfDisplayNameChanges": account_info["numberOfDisplayNameChanges"],
+    #         "dateOfBirth": account_info["dateOfBirth"],
+    #         "ageGroup": account_info["ageGroup"],
+    #         "headless": account_info["headless"],
+    #         "country": account_info["country"],
+    #         "lastName": account_info["lastName"],
+    #         "phoneNumber": account_info["phoneNumber"],
+    #         "preferredLanguage": account_info["preferredLanguage"],
+    #         "lastDisplayNameChange": account_info["lastDisplayNameChange"],
+    #         "canUpdateDisplayName": account_info["canUpdateDisplayName"],
+    #         "tfaEnabled": account_info["tfaEnabled"],
+    #         "emailVerified": account_info["emailVerified"],
+    #         "minorExpected": account_info["minorExpected"],
+    #         "hasHashedEmail": account_info["hasHashedEmail"],
+    #         "externalAuths": account_info["externalAuths"]
+    #     })
+    # return sanic.response.json({
+    #     "id": account_info["id"],
+    #     "displayName": account_info["displayName"],
+    #     "minorVerified": account_info["minorVerified"],
+    #     "minorStatus": account_info["minorStatus"],
+    #     "cabinedMode": account_info["cabinedMode"],
+    #     "externalAuths": account_info["externalAuths"]
+    # })
