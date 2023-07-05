@@ -49,7 +49,8 @@ async def kill_others(request: sanic.request.Request) -> sanic.response.HTTPResp
     match request.args.get("killType"):
         case "OTHERS_ACCOUNT_CLIENT_SERVICE":
             # TODO: kill all other tokens (client + account + service)
-            request.app.ctx.invalid_tokens.append((await request.app.ctx.parse_eg1(request.app.ctx.token))["jti"])
+            request.app.ctx.invalid_tokens.append(
+                (await request.app.ctx.parse_eg1(request.headers.get("Authorization", "")))["jti"])
             return sanic.response.empty()
         case "OTHERS_ACCOUNT_CLIENT":
             # TODO: kill all other tokens (client for the account)
@@ -62,11 +63,13 @@ async def kill_others(request: sanic.request.Request) -> sanic.response.HTTPResp
             return sanic.response.empty()
         case "ALL":
             # TODO: kill all tokens (client + account)
-            request.app.ctx.invalid_tokens.append((await request.app.ctx.parse_eg1(request.app.ctx.token))["jti"])
+            request.app.ctx.invalid_tokens.append(
+                (await request.app.ctx.parse_eg1(request.headers.get("Authorization", "")))["jti"])
             return sanic.response.empty()
         case "ALL_ACCOUNT_CLIENT":
             # TODO: kill all tokens (client + account for the client)
-            request.app.ctx.invalid_tokens.append((await request.app.ctx.parse_eg1(request.app.ctx.token))["jti"])
+            request.app.ctx.invalid_tokens.append(
+                (await request.app.ctx.parse_eg1(request.headers.get("Authorization", "")))["jti"])
             return sanic.response.empty()
         case _:
             raise errors.com.epicgames.bad_request()
