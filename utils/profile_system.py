@@ -50,19 +50,162 @@ class MCPItem:
     Class for items in an MCP Profile
     """
 
-    def __init__(self, item_type: str, item_id: str, item_data: dict[str, MCPTypes]) -> None:
+    def __init__(self, guid: str, template_id: str, attributes: dict[str, MCPTypes] = None,
+                 quantity: int = 1) -> None:
         """
         Initialise the MCP item
-        :param item_type: The type of the item
-        :param item_id: The ID of the item
-        :param item_data: The data of the item
+        :param guid: The GUID of the item
+        :param template_id: The template ID of the item
+        :param attributes: The attributes of the item
+        :param quantity: The quantity of the item
         """
-        self._type: str = item_type
-        self._id: str = item_id
-        self.data: dict[str, MCPTypes] = item_data
+        if attributes is None:
+            attributes = {}
+        self._guid: str = guid
+        self.templateId: str = template_id
+        self.attributes: dict[str, MCPTypes] = attributes
+        self.quantity: int = quantity
+
+    def __repr__(self) -> str:
+        """
+        Get the representation of the MCP item
+        :return: The representation of the MCP item
+        """
+        return f"<MCPItem guid={self._guid} templateId={self.templateId} attributes={self.attributes} " \
+               f"quantity={self.quantity}>"
+
+    def __str__(self) -> str:
+        """
+        Get the string of the MCP item
+        :return: The string of the MCP item
+        """
+        return self.__repr__()
+
+    def __eq__(self, other: object) -> bool:
+        """
+        Check if the MCP item is equal to another object
+        :param other: The other object to check
+        :return: Whether the MCP item is equal to the other object
+        """
+        if not isinstance(other, MCPItem):
+            return NotImplemented
+        return self._guid == other.guid
+
+    def __ne__(self, other: object) -> bool:
+        """
+        Check if the MCP item is not equal to another object
+        :param other: The other object to check
+        :return: Whether the MCP item is not equal to the other object
+        """
+        if not isinstance(other, MCPItem):
+            return NotImplemented
+        return self._guid != other.guid
+
+    def __dict__(self) -> dict[str, str | dict[str, MCPTypes] | int]:
+        """
+        Get the dictionary of the MCP item
+        :return: The dictionary of the MCP item
+        """
+        return self.item
+
+    def __getitem__(self, key: str) -> MCPTypes:
+        """
+        Get the item value from the MCP item
+        :param key: The attribute to get
+        :return: The item from the MCP item
+        """
+        return self.item[key]
+
+    def __setitem__(self, key: str, value: MCPTypes) -> None:
+        """
+        Set the item value in the MCP item
+        :param key: The item to set
+        :param value: The value to set
+        """
+        self.item[key] = value
+
+    def __delitem__(self, key: str) -> None:
+        """
+        Delete an item from the MCP item
+        :param key: The item to delete
+        """
+        del self.item[key]
+
+    def __contains__(self, key: str) -> bool:
+        """
+        Check if the MCP item contains the attribute
+        :param key: The attribute to check
+        :return: Whether the MCP item contains the attribute
+        """
+        return key in self.attributes
+
+    def __len__(self) -> int:
+        """
+        Get the length of the MCP item
+        :return: The length of the MCP item
+        """
+        return len(self.attributes)
+
+    def __iter__(self) -> iter:
+        """
+        Get the iterator of the MCP item
+        :return: The iterator of the MCP item
+        """
+        return iter(self.attributes)
+
+    def __reversed__(self) -> reversed:
+        """
+        Get the reversed iterator of the MCP item
+        :return: The reversed iterator of the MCP item
+        """
+        return reversed(self.attributes)
+
+    def __copy__(self) -> "MCPItem":
+        """
+        Copy the MCP item
+        :return: The copied MCP item
+        """
+        return MCPItem(self._guid, self.templateId, self.attributes, self.quantity)
+
+    @property
+    def guid(self) -> str:
+        """
+        Get the GUID of the item
+        :return: The GUID of the item
+        """
+        return self._guid
+
+    @guid.setter
+    def guid(self, value: str) -> None:
+        """
+        Set the GUID of the item
+        :param value: The value to set the GUID to
+        """
+        self._guid = value
+
+    @property
+    def item(self) -> dict[str, str | dict[str, MCPTypes] | int]:
+        """
+        Get the item
+        :return: The item
+        """
+        return {
+            "templateId": self.templateId,
+            "attributes": self.attributes,
+            "quantity": self.quantity
+        }
+
+    def get(self, key: str, default: Optional[MCPTypes] = None) -> MCPTypes:
+        """
+        Get the item value from the MCP item
+        :param key: The attribute to get
+        :param default: The default value to return if the attribute is not found
+        :return: The item from the MCP item
+        """
+        return self.item.get(key, default)
 
 
-class McpProfile:
+class MCPProfile:
     """
     Class for the MCP profile
     """
@@ -80,7 +223,7 @@ class McpProfile:
         self.rvn: Optional[int] = None
         self.wipeNumber: Optional[int] = None
         self.version: Optional[str] = None
-        self.items: Optional[dict[str, dict[str, dict[str, MCPTypes]]]] = None
+        self.items: Optional[dict[str, MCPItem]] = None
         self.stats: Optional[dict[str, dict[str, MCPTypes]]] = None
         self.commandRevision: Optional[int] = None
         try:
@@ -111,7 +254,7 @@ class McpProfile:
         :param other: The other object to check
         :return: Whether the MCP profile is equal to the other object
         """
-        if not isinstance(other, McpProfile):
+        if not isinstance(other, MCPProfile):
             return NotImplemented
         return self.accountId == other.accountId and self.profile_type == other.profile_type
 
@@ -121,7 +264,7 @@ class McpProfile:
         :param other: The other object to check
         :return: Whether the MCP profile is not equal to the other object
         """
-        if not isinstance(other, McpProfile):
+        if not isinstance(other, MCPProfile):
             return NotImplemented
         return self.accountId != other.accountId or self.profile_type != other.profile_type
 
@@ -140,10 +283,36 @@ class McpProfile:
         return self.profile
 
     def __getitem__(self, key: str) -> MCPTypes:
+        """
+        Get the value of the key in the MCP profile
+        :param key: The key to get the value of
+        :return: The value of the key in the MCP profile
+        """
         return self.profile[key]
 
     def __setitem__(self, key: str, value: MCPTypes) -> None:
+        """
+        Set the value of the key in the MCP profile
+        :param key: The key to set the value of
+        :param value: The value to set the key to
+        :return: The value of the key in the MCP profile
+        """
         setattr(self, key, value)
+
+    def __delitem__(self, key: str) -> None:
+        """
+        Delete the key in the MCP profile
+        :param key: The key to delete
+        :return: The value of the key in the MCP profile
+        """
+        delattr(self, key)
+
+    def __len__(self) -> int:
+        """
+        Get the length of the MCP profile
+        :return: The length of the MCP profile
+        """
+        return len(self.profile)
 
     @property
     def id(self) -> str:
@@ -225,7 +394,11 @@ class McpProfile:
         self.rvn: int = profile["rvn"]
         self.wipeNumber: int = profile["wipeNumber"]
         self.version: str = profile["version"]
-        self.items: dict[str, dict[str, dict[str, MCPTypes]]] = profile["items"]
+        if self.items is None:
+            self.items: dict[str, MCPItem] = {}
+        for item, item_data in profile["items"].items():
+            self.items[item]: MCPItem = MCPItem(item, item_data["templateId"], item_data["attributes"],
+                                                item_data["quantity"])
         self.stats: dict[str, dict[str, MCPTypes]] = profile["stats"]
         self.commandRevision: int = profile["commandRevision"]
 
@@ -246,7 +419,7 @@ class PlayerProfile:
             dict[str, str | int], dict[str, str | int], dict[str, str | int], dict[str, str | int], dict[
                 str, str | int]] = []
         for profile_type in ProfileType:
-            mcp_profile: McpProfile = McpProfile(account_id, profile_type)
+            mcp_profile: MCPProfile = MCPProfile(account_id, profile_type)
             setattr(self, f"_{profile_type.value}", mcp_profile)
             setattr(self, f"{profile_type.value}_changes", [])
             setattr(self, f"{profile_type.value}_notifications", [])

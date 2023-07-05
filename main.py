@@ -8,7 +8,7 @@ from typing import Any
 
 from api import api
 from utils import utils, error_handler
-from utils.profile_system import McpProfile
+from utils.profile_system import MCPProfile, MCPItem
 import middleware.mcp_middleware
 
 import orjson
@@ -31,8 +31,10 @@ def custom_serialise(obj: Any) -> dict[str, Any]:
     :param obj: The object to serialize
     :return: The serialisable object
     """
-    if isinstance(obj, McpProfile):
+    if isinstance(obj, MCPProfile):
         return obj.profile
+    if isinstance(obj, MCPItem):
+        return obj.item
     # Handle other custom serialization logic here
     raise TypeError(f"Object of type '{obj.__class__.__name__}' is not JSON serializable")
 
