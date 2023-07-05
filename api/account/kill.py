@@ -9,6 +9,7 @@ Handles the account token kill request
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -28,7 +29,10 @@ async def kill_auth(request: sanic.request.Request, token: str) -> sanic.respons
     :param token: The token to kill
     :return: The response object
     """
-    # since tokens are stateless jwt tokens, we can't really kill them yet
+    # TODO: support killAllWithSameSource query param
+    token = await request.app.ctx.parse_eg1(token)
+    if token is not None:
+        request.app.ctx.invalid_tokens.append(token["jti"])
     return sanic.response.empty()
 
 
@@ -36,10 +40,33 @@ async def kill_auth(request: sanic.request.Request, token: str) -> sanic.respons
 @kill.route("/api/oauth/sessions/kill", methods=["DELETE"])
 @auth
 @compress.compress()
-async def kill_others_account_client_service(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def kill_others(request: sanic.request.Request) -> sanic.response.HTTPResponse:
     """
     kill a token but quirky this time
     :param request: The request object
     :return: The response object
     """
-    return sanic.response.empty()
+    match request.args.get("killType"):
+        case "OTHERS_ACCOUNT_CLIENT_SERVICE":
+            # TODO: kill all other tokens (client + account + service)
+            request.app.ctx.invalid_tokens.append((await request.app.ctx.parse_eg1(request.app.ctx.token))["jti"])
+            return sanic.response.empty()
+        case "OTHERS_ACCOUNT_CLIENT":
+            # TODO: kill all other tokens (client for the account)
+            return sanic.response.empty()
+        case "OTHERS_SAME_SOURCE_ID":
+            # TODO: kill all other tokens with the same source id
+            return sanic.response.empty()
+        case "OTHERS":
+            # TODO: kill all other tokens (client + account)
+            return sanic.response.empty()
+        case "ALL":
+            # TODO: kill all tokens (client + account)
+            request.app.ctx.invalid_tokens.append((await request.app.ctx.parse_eg1(request.app.ctx.token))["jti"])
+            return sanic.response.empty()
+        case "ALL_ACCOUNT_CLIENT":
+            # TODO: kill all tokens (client + account for the client)
+            request.app.ctx.invalid_tokens.append((await request.app.ctx.parse_eg1(request.app.ctx.token))["jti"])
+            return sanic.response.empty()
+        case _:
+            raise errors.com.epicgames.bad_request()

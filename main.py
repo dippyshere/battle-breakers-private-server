@@ -78,6 +78,7 @@ app.register_middleware(middleware.mcp_middleware.add_mcp_headers, "response")
 app.ctx.accounts = {}
 app.ctx.friends = {}
 app.ctx.profiles = {}
+app.ctx.invalid_tokens = []
 
 
 @app.main_process_stop

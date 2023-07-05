@@ -294,6 +294,8 @@ async def verify_request_auth(request: sanic.request.Request, strict: bool = Fal
         if request.headers.get("Authorization", "").startswith("bearer "):
             token = request.headers.get("Authorization", "").replace("bearer ", "").replace("eg1~", "")
             token = jwt.decode(token, public_key, algorithms=["RS256"], leeway=20)
+            if token["jti"] in request.app.ctx.invalid_tokens:
+                raise errors.com.epicgames.account.auth_token.unknown_oauth_session()
             if strict:
                 if not (await verify_owner(request, token)):
                     raise errors.com.epicgames.account.auth_app.not_authorized_for_account()
@@ -304,7 +306,11 @@ async def verify_request_auth(request: sanic.request.Request, strict: bool = Fal
             return True
         else:
             return False
-    except:
+    except Exception as e:
+        if isinstance(e, errors.com.epicgames.account.auth_token.unknown_oauth_session):
+            raise e
+        elif isinstance(e, errors.com.epicgames.account.auth_app.not_authorized_for_account):
+            raise e
         return False
 
 
