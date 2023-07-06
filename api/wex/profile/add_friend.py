@@ -1,0 +1,37 @@
+"""
+Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2023 by Alex Hanson (Dippyshere).
+Please do not skid my hard work.
+https://github.com/dippyshere/battle-breakers-private-server
+This code is licensed under the [TBD] license.
+
+Handles adding friends and fetching their wex specific data
+"""
+import sanic
+
+from utils.friend_system import PlayerFriends
+from utils.utils import authorized as auth
+
+from utils.sanic_gzip import Compress
+
+compress = Compress()
+wex_profile_add_friend = sanic.Blueprint("wex_profile_add_friend")
+
+
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/profile/ec0ebb7e56f6454e86c62299a7b32e21/AddEpicFriend.md
+@wex_profile_add_friend.route("/<accountId>/AddFriend", methods=["POST"])
+@auth(strict=True)
+@compress.compress()
+async def add_friend(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+    """
+    This endpoint is used to fetch a new friend's wex data; its called by 1.0-1.71, for the old wex friend system
+    :param request: The request object
+    :param accountId: The account id
+    :return: The modified profile
+    """
+    if accountId not in request.app.ctx.friends:
+        request.app.ctx.friends[accountId] = PlayerFriends(accountId)
+    await request.app.ctx.friends[accountId].send_friend_request(request, request.json.get("friendAccountId"))
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions)
+    )
