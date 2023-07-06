@@ -137,6 +137,7 @@ class EpicException(Exception):
         return self._quiet
 
 
+# noinspection PyPep8Naming
 class errors:
     """
     Parent class for all error classes
