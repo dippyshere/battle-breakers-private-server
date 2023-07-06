@@ -10,7 +10,7 @@ Handles finalizing levels
 import sanic
 
 from utils.exceptions import errors
-from utils.profile_system import ProfileType
+from utils.enums import ProfileType
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress

@@ -11,7 +11,8 @@ import datetime
 import sanic
 
 from utils.friend_system import PlayerFriends
-from utils.profile_system import ProfileType, PlayerProfile
+from utils.profile_system import PlayerProfile
+from utils.enums import ProfileType
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress

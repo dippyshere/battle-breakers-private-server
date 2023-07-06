@@ -8,7 +8,8 @@ Handles the mcp profile subsystem
 """
 import sanic
 
-from utils.profile_system import PlayerProfile, ProfileType
+from utils.profile_system import PlayerProfile
+from utils.enums import ProfileType
 from .abandon_level import wex_profile_abandon_level
 from .add_epic_friend import wex_profile_add_epic_friend
 from .add_to_monster_pit import wex_profile_add_to_monster_pit

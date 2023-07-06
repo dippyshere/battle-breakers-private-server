@@ -10,7 +10,8 @@ import urllib.parse
 
 import sanic
 
-from utils.profile_system import PlayerProfile, ProfileType
+from utils.profile_system import PlayerProfile
+from utils.enums import ProfileType
 from utils.sanic_gzip import Compress
 
 compress = Compress()

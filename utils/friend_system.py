@@ -7,7 +7,6 @@ This code is licensed under the [TBD] license.
 Class based system to handle the friends service management
 """
 import asyncio
-import enum
 import os
 import random
 from concurrent.futures.thread import ThreadPoolExecutor
@@ -17,56 +16,10 @@ import aiofiles
 import orjson
 import sanic
 
+from utils.enums import FriendStatus
 from utils.exceptions import errors
 from utils.profile_system import PlayerProfile
 from utils.utils import format_time
-
-
-class FriendStatus(enum.Enum):
-    """
-    Enum for the different friend statuses in a WEX Profile
-
-    Attributes:
-        NONE: No friend status
-        SUGGESTED: Suggested friend
-        REQUESTED: Outgoing friend request
-        INVITED: Incoming friend request
-        FRIEND: Normal friend
-        EPICFRIEND: Epic friend (1.80+)
-        EPICNONPLATFORMFRIEND: Epic friend on a different platform
-        PLATFORMONLYFRIEND: Friend on a different platform
-        SUGGESTEDREQUEST: Suggested friend request sent
-        SUGGESTEDLEGACY: Suggested friend from legacy
-        NOTPLAYING: Not playing
-        PLATFORMNOTPLAYING: Not playing on a different platform
-        MAXNONE: Max friends reached
-
-    Methods:
-        from_string(cls, s: str) -> "FriendStatus":
-            Get the friend status from a string
-    """
-    NONE: str = "None"
-    SUGGESTED: str = "Suggested"
-    REQUESTED: str = "Requested"
-    INVITED: str = "Invited"
-    FRIEND: str = "Friend"
-    EPICFRIEND: str = "EpicFriend"
-    EPICNONPLATFORMFRIEND: str = "EpicNonPlatformFriend"
-    PLATFORMONLYFRIEND: str = "PlatformOnlyFriend"
-    SUGGESTEDREQUEST: str = "SuggestedRequest"
-    SUGGESTEDLEGACY: str = "SuggestedLegacy"
-    NOTPLAYING: str = "NotPlaying"
-    PLATFORMNOTPLAYING: str = "PlatformNotPlaying"
-    MAXNONE: str = "Max_None"
-
-    @classmethod
-    def from_string(cls, s: str) -> "FriendStatus":
-        """
-        Get the friend status from a string
-        :param s: The string to get the friend status from
-        :return: The friend status
-        """
-        return cls[s.upper()]
 
 
 class PlayerFriends:

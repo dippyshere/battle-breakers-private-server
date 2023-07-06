@@ -9,7 +9,7 @@ Handles level abandon/exit profile mcp
 
 import sanic
 
-from utils.profile_system import ProfileType
+from utils.enums import ProfileType
 from utils.utils import authorized as auth, format_time
 
 from utils.sanic_gzip import Compress

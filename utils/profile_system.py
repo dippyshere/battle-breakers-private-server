@@ -10,7 +10,6 @@ import ast
 import asyncio
 import datetime
 import uuid
-import enum
 from concurrent.futures.thread import ThreadPoolExecutor
 from types import UnionType
 from typing import Any, Optional
@@ -19,45 +18,9 @@ import aiofiles
 import orjson
 import sanic.request
 
-from utils.exceptions import errors
-from utils.friend_system import FriendStatus
+from utils.enums import ProfileType, FriendStatus
 
 MCPTypes: UnionType = str | int | float | list | dict | bool
-
-
-class ProfileType(enum.Enum):
-    """
-    Enum for the profile types
-
-    Attributes:
-        PROFILE0: The profile ID for the profile0 profile
-        LEVELS: The profile ID for the levels profile
-        FRIENDS: The profile ID for the friends profile
-        MONSTERPIT: The profile ID for the monsterpit profile
-        MULTIPLAYER: The profile ID for the multiplayer profile
-
-    Methods:
-        from_string(cls, s: str) -> "ProfileType":
-            Get the profile ID from the string
-    """
-    PROFILE0: str = "profile0"
-    LEVELS: str = "levels"
-    FRIENDS: str = "friends"
-    MONSTERPIT: str = "monsterpit"
-    MULTIPLAYER: str = "multiplayer"
-
-    @classmethod
-    def from_string(cls, s: str) -> "ProfileType":
-        """
-        Get the profile ID from the string
-        :param s: The string to get the profile ID from
-        :return: The profile ID
-        :raises: errors.com.epicgames.modules.profile.invalid_profile_id_param: Raised if the profile ID is invalid
-        """
-        try:
-            return cls[s.upper()]
-        except KeyError:
-            raise errors.com.epicgames.modules.profile.invalid_profile_id_param()
 
 
 class MCPItem:
@@ -802,7 +765,8 @@ class PlayerProfile:
             })
         friend_instance_guids: list[str] = await self.find_item_by_template_id("Friend:Instance", ProfileType.FRIENDS)
         for friend_instance_guid in friend_instance_guids:
-            friend_instance: dict[str, MCPTypes] = await self.get_item_by_guid(friend_instance_guid, ProfileType.FRIENDS)
+            friend_instance: dict[str, MCPTypes] = await self.get_item_by_guid(friend_instance_guid,
+                                                                               ProfileType.FRIENDS)
             if friend_instance["attributes"]["accountId"] == account_data["id"]:
                 if friend_instance["attributes"]["status"] == "Suggested" and friendStatus == FriendStatus.REQUESTED:
                     friendStatus: FriendStatus = FriendStatus.SUGGESTEDREQUEST
@@ -862,7 +826,8 @@ class PlayerProfile:
         """
         friend_instance_guids: list[str] = await self.find_item_by_template_id("Friend:Instance", ProfileType.FRIENDS)
         for friend_instance_guid in friend_instance_guids:
-            friend_instance: dict[str, MCPTypes] = await self.get_item_by_guid(friend_instance_guid, ProfileType.FRIENDS)
+            friend_instance: dict[str, MCPTypes] = await self.get_item_by_guid(friend_instance_guid,
+                                                                               ProfileType.FRIENDS)
             if friend_instance["attributes"]["accountId"] == friendId:
                 await self.remove_item(friend_instance_guid, ProfileType.FRIENDS)
                 return
