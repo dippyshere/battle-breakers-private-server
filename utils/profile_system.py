@@ -8,6 +8,7 @@ Class based system to handle the profile management for wex mcp service
 """
 import ast
 import asyncio
+import datetime
 import uuid
 import enum
 from concurrent.futures.thread import ThreadPoolExecutor
@@ -16,8 +17,10 @@ from typing import Any, Optional
 
 import aiofiles
 import orjson
+import sanic.request
 
 from utils.exceptions import errors
+from utils.friend_system import FriendStatus
 
 MCPTypes: UnionType = str | int | float | list | dict | bool
 
@@ -761,6 +764,108 @@ class PlayerProfile:
 
             # Clear the changes list for this profile
             setattr(self, f"{p_type.value}_changes", [])
+
+    async def add_friend_instance(self, request: sanic.request.Request, friendId: str,
+                                  friendStatus: FriendStatus = FriendStatus.FRIEND) -> None:
+        """
+        Adds / Updates a friend instance for the provided account ID to the current profile
+        :param request: The request to add the friend instance to
+        :param friendId: The ID of the friend to add
+        :param friendStatus: The status of the friend to add
+        :return: None
+        """
+        if friendId not in request.app.ctx.profiles:
+            request.app.ctx.profiles[friendId]: PlayerProfile = PlayerProfile(friendId)
+        wex_data: dict = await request.app.ctx.profiles[friendId].get_profile(ProfileType.PROFILE0)
+        rep_heroes: list = []
+        account_perks: list = []
+        # TODO: Move to database
+        account_data: dict = await request.app.ctx.read_file(f"res/account/api/public/account/{friendId}.json")
+        for account_perk in ["MaxHitPoints", "RegenStat", "PetStrength", "BasicAttack", "Attack", "SpecialAttack",
+                             "DamageReduction", "MaxMana"]:
+            account_perks.append(wex_data["stats"]["attributes"].get("account_perks").get(account_perk, 0))
+        for hero_id in wex_data["stats"]["attributes"].get("rep_hero_ids", []):
+            hero_data: dict = await request.app.ctx.profiles[friendId].get_item_by_guid(hero_id)
+            rep_heroes.append({
+                "itemId": hero_id,
+                "templateId": hero_data.get("templateId"),
+                "bIsCommander": True,
+                "level": hero_data.get("attributes").get("level"),
+                "skillLevel": hero_data.get("attributes").get("skill_level"),
+                "upgrades": hero_data.get("attributes").get("upgrades"),
+                "accountInfo": {
+                    "level": wex_data["stats"]["attributes"].get("level", 0),
+                    "perks": account_perks
+                },
+                "foilLevel": hero_data.get("attributes").get("foil_lvl", -1),
+                "gearTemplateId": hero_data.get("attributes").get("sidekick_template_id", ""),
+            })
+        friend_instance_guids: list[str] = await self.find_item_by_template_id("Friend:Instance", ProfileType.FRIENDS)
+        for friend_instance_guid in friend_instance_guids:
+            friend_instance: dict[str, MCPTypes] = await self.get_item_by_guid(friend_instance_guid, ProfileType.FRIENDS)
+            if friend_instance["attributes"]["accountId"] == account_data["id"]:
+                if friend_instance["attributes"]["status"] == "Suggested" and friendStatus == FriendStatus.REQUESTED:
+                    friendStatus: FriendStatus = FriendStatus.SUGGESTEDREQUEST
+                await self.change_item_attribute(friend_instance_guid, "status", friendStatus.value,
+                                                 ProfileType.FRIENDS)
+                await self.change_item_attribute(friend_instance_guid, "snapshot_expires",
+                                                 await request.app.ctx.format_time(
+                                                     datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
+                                                 ProfileType.FRIENDS)
+                await self.change_item_attribute(friend_instance_guid, "canBeSparred",
+                                                 wex_data["stats"]["attributes"].get("is_pvp_unlocked",
+                                                                                     False), ProfileType.FRIENDS)
+                await self.change_item_attribute(friend_instance_guid, "snapshot", {
+                    "displayName": account_data["displayName"],
+                    "avatarUrl": "wex-temp-avatar.png",
+                    "repHeroes": rep_heroes,
+                    "lastPlayTime": wex_data["updated"],
+                    "numLevelsCompleted": wex_data["stats"]["attributes"].get("num_levels_completed", 0),
+                    "numTerritoriesClaimed": wex_data["stats"]["attributes"].get("num_territories_claimed", 0),
+                    "accountLevel": wex_data["stats"]["attributes"].get("level", 0),
+                    "numRepHeroes": len(wex_data["stats"]["attributes"].get("rep_hero_ids", [])),
+                    "isPvPUnlocked": wex_data["stats"]["attributes"].get("is_pvp_unlocked", False)
+                }, ProfileType.FRIENDS)
+                return
+        await self.add_item({
+            "templateId": "Friend:Instance",
+            "attributes": {
+                "lifetime_claimed": 0,
+                "accountId": account_data["id"],
+                "canBeSparred": False,
+                "snapshot_expires": await request.app.ctx.format_time(
+                    datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
+                "best_gift": 0,  # These stats are unique to the friend instance on the profile, not the friend
+                "lifetime_gifted": 0,
+                "snapshot": {
+                    "displayName": account_data["displayName"],
+                    "avatarUrl": "wex-temp-avatar.png",
+                    "repHeroes": rep_heroes,
+                    "lastPlayTime": wex_data["updated"],
+                    "numLevelsCompleted": wex_data["stats"]["attributes"].get("num_levels_completed", 0),
+                    "numTerritoriesClaimed": wex_data["stats"]["attributes"].get("num_territories_claimed", 0),
+                    "accountLevel": wex_data["stats"]["attributes"].get("level", 0),
+                    "numRepHeroes": len(wex_data["stats"]["attributes"].get("rep_hero_ids", [])),
+                    "isPvPUnlocked": wex_data["stats"]["attributes"].get("is_pvp_unlocked", False)
+                },
+                "remoteFriendId": "",
+                "status": friendStatus.value,
+                "gifts": {}
+            },
+            "quantity": 1
+        }, profile_id=ProfileType.FRIENDS)
+
+    async def remove_friend_instance(self, friendId: str) -> None:
+        """
+        Remove a friend instance from the profile
+        :param friendId: The friend ID
+        """
+        friend_instance_guids: list[str] = await self.find_item_by_template_id("Friend:Instance", ProfileType.FRIENDS)
+        for friend_instance_guid in friend_instance_guids:
+            friend_instance: dict[str, MCPTypes] = await self.get_item_by_guid(friend_instance_guid, ProfileType.FRIENDS)
+            if friend_instance["attributes"]["accountId"] == friendId:
+                await self.remove_item(friend_instance_guid, ProfileType.FRIENDS)
+                return
 
     async def construct_response(self, profile_id: ProfileType = ProfileType.PROFILE0, rvn: int = -1,
                                  client_command_revision: Optional[str] = None,

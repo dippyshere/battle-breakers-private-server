@@ -7,7 +7,7 @@ This code is licensed under the [TBD] license.
 Class based system to handle the friends service management
 """
 import asyncio
-import datetime
+import enum
 import os
 import random
 from concurrent.futures.thread import ThreadPoolExecutor
@@ -18,8 +18,55 @@ import orjson
 import sanic
 
 from utils.exceptions import errors
-from utils.profile_system import PlayerProfile, ProfileType
+from utils.profile_system import PlayerProfile
 from utils.utils import format_time
+
+
+class FriendStatus(enum.Enum):
+    """
+    Enum for the different friend statuses in a WEX Profile
+
+    Attributes:
+        NONE: No friend status
+        SUGGESTED: Suggested friend
+        REQUESTED: Outgoing friend request
+        INVITED: Incoming friend request
+        FRIEND: Normal friend
+        EPICFRIEND: Epic friend (1.80+)
+        EPICNONPLATFORMFRIEND: Epic friend on a different platform
+        PLATFORMONLYFRIEND: Friend on a different platform
+        SUGGESTEDREQUEST: Suggested friend request sent
+        SUGGESTEDLEGACY: Suggested friend from legacy
+        NOTPLAYING: Not playing
+        PLATFORMNOTPLAYING: Not playing on a different platform
+        MAXNONE: Max friends reached
+
+    Methods:
+        from_string(cls, s: str) -> "FriendStatus":
+            Get the friend status from a string
+    """
+    NONE: str = "None"
+    SUGGESTED: str = "Suggested"
+    REQUESTED: str = "Requested"
+    INVITED: str = "Invited"
+    FRIEND: str = "Friend"
+    EPICFRIEND: str = "EpicFriend"
+    EPICNONPLATFORMFRIEND: str = "EpicNonPlatformFriend"
+    PLATFORMONLYFRIEND: str = "PlatformOnlyFriend"
+    SUGGESTEDREQUEST: str = "SuggestedRequest"
+    SUGGESTEDLEGACY: str = "SuggestedLegacy"
+    NOTPLAYING: str = "NotPlaying"
+    PLATFORMNOTPLAYING: str = "PlatformNotPlaying"
+    MAXNONE: str = "Max_None"
+
+    @classmethod
+    def from_string(cls, s: str) -> "FriendStatus":
+        """
+        Get the friend status from a string
+        :param s: The string to get the friend status from
+        :return: The friend status
+        """
+        return cls[s.upper()]
 
 
 class PlayerFriends:
@@ -129,66 +176,20 @@ class PlayerFriends:
         other_friend: PlayerFriends = request.app.ctx.friends[friendId]
         for friend in self.friends["incoming"]:
             if friend["accountId"] == friendId:
-                await other_friend.add_friend(self.account_id)
-                await self.add_friend(friendId)
+                await other_friend.add_friend(request, self.account_id)
+                await self.add_friend(request, friendId)
                 return
         if other_friend.friends["settings"]["acceptInvites"] != "public":
             raise errors.com.epicgames.friends.cannot_friend_due_to_target_settings()
         for blocked in other_friend.friends["blocklist"]:
             if blocked["accountId"] == self.account_id:
                 raise errors.com.epicgames.friends.cannot_friend_due_to_target_settings()
-        if friendId not in request.app.ctx.profiles:
-            request.app.ctx.profiles[friendId]: PlayerProfile = PlayerProfile(friendId)
-        wex_data: dict = await request.app.ctx.profiles[friendId].get_profile(ProfileType.PROFILE0)
-        rep_heroes: list = []
-        account_perks: list = []
-        account_data: dict = await request.app.ctx.read_file(f"res/account/api/public/account/{friendId}.json")
-        for account_perk in ["MaxHitPoints", "RegenStat", "PetStrength", "BasicAttack", "Attack", "SpecialAttack",
-                             "DamageReduction", "MaxMana"]:
-            account_perks.append(wex_data["stats"]["attributes"].get("account_perks").get(account_perk, 0))
-        for hero_id in wex_data["stats"]["attributes"].get("rep_hero_ids", []):
-            hero_data: dict = await request.app.ctx.profiles[friendId].get_item_by_guid(hero_id)
-            rep_heroes.append({
-                "itemId": hero_id,
-                "templateId": hero_data.get("templateId"),
-                "bIsCommander": True,
-                "level": hero_data.get("attributes").get("level"),
-                "skillLevel": hero_data.get("attributes").get("skill_level"),
-                "upgrades": hero_data.get("attributes").get("upgrades"),
-                "accountInfo": {
-                    "level": wex_data["stats"]["attributes"].get("level", 0),
-                    "perks": account_perks
-                },
-                "foilLevel": hero_data.get("attributes").get("foil_lvl", -1),
-                "gearTemplateId": hero_data.get("attributes").get("sidekick_template_id", ""),
-            })
-        await request.app.ctx.profiles[self.account_id].add_item({
-            "templateId": "Friend:Instance",
-            "attributes": {
-                "lifetime_claimed": 0,
-                "accountId": account_data["id"],
-                "canBeSparred": False,
-                "snapshot_expires": await request.app.ctx.format_time(
-                    datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
-                "best_gift": 0,  # These stats are unique to the friend instance on the profile, not the friend
-                "lifetime_gifted": 0,
-                "snapshot": {
-                    "displayName": account_data["displayName"],
-                    "avatarUrl": "wex-temp-avatar.png",
-                    "repHeroes": rep_heroes,
-                    "lastPlayTime": wex_data["updated"],
-                    "numLevelsCompleted": wex_data["stats"]["attributes"].get("num_levels_completed", 0),
-                    "numTerritoriesClaimed": wex_data["stats"]["attributes"].get("num_territories_claimed", 0),
-                    "accountLevel": wex_data["stats"]["attributes"].get("level", 0),
-                    "numRepHeroes": len(wex_data["stats"]["attributes"].get("rep_hero_ids", [])),
-                    "isPvPUnlocked": wex_data["stats"]["attributes"].get("is_pvp_unlocked", False)
-                },
-                "remoteFriendId": "",
-                "status": "Requested",
-                "gifts": {}
-            },
-            "quantity": 1
-        }, profile_id=ProfileType.FRIENDS)
+        for blocked in self.friends["blocklist"]:
+            if blocked["accountId"] == friendId:
+                raise errors.com.epicgames.friends.cannot_friend_due_to_target_settings()
+        if self.account_id not in request.app.ctx.profiles:
+            request.app.ctx.profiles[self.account_id]: PlayerProfile = PlayerProfile(self.account_id)
+        await request.app.ctx.profiles[self.account_id].add_friend_instance(request, friendId, FriendStatus.REQUESTED)
         self.friends["outgoing"].append({
             "accountId": friendId,
             "mutual": 0,
@@ -196,59 +197,9 @@ class PlayerFriends:
             "created": await format_time()
         })
         await self.save_friends()
-        if self.account_id not in request.app.ctx.profiles:
-            request.app.ctx.profiles[self.account_id]: PlayerProfile = PlayerProfile(self.account_id)
-        wex_data: dict = await request.app.ctx.profiles[self.account_id].get_profile(ProfileType.PROFILE0)
-        rep_heroes: list = []
-        account_perks: list = []
-        account_data: dict = await request.app.ctx.read_file(
-            f"res/account/api/public/account/{self.account_id}.json")
-        for account_perk in ["MaxHitPoints", "RegenStat", "PetStrength", "BasicAttack", "Attack", "SpecialAttack",
-                             "DamageReduction", "MaxMana"]:
-            account_perks.append(wex_data["stats"]["attributes"].get("account_perks").get(account_perk, 0))
-        for hero_id in wex_data["stats"]["attributes"].get("rep_hero_ids", []):
-            hero_data: dict = await request.app.ctx.profiles[self.account_id].get_item_by_guid(hero_id)
-            rep_heroes.append({
-                "itemId": hero_id,
-                "templateId": hero_data.get("templateId"),
-                "bIsCommander": True,
-                "level": hero_data.get("attributes").get("level"),
-                "skillLevel": hero_data.get("attributes").get("skill_level"),
-                "upgrades": hero_data.get("attributes").get("upgrades"),
-                "accountInfo": {
-                    "level": wex_data["stats"]["attributes"].get("level", 0),
-                    "perks": account_perks
-                },
-                "foilLevel": hero_data.get("attributes").get("foil_lvl", -1),
-                "gearTemplateId": hero_data.get("attributes").get("sidekick_template_id", ""),
-            })
-        await request.app.ctx.profiles[friendId].add_item({
-            "templateId": "Friend:Instance",
-            "attributes": {
-                "lifetime_claimed": 0,
-                "accountId": account_data["id"],
-                "canBeSparred": False,
-                "snapshot_expires": await request.app.ctx.format_time(
-                    datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
-                "best_gift": 0,  # These stats are unique to the friend instance on the profile, not the friend
-                "lifetime_gifted": 0,
-                "snapshot": {
-                    "displayName": account_data["displayName"],
-                    "avatarUrl": "wex-temp-avatar.png",
-                    "repHeroes": rep_heroes,
-                    "lastPlayTime": wex_data["updated"],
-                    "numLevelsCompleted": wex_data["stats"]["attributes"].get("num_levels_completed", 0),
-                    "numTerritoriesClaimed": wex_data["stats"]["attributes"].get("num_territories_claimed", 0),
-                    "accountLevel": wex_data["stats"]["attributes"].get("level", 0),
-                    "numRepHeroes": len(wex_data["stats"]["attributes"].get("rep_hero_ids", [])),
-                    "isPvPUnlocked": wex_data["stats"]["attributes"].get("is_pvp_unlocked", False)
-                },
-                "remoteFriendId": "",
-                "status": "Invited",
-                "gifts": {}
-            },
-            "quantity": 1
-        }, profile_id=ProfileType.FRIENDS)
+        if friendId not in request.app.ctx.profiles:
+            request.app.ctx.profiles[friendId]: PlayerProfile = PlayerProfile(friendId)
+        await request.app.ctx.profiles[friendId].add_friend_instance(request, self.account_id, FriendStatus.INVITED)
         other_friend.friends["incoming"].append({
             "accountId": self.account_id,
             "mutual": 0,
@@ -257,15 +208,20 @@ class PlayerFriends:
         })
         await other_friend.save_friends()
 
-    async def add_friend(self, friendId: str) -> None:
+    async def add_friend(self, request: sanic.request.Request, friendId: str) -> None:
         """
         Add a friend to the profile
+        :param request: The request object
         :param friendId: The account ID of the player to add
         :return: None
         """
         for friend in self.friends["friends"]:
             if friend["accountId"] == friendId:
                 return
+        if friendId not in request.app.ctx.profiles:
+            request.app.ctx.profiles[friendId]: PlayerProfile = PlayerProfile(friendId)
+        await request.app.ctx.profiles[friendId].add_friend_instance(request, self.account_id,
+                                                                     FriendStatus.FRIEND)
         for friend in self.friends["incoming"]:
             if friend["accountId"] == friendId:
                 self.friends["friends"].append({
@@ -327,6 +283,9 @@ class PlayerFriends:
             if friend["accountId"] == friendId:
                 self.friends["outgoing"].remove(friend)
                 break
+        if self.account_id not in request.app.ctx.profiles:
+            request.app.ctx.profiles[self.account_id]: PlayerProfile = PlayerProfile(self.account_id)
+        await request.app.ctx.profiles[self.account_id].remove_friend_instance(friendId, FriendStatus.FRIEND)
         await self.save_friends()
         try:
             if friendId not in request.app.ctx.friends:
@@ -344,6 +303,9 @@ class PlayerFriends:
                 if friend["accountId"] == self.account_id:
                     other_friend.friends["outgoing"].remove(friend)
                     break
+            if friendId not in request.app.ctx.profiles:
+                request.app.ctx.profiles[friendId]: PlayerProfile = PlayerProfile(friendId)
+            await request.app.ctx.profiles[friendId].remove_friend_instance(self.account_id, FriendStatus.FRIEND)
             await other_friend.save_friends()
         except:
             pass
