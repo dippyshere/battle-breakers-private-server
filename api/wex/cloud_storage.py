@@ -110,6 +110,7 @@ async def cloudstorage_system_config(request: sanic.request.Request) -> sanic.re
 
 @wex_cloud.route("/api/cloudstorage/system/<filename>", methods=['GET'])
 @auth(allow_basic=True)
+@compress.compress()
 async def cloudstorage_system_get_file(request: sanic.request.Request, filename: str) -> sanic.response.HTTPResponse:
     """
     Handles the cloudstorage system get request
@@ -123,12 +124,13 @@ async def cloudstorage_system_get_file(request: sanic.request.Request, filename:
         filename = "DefaultGame.ini"
     if not os.path.exists(f"res/wex/api/cloudstorage/system/{filename}"):
         raise errors.com.epicgames.cloudstorage.file_not_found()
-    data = await request.app.ctx.read_file(f"res/wex/api/cloudstorage/system/{filename}")
+    data = await request.app.ctx.read_file(f"res/wex/api/cloudstorage/system/{filename}", False)
     return sanic.response.raw(data, content_type="application/octet-stream")
 
 
 @wex_cloud.route("/api/cloudstorage/storage/<accountId>/info", methods=['GET'])
 @auth(strict=True)
+@compress.compress()
 async def cloudstorage_storage_info(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
     """
     Handles the cloudstorage storage info request
@@ -149,6 +151,7 @@ async def cloudstorage_storage_info(request: sanic.request.Request, accountId: s
 
 @wex_cloud.route("/api/cloudstorage/user/<accountId>", methods=['GET'])
 @auth(strict=True)
+@compress.compress()
 async def cloudstorage_user(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
     """
     Handles the cloudstorage user request
@@ -176,6 +179,7 @@ async def cloudstorage_user(request: sanic.request.Request, accountId: str) -> s
 
 @wex_cloud.route("/api/cloudstorage/user/<accountId>/<filename>", methods=['GET'])
 @auth(strict=True)
+@compress.compress()
 async def cloudstorage_user_get_file(request: sanic.request.Request, accountId: str,
                                      filename: str) -> sanic.response.HTTPResponse:
     """
@@ -194,6 +198,7 @@ async def cloudstorage_user_get_file(request: sanic.request.Request, accountId: 
 
 @wex_cloud.route("/api/cloudstorage/user/<accountId>/<filename>", methods=['PUT'])
 @auth(strict=True)
+@compress.compress()
 async def cloudstorage_user_put_file(request: sanic.request.Request, accountId: str,
                                      filename: str) -> sanic.response.HTTPResponse:
     """
