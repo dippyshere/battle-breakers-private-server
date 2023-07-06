@@ -9,7 +9,7 @@ Handles upgrading hero skills.
 
 import sanic
 
-from utils.exceptions import errors
+from utils.enums import ProfileType
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -29,4 +29,26 @@ async def upgrade_hero_skills(request: sanic.request.Request, accountId: str) ->
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_implemented()
+    # TODO: validation
+    skill_xp_id = (await request.ctx.profile.find_item_by_template_id("Currency:SkillXP"))[0]
+    skill_xp_quantity = (await request.ctx.profile.get_item_by_guid(skill_xp_id))["quantity"]
+    await request.ctx.profile.change_item_quantity(skill_xp_id, skill_xp_quantity - request.json.get("xpToSpend"))
+    if request.json.get("bIsInPit"):
+        hero_data = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"), ProfileType.MONSTERPIT)
+        await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "skill_level",
+                                                        hero_data["attributes"]["skill_level"] + 1,
+                                                        ProfileType.MONSTERPIT)
+    else:
+        hero_data = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"), request.ctx.profile_id)
+        await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "skill_level",
+                                                        hero_data["attributes"]["skill_level"] + 1)
+    await request.ctx.profile.add_notifications({
+        "type": "CharacterSkillLevelUp",
+        "primary": False,
+        "itemId": request.json.get("heroItemId"),
+        "level": hero_data["attributes"]["skill_level"] + 1
+    }, request.ctx.profile_id)
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions, True)
+    )
