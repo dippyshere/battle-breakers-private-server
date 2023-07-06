@@ -10,9 +10,7 @@ import datetime
 
 import sanic
 
-from utils.exceptions import errors
-from utils.profile_system import PlayerProfile
-from utils.enums import ProfileType
+from utils.friend_system import PlayerFriends
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -28,71 +26,27 @@ wex_profile_add_epic_friend = sanic.Blueprint("wex_profile_add_epic_friend")
 async def add_epic_friend(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to fetch a new friend's wex data
+
+    When the friend type is incoming, 1.80+ clients call this endpoint with an empty friendAccountId.
+    On 1.80+, the friend instance shouldnt exist in the profile at all, instead, on start the game checks your
+    incoming friends via friend service, and adds placeholder friend entries in the social tab.
+    This will call the endpoint correctly, but will only update on launch (rather than upon next mcp request),
+    and will not appear in legacy clients; for this reason, we will instead use the legacy system.
+    Currently, this has the drawback of not being able to choose which friend requests to accept.
+
+    TODO: Modify profile depending on game version (low priority, current workaround is fine)
     :param request: The request object
     :param accountId: The account id
     :return: The modified profile
     """
-    # TODO: Investigate old clients
-    try:
-        account_data = await request.app.ctx.read_file(
-            f"res/account/api/public/account/{request.json.get('friendAccountId')}.json")
-    except:
-        raise errors.com.epicgames.world_explorers.not_found(
-            errorMessage="Could not find friend account"
-        )
-    friend = request.json.get("friendAccountId")
-    # TODO: resolve duplicated code
-    if friend not in request.app.ctx.profiles:
-        request.app.ctx.profiles[friend] = PlayerProfile(friend)
-    wex_data = await request.app.ctx.profiles[friend].get_profile(ProfileType.PROFILE0)
-    rep_heroes = []
-    account_perks = []
-    for account_perk in ["MaxHitPoints", "RegenStat", "PetStrength", "BasicAttack", "Attack", "SpecialAttack",
-                         "DamageReduction", "MaxMana"]:
-        account_perks.append(wex_data["stats"]["attributes"].get("account_perks").get(account_perk, 0))
-    for hero_id in wex_data["stats"]["attributes"].get("rep_hero_ids", []):
-        hero_data = await request.app.ctx.profiles[friend].get_item_by_guid(hero_id)
-        rep_heroes.append({
-            "itemId": hero_id,
-            "templateId": hero_data.get("templateId"),
-            "bIsCommander": True,
-            "level": hero_data.get("attributes").get("level"),
-            "skillLevel": hero_data.get("attributes").get("skill_level"),
-            "upgrades": hero_data.get("attributes").get("upgrades"),
-            "accountInfo": {
-                "level": wex_data["stats"]["attributes"].get("level", 0),
-                "perks": account_perks
-            },
-            "foilLevel": hero_data.get("attributes").get("foil_lvl", -1),
-            "gearTemplateId": hero_data.get("attributes").get("sidekick_template_id", ""),
-        })
-    await request.ctx.profile.add_item({
-        "templateId": "Friend:Instance",
-        "attributes": {
-            "lifetime_claimed": 0,
-            "accountId": account_data["id"],
-            "canBeSparred": False,
-            "snapshot_expires": await request.app.ctx.format_time(
-                datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
-            "best_gift": 0,  # These stats are unique to the friend instance on the profile, not the friend
-            "lifetime_gifted": 0,
-            "snapshot": {
-                "displayName": account_data["displayName"],
-                "avatarUrl": "wex-temp-avatar.png",
-                "repHeroes": rep_heroes,
-                "lastPlayTime": wex_data["updated"],
-                "numLevelsCompleted": wex_data["stats"]["attributes"].get("num_levels_completed", 0),
-                "numTerritoriesClaimed": wex_data["stats"]["attributes"].get("num_territories_claimed", 0),
-                "accountLevel": wex_data["stats"]["attributes"].get("level", 0),
-                "numRepHeroes": len(wex_data["stats"]["attributes"].get("rep_hero_ids", [])),
-                "isPvPUnlocked": wex_data["stats"]["attributes"].get("is_pvp_unlocked", False)
-            },
-            "remoteFriendId": "",
-            "status": "Friend",
-            "gifts": {}
-        },
-        "quantity": 1
-    }, profile_id=ProfileType.FRIENDS)
+    if accountId not in request.app.ctx.friends:
+        request.app.ctx.friends[accountId] = PlayerFriends(accountId)
+    if request.json.get("friendAccountId") == "":
+        incoming_list = (await request.app.ctx.friends[accountId].get_summary())["incoming"]
+        for friend in incoming_list:
+            await request.app.ctx.friends[accountId].send_friend_request(request, friend["accountId"])
+    else:
+        await request.app.ctx.friends[accountId].send_friend_request(request, request.json.get("friendAccountId"))
     return sanic.response.json(
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
                                                      request.ctx.profile_revisions)

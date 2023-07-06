@@ -12,6 +12,7 @@ from utils.profile_system import PlayerProfile
 from utils.enums import ProfileType
 from .abandon_level import wex_profile_abandon_level
 from .add_epic_friend import wex_profile_add_epic_friend
+from .add_friend import wex_profile_add_friend
 from .add_to_monster_pit import wex_profile_add_to_monster_pit
 from .blitz_level import wex_profile_blitz_level
 from .bulk_improve_heroes import wex_profile_bulk_improve_heroes
@@ -102,7 +103,7 @@ wex_profile = sanic.Blueprint.group(wex_profile_abandon_level, wex_profile_add_e
                                     wex_profile_suggest_friends, wex_profile_mark_hero_seen,
                                     wex_profile_claim_gift_points, wex_profile_sell_gear,
                                     wex_profile_sell_multiple_gear, wex_profile_sell_treasure,
-                                    wex_profile_delete_friend, wex_profile_redeem_token,
+                                    wex_profile_delete_friend, wex_profile_redeem_token, wex_profile_add_friend,
                                     url_prefix="/api/game/v2/profile")
 
 

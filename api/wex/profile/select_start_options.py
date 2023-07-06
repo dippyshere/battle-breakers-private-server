@@ -184,7 +184,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
                     "numRepHeroes": len(wex_data["stats"]["attributes"].get("rep_hero_ids", [])),
                     "isPvPUnlocked": wex_data["stats"]["attributes"].get("is_pvp_unlocked", False)
                 },
-                "remoteFriendId": "",
+                "remoteFriendId": account_data["id"],
                 "status": "Suggested",
                 "gifts": {}
             },

@@ -812,7 +812,7 @@ class PlayerProfile:
                     "numRepHeroes": len(wex_data["stats"]["attributes"].get("rep_hero_ids", [])),
                     "isPvPUnlocked": wex_data["stats"]["attributes"].get("is_pvp_unlocked", False)
                 },
-                "remoteFriendId": "",
+                "remoteFriendId": account_data["id"],
                 "status": friendStatus.value,
                 "gifts": {}
             },

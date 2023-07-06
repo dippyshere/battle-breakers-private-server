@@ -238,7 +238,7 @@ class PlayerFriends:
                 break
         if self.account_id not in request.app.ctx.profiles:
             request.app.ctx.profiles[self.account_id]: PlayerProfile = PlayerProfile(self.account_id)
-        await request.app.ctx.profiles[self.account_id].remove_friend_instance(friendId, FriendStatus.FRIEND)
+        await request.app.ctx.profiles[self.account_id].remove_friend_instance(friendId)
         await self.save_friends()
         try:
             if friendId not in request.app.ctx.friends:
@@ -258,7 +258,7 @@ class PlayerFriends:
                     break
             if friendId not in request.app.ctx.profiles:
                 request.app.ctx.profiles[friendId]: PlayerProfile = PlayerProfile(friendId)
-            await request.app.ctx.profiles[friendId].remove_friend_instance(self.account_id, FriendStatus.FRIEND)
+            await request.app.ctx.profiles[friendId].remove_friend_instance(self.account_id)
             await other_friend.save_friends()
         except:
             pass
