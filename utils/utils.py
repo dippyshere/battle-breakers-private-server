@@ -18,6 +18,7 @@ import zlib
 from inspect import isawaitable
 from typing import Any, Tuple, Optional, Callable
 
+import bcrypt
 import jwt
 import orjson
 import sanic
@@ -383,6 +384,25 @@ async def to_insecure_hash(s: str) -> int:
     return hash_val
 
 
+async def bcrypt_hash(s: str) -> bytes:
+    """
+    Hashes a string using bcrypt
+    :param s: The string to hash
+    :return: The hashed string
+    """
+    return bcrypt.hashpw(s.encode(), bcrypt.gensalt())
+
+
+async def bcrypt_check(s: str, hashed: bytes) -> bool:
+    """
+    Checks if a string matches a bcrypt hash
+    :param s: The string to check
+    :param hashed: The hash to check against
+    :return: True if the string matches the hash, False otherwise
+    """
+    return bcrypt.checkpw(s.encode(), hashed)
+
+
 async def get_account_id_from_display_name(display_name: str) -> Optional[str]:
     """
     Gets an account id from a display name
@@ -476,7 +496,7 @@ async def oauth_client_response(client_id: str) -> dict:
     }
 
 
-async def create_account(displayName: Optional[str] = None, password: Optional[str | int] = None) -> str:
+async def create_account(displayName: Optional[str] = None, password: Optional[bytes] = None) -> str:
     """
     Creates an account and prepares all the files
     :param displayName: The display name

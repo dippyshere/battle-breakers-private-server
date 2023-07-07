@@ -13,7 +13,7 @@ import uuid
 from utils.utils import normalise_string, write_file
 
 
-async def initialise_account(account_id: str = None, display_name: str = None, password: str | int = None,
+async def initialise_account(account_id: str = None, display_name: str = None, password: bytes = None,
                              **kwargs) -> str:
     """
     Initialises an account with the given account ID.
@@ -66,7 +66,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
         "hasHashedEmail": False,
         "externalAuths": {},
         "extra": {
-            "pwhash": password,
+            "pwhash": password.decode() if password is not None else "",
             "deviceAuths": []
         },
         "metadata": {

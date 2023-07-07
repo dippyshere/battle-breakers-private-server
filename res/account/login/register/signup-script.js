@@ -49,20 +49,6 @@ function addListeners() {
     loginLink.addEventListener('click', handleLoginClick);
 }
 
-String.prototype.hashCode = function() {
-    // This is purely a simple hashing function to prevent the password from being sent in plain text to the server over HTTP
-    // This hash is insecure and passwords are not stored in this format on the server
-    var hash = 0,
-        i, chr;
-    if (this.length === 0) return hash;
-    for (i = 0; i < this.length; i++) {
-        chr = this.charCodeAt(i);
-        hash = ((hash << 5) - hash) + chr;
-        hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-};
-
 showOnboarding = (username, code, id, heading) => {
     signupFormDiv.style.display = 'none';
     loginFormDiv.style.display = 'none';
@@ -139,7 +125,7 @@ signupForm.addEventListener('submit', (event) => {
             // post to the server
             const signupData = {
                 username: document.querySelector('#signup-username').value,
-                password: document.querySelector('#signup-password').value.hashCode()
+                password: document.querySelector('#signup-password').value
             };
             const controller = new AbortController();
             const signal = controller.signal;
@@ -272,7 +258,7 @@ loginForm.addEventListener('submit', (event) => {
             // post to the server
             const loginData = {
                 username: document.querySelector('#login-name').value,
-                password: document.querySelector('#login-password').value.hashCode()
+                password: document.querySelector('#login-password').value
             };
             const controller = new AbortController();
             const signal = controller.signal;

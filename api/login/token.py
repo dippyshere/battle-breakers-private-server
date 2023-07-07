@@ -63,18 +63,6 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
         elif len(username) > 32:
             raise sanic.exceptions.InvalidUsage("Invalid username", context={
                 "errorMessage": "Username/Account ID too long"})
-        elif len(str(password)) < 4:
-            raise sanic.exceptions.InvalidUsage("Invalid password", context={
-                "errorMessage": "Your password is too short"})
-        elif len(str(password)) > 32:
-            raise sanic.exceptions.InvalidUsage("Invalid password", context={
-                "errorMessage": "Your password is too long"})
-        elif await request.app.ctx.to_insecure_hash(username) == password:
-            raise sanic.exceptions.InvalidUsage("Invalid username and password", context={
-                "errorMessage": "Your username and password are the same"})
-        elif username == password:
-            raise sanic.exceptions.InvalidUsage("Invalid username and password", context={
-                "errorMessage": "Your username and password are the same"})
         else:
             account_id = await request.app.ctx.get_account_id_from_display_name(username.split("@")[0].strip())
             if account_id is None:
@@ -83,7 +71,7 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
                                     "Discord.\nTrying to create an account? Sign up instead."})
             else:
                 account = await request.app.ctx.read_file(f"res/account/api/public/account/{account_id}.json")
-                if account["extra"]["pwhash"] != password:
+                if not await request.app.ctx.bcrypt_check(password, account["extra"]["pwhash"].encode()):
                     raise sanic.exceptions.Unauthorized("Invalid password", context={
                         "errorMessage": "The password you entered is incorrect"})
                 else:
@@ -109,16 +97,10 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
         elif len(str(password)) > 32:
             raise sanic.exceptions.InvalidUsage("Invalid password", context={
                 "errorMessage": "Your password is too long"})
-        elif await request.app.ctx.to_insecure_hash(username) == password:
-            raise sanic.exceptions.InvalidUsage("Invalid username and password", context={
-                "errorMessage": "Your username and password are the same"})
-        elif username == password:
-            raise sanic.exceptions.InvalidUsage("Invalid username and password", context={
-                "errorMessage": "Your username and password are the same"})
         else:
             account_id = await request.app.ctx.get_account_id_from_display_name(username.split("@")[0].strip())
             if account_id is None:
-                account_id = await request.app.ctx.create_account(username, password)
+                account_id = await request.app.ctx.create_account(username, await request.app.ctx.bcrypt_hash(password))
                 account = await request.app.ctx.read_file(f"res/account/api/public/account/{account_id}.json")
                 return sanic.response.json(
                     {"username": account["displayName"],
@@ -129,7 +111,7 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
                 )
             else:
                 account = await request.app.ctx.read_file(f"res/account/api/public/account/{account_id}.json")
-                if account["extra"]["pwhash"] != password:
+                if not await request.app.ctx.bcrypt_check(password, account["extra"]["pwhash"].encode()):
                     raise sanic.exceptions.Unauthorized("Invalid password", context={
                         "errorMessage": "Your account already exists. The password you entered is incorrect."})
                 else:

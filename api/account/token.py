@@ -72,12 +72,12 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
             case 'password':  # backwards compatibility for old clients
                 account_id = await request.app.ctx.get_account_id_from_display_name(
                     request.form.get('username').split("@")[0].strip())
-                password = await request.app.ctx.to_insecure_hash(request.form.get('password'))
                 if account_id is None:
                     raise errors.com.epicgames.account.account_not_found(
                         request.form.get('username').split("@")[0].strip())
                 account = await request.app.ctx.read_file(f"res/account/api/public/account/{account_id}.json")
-                if account["extra"]["pwhash"] != password:
+                if not await request.app.ctx.bcrypt_check(request.form.get('password'),
+                                                          account["extra"]["pwhash"].encode()):
                     raise errors.com.epicgames.account.invalid_account_credentials()
                 else:
                     return sanic.response.json((await request.app.ctx.oauth_response(client_id, account['displayName'],

@@ -7,3 +7,4 @@ py-cpuinfo
 sanic-gzip
 brotlipy
 aiofiles
+bcrypt
