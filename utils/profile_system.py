@@ -143,14 +143,14 @@ class MCPItem:
         :param key: The item to set
         :param value: The value to set
         """
-        self.item[key] = value
+        setattr(self, key, value)
 
     def __delitem__(self, key: str) -> None:
         """
         Delete an item from the MCP item
         :param key: The item to delete
         """
-        del self.item[key]
+        delattr(self, key)
 
     def __contains__(self, key: str) -> bool:
         """
