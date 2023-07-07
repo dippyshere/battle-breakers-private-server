@@ -769,6 +769,7 @@ class PlayerProfile:
                                                                                ProfileType.FRIENDS)
             if friend_instance["attributes"]["accountId"] == account_data["id"]:
                 if friend_instance["attributes"]["status"] == "Suggested" and friendStatus == FriendStatus.REQUESTED:
+                    # noinspection PyPep8Naming
                     friendStatus: FriendStatus = FriendStatus.SUGGESTEDREQUEST
                 await self.change_item_attribute(friend_instance_guid, "status", friendStatus.value,
                                                  ProfileType.FRIENDS)

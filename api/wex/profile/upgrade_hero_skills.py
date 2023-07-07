@@ -42,6 +42,7 @@ async def upgrade_hero_skills(request: sanic.request.Request, accountId: str) ->
         hero_data = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"), request.ctx.profile_id)
         await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "skill_level",
                                                         hero_data["attributes"]["skill_level"] + 1)
+    # TODO: investigate skill xp attribute
     await request.ctx.profile.add_notifications({
         "type": "CharacterSkillLevelUp",
         "primary": False,
