@@ -24,9 +24,22 @@ wex_profile_generate_daily_quests = sanic.Blueprint("wex_profile_generate_daily_
 @compress.compress()
 async def generate_daily_quests(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
     """
-    This endpoint is used to generate daily quests for a profile.
+    This endpoint is used to generate daily quests for a profile, and fetch friend gift points.
     :param request: The request object
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_implemented()
+    await request.ctx.profile.modify_stat("daily_quest_last_refresh", await request.app.ctx.format_time())
+    # TODO: add daily quests
+    await request.ctx.profile.add_notifications({
+        "type": "WExpGiftPointReward",
+        "primary": True,
+        "totalPoints": 0,
+        "lootResult": {
+            "items": []
+        }
+    }, request.ctx.profile_id)
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions, True)
+    )
