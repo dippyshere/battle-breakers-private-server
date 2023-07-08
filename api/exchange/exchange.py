@@ -33,8 +33,8 @@ async def exchange_route(request: sanic.request.Request) -> sanic.response.HTTPR
         if token["jti"] in request.app.ctx.invalid_tokens:
             raise errors.com.epicgames.account.auth_token.unknown_oauth_session()
         else:
-            redirect_url = urllib.parse.urlparse(request.args.get("exchangeCode"))
-            redirect_url = request.args.get("exchangeCode").replace(redirect_url.scheme, "").replace(
+            redirect_url = urllib.parse.urlparse(request.args.get("redirectUrl"))
+            redirect_url = request.args.get("redirectUrl").replace(f"{redirect_url.scheme}://", "").replace(
                 redirect_url.netloc, "")
             return sanic.response.redirect(redirect_url)
     except Exception as e:
