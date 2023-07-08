@@ -21,7 +21,9 @@ from .login import login
 from .misc import misc
 from .presence import presence
 from .priceengine import priceengine
+from .purchase import purchase
+from .thirdpartytrackers import trackers
 from .wex import wex
 
 api = sanic.Blueprint.group(trackers, account, catalog, datarouter, entitlements, friends, lightswitch, login, misc,
-                            presence, priceengine, wex, bb_cdn, affiliate)
+                            presence, priceengine, wex, bb_cdn, affiliate, agreements, exchange, purchase)
