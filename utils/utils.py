@@ -731,3 +731,21 @@ async def room_generator(level_id: str, room_number: int, level_info: dict) -> d
         }]
     }
     return room
+
+
+async def parse_template_id(template_id: str) -> dict:
+    """
+    Parses a template id into a dict
+    :param template_id: The template id to parse
+    :return: The parsed template id as a dict
+    """
+    if template_id.split(":")[0] == "Character":
+        return {
+            "type": template_id.split(":")[0],
+            "id": template_id.split(":")[1],
+            "class": template_id.split("_")[0].split(":")[1],
+            "rarity": template_id.split("_")[1],
+            "element": template_id.split("_")[2],
+            "name": template_id.split("_")[3],
+            "tier": template_id.split("_")[4],
+        }

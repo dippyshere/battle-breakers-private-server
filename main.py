@@ -78,6 +78,7 @@ app.ctx.load_datatable = utils.load_datatable
 app.ctx.get_template_id_from_path = utils.get_template_id_from_path
 app.ctx.extract_version_info = utils.extract_version_info
 app.ctx.room_generator = utils.room_generator
+app.ctx.parse_template_id = utils.parse_template_id
 app.error_handler = error_handler.CustomErrorHandler()
 app.register_middleware(middleware.mcp_middleware.add_mcp_headers, "response")
 app.ctx.accounts = {}
