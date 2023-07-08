@@ -18,7 +18,7 @@ compress = Compress()
 wex_profile_claim_quest_reward = sanic.Blueprint("wex_profile_claim_quest_reward")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/profile/ec0ebb7e56f6454e86c62299a7b32e21/ClaimQuestReward.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/game/v2/profile/accountId/ClaimQuestReward.md
 @wex_profile_claim_quest_reward.route("/<accountId>/ClaimQuestReward", methods=["POST"])
 @auth(strict=True)
 @compress.compress()

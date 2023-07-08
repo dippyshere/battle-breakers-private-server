@@ -17,7 +17,7 @@ compress = Compress()
 verify = sanic.Blueprint("account_verify")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/account-public-service-prod.ol.epicgames.com/account/api/oauth/verify.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Account%20Service/account/api/oauth/verify.md
 @verify.route("/api/oauth/verify", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()

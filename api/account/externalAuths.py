@@ -17,7 +17,7 @@ compress = Compress()
 external_auths = sanic.Blueprint("account_external_auths")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/account-public-service-prod.ol.epicgames.com/account/api/public/account/ec0ebb7e56f6454e86c62299a7b32e21/externalAuths.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Account%20Service/account/api/public/account/accountId/externalAuths.md
 @external_auths.route("/api/public/account/<accountId>/externalAuths", methods=["GET"])
 @auth(strict=True)
 @compress.compress()

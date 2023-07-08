@@ -17,7 +17,7 @@ compress = Compress()
 agreements = sanic.Blueprint("eula_agreements")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/eulatracking-public-service-prod06.ol.epicgames.com/eulatracking/api/public/agreements/egstore/account/ec0ebb7e56f6454e86c62299a7b32e21.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/EULA%20Tracking%20Service/eulatracking/api/public/agreements/egstore/account/accountId.md
 @agreements.route("/api/public/agreements/egstore/account/<accountId>", methods=["GET"])
 @auth(strict=True)
 @compress.compress()

@@ -17,7 +17,7 @@ compress = Compress()
 account_info = sanic.Blueprint("account_info")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/account-public-service-prod.ol.epicgames.com/account/api/public/account/ec0ebb7e56f6454e86c62299a7b32e21.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Account%20Service/account/api/public/account/accountId.md
 @account_info.route("/api/public/account/<accountId>", methods=["GET"])
 @auth
 @compress.compress()

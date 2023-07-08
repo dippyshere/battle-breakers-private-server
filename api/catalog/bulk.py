@@ -17,7 +17,7 @@ compress = Compress()
 bulk = sanic.Blueprint("catalog_bulk")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/catalog-public-service-prod.ol.epicgames.com/catalog/api/shared/bulk/offers.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Catalog%20Service/catalog/api/shared/bulk/offers.md
 @bulk.route("/api/shared/bulk/offers", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()

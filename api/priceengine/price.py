@@ -17,7 +17,7 @@ compress = Compress()
 price = sanic.Blueprint("priceengine_price")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/catalog-public-service-prod.ol.epicgames.com/catalog/api/shared/bulk/offers.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Price%20Engine%20Service/priceengine/api/shared/offers/price.md
 @price.route("/api/shared/offers/price", methods=["POST"])
 @auth(allow_basic=True)
 @compress.compress()

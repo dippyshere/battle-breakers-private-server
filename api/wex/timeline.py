@@ -18,7 +18,7 @@ compress = Compress()
 wex_timeline = sanic.Blueprint("wex_timeline")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/calendar/v1/timeline.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/calendar/v1/timeline.md
 @wex_timeline.route("/api/calendar/v1/timeline", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()

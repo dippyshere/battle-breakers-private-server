@@ -15,7 +15,7 @@ compress = Compress()
 data = sanic.Blueprint("datarouter_data")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/datarouter.ol.epicgames.com/datarouter/api/v1/public/data.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Data%20Router/datarouter/api/v1/public/data.md
 @data.route("/api/v1/public/data", methods=["POST"])
 @compress.compress()
 async def datarouter(request: sanic.request.Request) -> sanic.response.HTTPResponse:

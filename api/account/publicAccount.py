@@ -19,7 +19,7 @@ compress = Compress()
 public_account = sanic.Blueprint("account_public")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/account-public-service-prod.ol.epicgames.com/account/api/public/account.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Account%20Service/account/api/public/account.md
 @public_account.route("/api/public/account", methods=["GET"])
 @auth
 @compress.compress()
@@ -49,6 +49,7 @@ async def public_account_info(request: sanic.request.Request) -> sanic.response.
     return sanic.response.json(final_accounts)
 
 
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Account%20Service/account/api/public/account/displayName/displayName.md
 @public_account.route("/api/public/account/displayName/<displayName>", methods=["GET"])
 @auth
 @compress.compress()

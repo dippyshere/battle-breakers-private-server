@@ -15,7 +15,7 @@ from utils.utils import authorized as auth
 wex_entitlement = sanic.Blueprint("wex_entitlement")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/entitlementCheck.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/entitlementCheck.md
 @wex_entitlement.route("/api/entitlementCheck", methods=["GET"])
 @auth
 async def entitlement_check(request: sanic.request.Request) -> sanic.response.HTTPResponse:

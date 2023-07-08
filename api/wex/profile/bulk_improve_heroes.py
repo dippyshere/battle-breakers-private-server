@@ -18,7 +18,7 @@ compress = Compress()
 wex_profile_bulk_improve_heroes = sanic.Blueprint("wex_profile_bulk_improve_heroes")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/profile/ec0ebb7e56f6454e86c62299a7b32e21/BulkImproveHeroes.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/game/v2/profile/accountId/BulkImproveHeroes.md
 @wex_profile_bulk_improve_heroes.route("/<accountId>/BulkImproveHeroes", methods=["POST"])
 @auth(strict=True)
 @compress.compress()

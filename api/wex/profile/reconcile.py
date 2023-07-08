@@ -20,7 +20,7 @@ compress = Compress()
 wex_profile_reconcile = sanic.Blueprint("wex_profile_reconcile")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/profile/ec0ebb7e56f6454e86c62299a7b32e21/Reconcile.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/game/v2/profile/accountId/Reconcile.md
 @wex_profile_reconcile.route("/<accountId>/Reconcile", methods=["POST"])
 @auth(strict=True)
 @compress.compress()

@@ -19,7 +19,7 @@ compress = Compress()
 wex_profile_suggestion_response = sanic.Blueprint("wex_profile_suggestion_response")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/profile/ec0ebb7e56f6454e86c62299a7b32e21/SuggestionResponse.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/game/v2/profile/accountId/SuggestionResponse.md
 @wex_profile_suggestion_response.route("/<accountId>/SuggestionResponse", methods=["POST"])
 @auth(strict=True)
 @compress.compress()

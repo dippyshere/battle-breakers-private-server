@@ -15,7 +15,7 @@ compress = Compress()
 wex_version_probe = sanic.Blueprint("wex_version_probe")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/version-probe.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/game/version-probe.md
 @wex_version_probe.route("/api/game/version-probe", methods=['GET'])
 @compress.compress()
 async def version_probe(request: sanic.request.Request) -> sanic.response.HTTPResponse:

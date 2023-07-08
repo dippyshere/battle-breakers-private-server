@@ -15,7 +15,7 @@ compress = Compress()
 wex_catalog = sanic.Blueprint("wex_catalog")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/storefront/v2/catalog.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/storefront/v2/catalog.md
 @wex_catalog.route("/api/storefront/v2/catalog", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()

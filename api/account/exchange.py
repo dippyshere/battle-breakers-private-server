@@ -15,7 +15,7 @@ compress = Compress()
 exchange = sanic.Blueprint("exchange_token")
 
 
-# undocumented
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Account%20Service/account/api/oauth/exchange.md
 @exchange.route("/api/oauth/exchange", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()

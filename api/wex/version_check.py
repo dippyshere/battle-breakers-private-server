@@ -15,7 +15,7 @@ compress = Compress()
 wex_version_check = sanic.Blueprint("wex_version_check")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/v2/versioncheck/Windows.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/v2/versioncheck/Windows.md
 @wex_version_check.route("/api/v2/versioncheck/<platform>", methods=['GET'])
 @compress.compress()
 async def version_check(request: sanic.request.Request, platform: str) -> sanic.response.HTTPResponse:

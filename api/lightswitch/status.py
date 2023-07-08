@@ -17,7 +17,7 @@ compress = Compress()
 status = sanic.Blueprint("lightswitch_status")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/lightswitch-public-service-prod.ol.epicgames.com/lightswitch/api/service/bulk/status.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Lightswitch%20Service/lightswitch/api/service/bulk/status.md
 @status.route("/api/service/bulk/status", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()

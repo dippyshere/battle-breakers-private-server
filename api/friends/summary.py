@@ -17,7 +17,7 @@ compress = Compress()
 summary = sanic.Blueprint("friends_summary")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/friends-public-service-prod.ol.epicgames.com/friends/api/v1/ec0ebb7e56f6454e86c62299a7b32e21/summary.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Friends%20Service/friends/api/v1/accountId/summary.md
 @summary.route("/api/v1/<accountId>/summary", methods=["GET"])
 @auth(strict=True)
 @compress.compress()

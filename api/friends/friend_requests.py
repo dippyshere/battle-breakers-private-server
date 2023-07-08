@@ -20,7 +20,7 @@ compress = Compress()
 friend_request = sanic.Blueprint("friend_request")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/friends-public-service-prod.ol.epicgames.com/friends/api/v1/ec0ebb7e56f6454e86c62299a7b32e21/friends/47c782fa8b0144afb42e0f8d2f6ca41b.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Friends%20Service/friends/api/v1/accountId/friends/friendId.md
 @friend_request.route("/api/v1/<accountId>/friends/<friendId>", methods=["POST", "DELETE"])
 @auth(strict=True)
 @compress.compress()

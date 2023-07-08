@@ -18,7 +18,7 @@ compress = Compress()
 wex_profile_sell_multiple_gear = sanic.Blueprint("wex_profilwex_profile_sell_multiple_geare_sell_gear")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/profile/ec0ebb7e56f6454e86c62299a7b32e21/SellHero.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/game/v2/profile/accountId/SellHero.md
 @wex_profile_sell_multiple_gear.route("/<accountId>/SellMultipleGear", methods=["POST"])
 @auth(strict=True)
 @compress.compress()

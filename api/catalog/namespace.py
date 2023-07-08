@@ -17,7 +17,7 @@ compress = Compress()
 namespace = sanic.Blueprint("catalog_namespace")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/catalog-public-service-prod06.ol.epicgames.com/catalog/api/shared/namespace/wex/bulk/items.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Catalog%20Service/catalog/api/shared/namespace/wex/bulk/items.md
 @namespace.route("/api/shared/bulk/namespace/wex/bulk/items", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()

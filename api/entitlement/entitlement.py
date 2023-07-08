@@ -17,7 +17,7 @@ compress = Compress()
 entitlement = sanic.Blueprint("entitlement")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/entitlement-public-service-prod08.ol.epicgames.com/entitlement/api/account/ec0ebb7e56f6454e86c62299a7b32e21/entitlements.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Entitlement%20Service/entitlement/api/account/accountId/entitlements.md
 @entitlement.route("/api/account/<accountId>/entitlements", methods=["GET"])
 @auth(strict=True)
 @compress.compress()

@@ -19,7 +19,7 @@ compress = Compress()
 token = sanic.Blueprint("account_token")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/account-public-service-prod.ol.epicgames.com/account/api/oauth/token.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Account%20Service/account/api/oauth/token.md
 @token.route("/api/oauth/token", methods=["POST"])
 @auth(allow_basic=True)
 @compress.compress()

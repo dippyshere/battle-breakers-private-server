@@ -18,7 +18,7 @@ compress = Compress()
 wex_profile_roll_hammer_chests = sanic.Blueprint("wex_profile_roll_hammer_chests")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/profile/ec0ebb7e56f6454e86c62299a7b32e21/RollHammerChests.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/game/v2/profile/accountId/RollHammerChests.md
 @wex_profile_roll_hammer_chests.route("/<accountId>/RollHammerChests", methods=["POST"])
 @auth(strict=True)
 @compress.compress()

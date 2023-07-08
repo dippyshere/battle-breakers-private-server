@@ -15,7 +15,7 @@ compress = Compress()
 wex_enabled_features = sanic.Blueprint("wex_enabled_features")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/v2/versioncheck/Windows.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/v2/versioncheck/Windows.md
 @wex_enabled_features.route("/api/v2/enabled_features", methods=['GET'])
 @compress.compress()
 async def enabled_features(request: sanic.request.Request, platform: str) -> sanic.response.JSONResponse:

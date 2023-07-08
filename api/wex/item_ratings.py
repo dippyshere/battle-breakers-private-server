@@ -18,7 +18,7 @@ compress = Compress()
 wex_item_ratings = sanic.Blueprint("wex_item_ratings")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/tree/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/item_ratings/ec0ebb7e56f6454e86c62299a7b32e21
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/game/v2/item_ratings/accountId/templateId.md
 @wex_item_ratings.route("/api/game/v2/item_ratings/<accountId>/<templateId>", methods=["GET"])
 @auth(strict=True)
 @compress.compress()

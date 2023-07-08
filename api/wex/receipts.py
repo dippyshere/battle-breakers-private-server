@@ -17,7 +17,7 @@ compress = Compress()
 wex_receipts = sanic.Blueprint("wex_receipts")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/receipts/v1/account/ec0ebb7e56f6454e86c62299a7b32e21/receipts.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/receipts/v1/account/accountId/receipts.md
 @wex_receipts.route("/api/receipts/v1/account/<accountId>/receipts", methods=["GET"])
 @auth(strict=True)
 @compress.compress()

@@ -15,7 +15,7 @@ compress = Compress()
 ssodomains = sanic.Blueprint("account_ssodomains")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/account-public-service-prod.ol.epicgames.com/account/api/epicdomains/ssodomains.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Account%20Service/account/api/epicdomains/ssodomains.md
 @ssodomains.route("/api/epicdomains/ssodomains", methods=["GET"])
 @compress.compress()
 async def epic_domains_sso_domains(request: sanic.request.Request) -> sanic.response.JSONResponse:

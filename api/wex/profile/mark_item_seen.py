@@ -17,7 +17,7 @@ compress = Compress()
 wex_profile_mark_item_seen = sanic.Blueprint("wex_profile_mark_item_seen")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/profile/ec0ebb7e56f6454e86c62299a7b32e21/MarkItemSeen.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/game/v2/profile/accountId/MarkItemSeen.md
 @wex_profile_mark_item_seen.route("/<accountId>/MarkItemSeen", methods=["POST"])
 @auth(strict=True)
 @compress.compress()

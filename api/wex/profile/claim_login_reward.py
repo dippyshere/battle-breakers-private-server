@@ -16,7 +16,7 @@ compress = Compress()
 wex_profile_claim_login = sanic.Blueprint("wex_profile_claim_login")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/profile/ec0ebb7e56f6454e86c62299a7b32e21/QueryProfile(profile0).md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/game/v2/profile/accountId/QueryProfile(profile0).md
 @wex_profile_claim_login.route("/<accountId>/ClaimLoginReward", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
@@ -30,7 +30,8 @@ async def claim_login_reward(request: sanic.request.Request, accountId: str) -> 
     current_day = (await request.ctx.profile.get_stat("login_reward"))["next_level"]
     if current_day >= 1800:
         await request.ctx.profile.modify_stat("login_reward", {
-            "last_claim_time": "2099-12-31T23:59:99.999Z",  # Disable future login rewards as this is the limit
+            # Effectively disable future login rewards as beyond this, the game crashes
+            "last_claim_time": "2099-12-31T23:59:99.999Z",
             "next_level": 1800
         })
     else:

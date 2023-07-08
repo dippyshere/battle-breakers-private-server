@@ -18,7 +18,7 @@ compress = Compress()
 wex_profile_open_gift_box = sanic.Blueprint("wex_profile_open_gift_box")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/wex-public-service-live-prod.ol.epicgames.com/wex/api/game/v2/profile/ec0ebb7e56f6454e86c62299a7b32e21/OpenGiftBox.md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/game/v2/profile/accountId/OpenGiftBox.md
 @wex_profile_open_gift_box.route("/<accountId>/OpenGiftBox", methods=["POST"])
 @auth(strict=True)
 @compress.compress()

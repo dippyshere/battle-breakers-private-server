@@ -18,7 +18,7 @@ compress = Compress()
 kill = sanic.Blueprint("account_kill")
 
 
-# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/account-public-service-prod.ol.epicgames.com/account/api/oauth/sessions/kill/eg1~token....md
+# https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Account%20Service/account/api/oauth/sessions/kill/kill.md
 @kill.route("/api/oauth/sessions/kill/<token>", methods=["DELETE"])
 @auth
 @compress.compress()
