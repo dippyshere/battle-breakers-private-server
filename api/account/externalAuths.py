@@ -47,23 +47,42 @@ async def add_external_auth(request: sanic.request.Request, accountId: str) -> s
     """
     data = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
     # not bothered to add ALL of the external auths, only adding google cause mobile (fb blocked insecure sign in)
-    if request.json["authType"] == "google_user_id":
-        data["externalAuths"]["google"] = {
-            "accountId": accountId,
-            "type": "google",
-            "externalAuthId": request.json["externalAuthToken"],
-            "externalAuthIdType": "google_user_id",
-            "externalDisplayName": "",
-            "authIds": [
-                {
-                    "id": request.json["externalAuthToken"],
-                    "type": "google_user_id"
+    match request.json.get("authType"):
+        case "google_user_id":
+            data["externalAuths"]["google"] = {
+                "accountId": accountId,
+                "type": "google",
+                "externalAuthId": request.json["externalAuthToken"],
+                "externalAuthIdType": "google_user_id",
+                "externalDisplayName": "",
+                "authIds": [
+                    {
+                        "id": request.json["externalAuthToken"],
+                        "type": "google_user_id"
+                    }
+                ]
+            }
+        case "google_id_token":
+            google_token = await request.app.ctx.verify_google_token(request.json.get("externalAuthToken"))
+            if google_token is not None:
+                data["externalAuths"]["google"] = {
+                    "accountId": accountId,
+                    "type": "google",
+                    "externalAuthId": google_token.get("sub"),
+                    "externalAuthIdType": "google_id_token",
+                    "externalDisplayName": google_token.get("name"),
+                    "authIds": [
+                        {
+                            "id": google_token.get("sub"),
+                            "type": "google_id_token"
+                        }
+                    ]
                 }
-            ]
-        }
-    else:
-        raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()
-    await request.app.ctx.save_file(f"res/account/api/public/account/{accountId}.json", data)
+                data["name"] = google_token.get("given_name")
+                data["lastName"] = google_token.get("family_name")
+        case _:
+            raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()
+    await request.app.ctx.write_file(f"res/account/api/public/account/{accountId}.json", data)
     return sanic.response.json([data["externalAuths"]])
 
 

@@ -18,6 +18,7 @@ import zlib
 from inspect import isawaitable
 from typing import Any, Tuple, Optional, Callable
 
+import aiohttp
 import bcrypt
 import jwt
 import orjson
@@ -256,6 +257,22 @@ async def parse_eg1(token: str) -> Optional[dict]:
     try:
         token = token.replace("bearer ", "").replace("eg1~", "")
         return jwt.decode(token, public_key, algorithms=["RS256"], leeway=20)
+    except:
+        return None
+
+
+async def verify_google_token(token: str) -> Optional[dict]:
+    """
+    Verifies a Google token
+    :param token: The token to verify
+    :return: The token if verified, None otherwise
+    """
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"https://oauth2.googleapis.com/tokeninfo?id_token={token}") as r:
+                if r.status != 200:
+                    return None
+                return await r.json()
     except:
         return None
 

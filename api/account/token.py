@@ -7,6 +7,7 @@ This code is licensed under the [TBD] license.
 Handles the token requests
 """
 import base64
+import os
 
 import sanic
 
@@ -44,15 +45,69 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
             case 'client_credentials':
                 return sanic.response.json((await request.app.ctx.oauth_client_response(client_id)))
             case 'external_auth':
-                if request.form.get('external_auth_type') != 'google':
-                    raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()
-                # TODO: Investigate external auth when there is no linked account
-                # TODO: Investigate and implement proper external auth if possible
-                sub = request.form.get('external_auth_token').split(':')[0]
-                account = await request.app.ctx.read_file(f"res/account/api/public/account/{sub}.json")
-                dn = account['displayName']
-                dvid = request.headers.get('X-Epic-Device-ID')
-                return sanic.response.json((await request.app.ctx.oauth_response(client_id, dn, dvid, sub)))
+                match request.form.get('external_auth_type'):
+                    case 'google':
+                        # TODO: Reinvestigate what this case is
+                        sub = request.form.get('external_auth_token').split(':')[0]
+                        account = await request.app.ctx.read_file(f"res/account/api/public/account/{sub}.json")
+                        dn = account['displayName']
+                        dvid = request.headers.get('X-Epic-Device-ID')
+                        return sanic.response.json((await request.app.ctx.oauth_response(client_id, dn, dvid, sub)))
+                    case 'google_id_token':
+                        google_token = await request.app.ctx.verify_google_token(
+                            request.form.get('external_auth_token'))
+                        if google_token is not None:
+                            sub = google_token['sub']
+                            for account in os.listdir('res/account/api/public/account'):
+                                account = await request.app.ctx.read_file(f"res/account/api/public/account/{account}")
+                                if account.get('externalAuths', {}).get('google', {}).get('externalAuthId') == sub:
+                                    dn = account['displayName']
+                                    dvid = request.headers.get('X-Epic-Device-ID')
+                                    return sanic.response.json(
+                                        (await request.app.ctx.oauth_response(client_id, dn, dvid, account['id'])))
+                            # Create an account
+                            account_id = await request.app.ctx.create_account()
+                            account = await request.app.ctx.read_file(
+                                f"res/account/api/public/account/{account_id}.json")
+                            account["externalAuths"]["google"] = {
+                                "accountId": account_id,
+                                "type": "google",
+                                "externalAuthId": google_token.get("sub"),
+                                "externalAuthIdType": "google_id_token",
+                                "externalDisplayName": google_token.get("name"),
+                                "authIds": [
+                                    {
+                                        "id": google_token.get("sub"),
+                                        "type": "google_id_token"
+                                    }
+                                ]
+                            }
+                            account["name"] = google_token.get("given_name")
+                            account["lastName"] = google_token.get("family_name")
+                            account["headless"] = True
+                            await request.app.ctx.write_file(f"res/account/api/public/account/{account_id}.json",
+                                                             account)
+                            profile = await request.app.ctx.read_file(
+                                f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/profile0.json")
+                            profile["stats"]["attributes"]["is_headless"] = True
+                            await request.app.ctx.write_file(
+                                f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/profile0.json", profile)
+                            return sanic.response.json(
+                                (await request.app.ctx.oauth_response(sub=account_id)))
+                        else:
+                            raise errors.com.epicgames.account.external_auth_validate_failed()
+                    case 'internal':
+                        # Yeah, really! Internal external auth!
+                        token = await request.app.ctx.parse_eg1(
+                            request.form.get('external_auth_token').split(":")[-1])
+                        if token is not None:
+                            return sanic.response.json((await request.app.ctx.oauth_response(client_id, token['dn'],
+                                                                                             token['dvid'],
+                                                                                             token['sub'])))
+                        else:
+                            raise errors.com.epicgames.account.oauth.expired_exchange_code()
+                    case _:
+                        raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()
             case 'authorization_code':
                 token = await request.app.ctx.parse_eg1(request.form.get('code'))
                 if token is not None:

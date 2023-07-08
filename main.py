@@ -63,6 +63,7 @@ app.ctx.generate_client_eg1 = utils.generate_client_eg1
 app.ctx.generate_refresh_eg1 = utils.generate_refresh_eg1
 app.ctx.generate_authorisation_eg1 = utils.generate_authorisation_eg1
 app.ctx.parse_eg1 = utils.parse_eg1
+app.ctx.verify_google_token = utils.verify_google_token
 app.ctx.to_insecure_hash = utils.to_insecure_hash
 app.ctx.bcrypt_hash = utils.bcrypt_hash
 app.ctx.bcrypt_check = utils.bcrypt_check
