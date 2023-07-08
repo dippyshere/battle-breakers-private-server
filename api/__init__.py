@@ -7,13 +7,14 @@ This code is licensed under the [TBD] license.
 Main Blueprint group for the server
 """
 import sanic
-from .thirdpartytrackers import trackers
 from .account import account
 from .affiliate import affiliate
 from .battlebreakers import bb_cdn
 from .catalog import catalog
 from .datarouter import datarouter
 from .entitlement import entitlements
+from .eulatracking import agreements
+from .exchange import exchange
 from .friends import friends
 from .lightswitch import lightswitch
 from .login import login
