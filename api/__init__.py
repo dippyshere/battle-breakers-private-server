@@ -11,6 +11,7 @@ from .account import account
 from .affiliate import affiliate
 from .battlebreakers import bb_cdn
 from .catalog import catalog
+from .dashboard import dasboard
 from .datarouter import datarouter
 from .entitlement import entitlements
 from .eulatracking import agreements
@@ -26,4 +27,4 @@ from .thirdpartytrackers import trackers
 from .wex import wex
 
 api = sanic.Blueprint.group(trackers, account, catalog, datarouter, entitlements, friends, lightswitch, login, misc,
-                            presence, priceengine, wex, bb_cdn, affiliate, agreements, exchange, purchase)
+                            presence, priceengine, wex, bb_cdn, affiliate, agreements, exchange, purchase, dasboard)
