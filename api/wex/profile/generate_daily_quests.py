@@ -31,6 +31,7 @@ async def generate_daily_quests(request: sanic.request.Request, accountId: str) 
     """
     await request.ctx.profile.modify_stat("daily_quest_last_refresh", await request.app.ctx.format_time())
     # TODO: add daily quests
+    # TODO: add gift point rewards from friends
     await request.ctx.profile.add_notifications({
         "type": "WExpGiftPointReward",
         "primary": True,
