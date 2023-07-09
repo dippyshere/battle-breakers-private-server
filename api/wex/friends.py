@@ -28,26 +28,33 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
     :param accountId: The account id
     :return: The response object
     """
-    account_id = request.match_info.get('accountId')
-    if account_id is not None:
-        if account_id not in request.app.ctx.profiles:
-            request.app.ctx.profiles[account_id] = PlayerProfile(account_id)
-        request.ctx.profile = request.app.ctx.profiles[account_id]
-    else:
-        request.ctx.profile = None
-    if request.args.get("rvn") is None:
-        request.ctx.rvn = -1
-    else:
-        try:
-            request.ctx.rvn = int(request.args.get("rvn"))
-        except:
-            request.ctx.rvn = -1
-    request.ctx.profile_id = ProfileType.from_string("friends")
-    request.ctx.profile_revisions = request.headers.get("X-EpicGames-ProfileRevisions")
-    return sanic.response.json(
-        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
-                                                     request.ctx.profile_revisions)
-    )
+    # return sanic.response.json({
+    #     "accounts": [{
+    #     "accountId": "09b8744abd524d879630f7c79365e2f8",
+    #     "username": "Dippyshere",
+    # }],
+    #     "count": 1
+    # })
+    # account_id = request.match_info.get('accountId')
+    # if account_id is not None:
+    #     if account_id not in request.app.ctx.profiles:
+    #         request.app.ctx.profiles[account_id] = PlayerProfile(account_id)
+    #     request.ctx.profile = request.app.ctx.profiles[account_id]
+    # else:
+    #     request.ctx.profile = None
+    # if request.args.get("rvn") is None:
+    #     request.ctx.rvn = -1
+    # else:
+    #     try:
+    #         request.ctx.rvn = int(request.args.get("rvn"))
+    #     except:
+    #         request.ctx.rvn = -1
+    # request.ctx.profile_id = ProfileType.from_string("friends")
+    # request.ctx.profile_revisions = request.headers.get("X-EpicGames-ProfileRevisions")
+    # return sanic.response.json(
+    #     await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+    #                                                  request.ctx.profile_revisions)
+    # )
     # displayName = urllib.parse.unquote(request.args.get("name"))
     # requested_id = await request.app.ctx.get_account_id_from_display_name(displayName)
     # if requested_id is None:
