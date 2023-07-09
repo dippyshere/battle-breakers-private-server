@@ -41,6 +41,7 @@ async def upgrade_building(request: sanic.request.Request, accountId: str) -> sa
             await request.ctx.profile.change_item_quantity(current_item[0],
                                                            current_quantity - item["Count"])
         if promotion_table.get("MtxCost") is not None:
+            # TODO: enforce account level
             mtx_item_id = (await request.ctx.profile.find_item_by_template_id("Currency:MtxGiveaway"))[0]
             mtx_quantity = (await request.ctx.profile.get_item_by_guid(mtx_item_id))["quantity"]
             await request.ctx.profile.change_item_quantity(mtx_item_id, mtx_quantity - promotion_table["MtxCost"])
