@@ -15,6 +15,7 @@ import random
 import re
 import uuid
 import zlib
+from difflib import SequenceMatcher
 from inspect import isawaitable
 from typing import Any, Tuple, Optional, Callable
 
@@ -603,6 +604,38 @@ async def get_template_id_from_path(path: Optional[str]) -> Optional[str]:
         if data[0].get('Type') == "WExpTokenDefinition":
             return f"Token:{data[0].get('Name')}"
     return None
+
+
+async def find_best_match(input_str: str, item_list: list) -> str:
+    """
+    Finds the best match for a string in a list
+    :param input_str: The string to find the best match for
+    :param item_list: The list to find the best match in
+    :return: The best match
+    """
+    best_match = ""
+    best_match_score = 0
+    for item in item_list:
+        score = SequenceMatcher(None, input_str, item).ratio()
+        if score > best_match_score:
+            best_match_score = score
+            best_match = item
+    return best_match
+
+
+async def get_path_from_template_id(template_id: str) -> str:
+    """
+    Gets the path from a template id
+    :param template_id: The template id to get the path for
+    :return: The path
+    """
+    # list all files in the content folder
+    file_list = []
+    for root, dirs, files in os.walk('res/Game/WorldExplorers/Content/'):
+        for file in files:
+            file_list.append(os.path.join(root, file))
+    best_match = await find_best_match(template_id, file_list)
+    return best_match
 
 
 async def extract_version_info(user_agent: str) -> Tuple[int, int, int]:

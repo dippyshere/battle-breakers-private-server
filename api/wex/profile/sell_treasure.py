@@ -29,4 +29,21 @@ async def sell_treasure(request: sanic.request.Request, accountId: str) -> sanic
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_implemented()
+    item_path = (await request.app.ctx.get_path_from_template_id(request.json.get("itemTemplateId")))
+    value = (await request.app.ctx.read_file(item_path))[0]["Properties"]["GoldValue"]
+    gold_id = (await request.ctx.profile.find_item_by_template_id("Currency:Gold"))[0]
+    current_gold = (await request.ctx.profile.get_item_by_guid(gold_id))["quantity"]
+    item_guid = (await request.ctx.profile.find_item_by_template_id(request.json.get("itemTemplateId")))[0]
+    item_quantity = (await request.ctx.profile.get_item_by_guid(item_guid))["quantity"]
+    sell_quantity = request.json.get("quantity")
+    if sell_quantity > item_quantity:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid quantity")
+    if sell_quantity < item_quantity:
+        await request.ctx.profile.change_item_quantity(item_guid, item_quantity - sell_quantity)
+    else:
+        await request.ctx.profile.remove_item(item_guid)
+    await request.ctx.profile.change_item_quantity(gold_id, current_gold + (value * sell_quantity))
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions)
+    )
