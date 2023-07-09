@@ -123,7 +123,7 @@ async def cloudstorage_system_get_file(request: sanic.request.Request, filename:
     elif filename == "b91b0a42b48740bfaaf0acae1df48cb1":
         filename = "DefaultGame.ini"
     if not os.path.exists(f"res/wex/api/cloudstorage/system/{filename}"):
-        raise errors.com.epicgames.cloudstorage.file_not_found()
+        raise errors.com.epicgames.cloudstorage.file_not_found(filename)
     data = await request.app.ctx.read_file(f"res/wex/api/cloudstorage/system/{filename}", False)
     return sanic.response.raw(data, content_type="application/octet-stream")
 
@@ -189,9 +189,9 @@ async def cloudstorage_user_get_file(request: sanic.request.Request, accountId: 
     :param filename: The filename
     :return: The response object
     """
-    if not os.path.exists(f"res/wex/api/cloudstorage/user/{filename}"):
-        raise errors.com.epicgames.cloudstorage.file_not_found()
-    with open(f"res/wex/api/cloudstorage/user/{filename}", "rb") as f:
+    if not os.path.exists(f"res/wex/api/cloudstorage/user/{accountId}/{filename}"):
+        raise errors.com.epicgames.cloudstorage.file_not_found(filename, accountId)
+    with open(f"res/wex/api/cloudstorage/user/{accountId}/{filename}", "rb") as f:
         data = f.read()
     return sanic.response.raw(data, content_type="application/octet-stream")
 

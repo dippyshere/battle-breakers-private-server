@@ -1687,10 +1687,10 @@ class errors:
                     This error is thrown when a file is not found
                     *errors.com.epicgames.cloudstorage.file_not_found*
                     """
-                    errorMessage: str = "File not found"
-                    numericErrorCode: int = 0
+                    errorMessage: str = "Sorry, we couldn't find a file {0} for account {1}"
+                    numericErrorCode: int = 12007
                     originatingService: str = "WEX"
-                    statusCode: int = 400
+                    statusCode: int = 404
 
                 class invalid_storage_size(EpicException):
                     """
