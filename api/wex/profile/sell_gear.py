@@ -29,4 +29,48 @@ async def sell_gear(request: sanic.request.Request, accountId: str) -> sanic.res
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_implemented()
+    # EWExpRarity::Common       - 1
+    # EWExpRarity::Uncommon     - 2
+    # EWExpRarity::Rare         - 4
+    # EWExpRarity::VeryRare     - 8
+    # EWExpRarity::SuperRare    - 20
+    gear_guid = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_Shard_Gear")
+    match (await request.ctx.profile.get_item_by_guid(request.json.get("itemId")))["attributes"]["rarity"]:
+        case "Common":
+            value = 1
+        case "Uncommon":
+            value = 2
+        case "Rare":
+            value = 4
+        case "VeryRare":
+            value = 8
+        case "SuperRare":
+            value = 20
+        case _:
+            raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid rarity")
+    if gear_guid:
+        await request.ctx.profile.change_item_quantity(gear_guid[0],
+                                                       (await request.ctx.profile.get_item_by_guid(gear_guid[0]))[
+                                                           "quantity"] + value)
+    else:
+        await request.ctx.profile.add_item({
+            "templateId": "Reagent:Reagent_Shard_Gear",
+            "attributes": {},
+            "quantity": value}
+        )
+    await request.ctx.profile.remove_item(request.json.get("itemId"))
+    # await request.ctx.profile.add_notifications({
+    #     "type": "WExpGiftPointReward",
+    #     "primary": True,
+    #     "totalPoints": 0,
+    #     "lootResult": {
+    #         "items": [{
+    #             "itemType": "Reagent:Reagent_Shard_Gear",
+    #             "quantity": value
+    #         }]
+    #     }
+    # })
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions)
+    )
