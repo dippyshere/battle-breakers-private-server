@@ -30,7 +30,9 @@ async def sell_treasure(request: sanic.request.Request, accountId: str) -> sanic
     :return: The modified profile
     """
     item_path = (await request.app.ctx.get_path_from_template_id(request.json.get("itemTemplateId")))
-    value = (await request.app.ctx.read_file(item_path))[0]["Properties"]["GoldValue"]
+    value = (await request.app.ctx.load_datatable(
+        item_path.replace("res/Game/WorldExplorers/", "").replace(".json", "").replace("\\", "/")))[0]["Properties"][
+        "GoldValue"]
     gold_id = (await request.ctx.profile.find_item_by_template_id("Currency:Gold"))[0]
     current_gold = (await request.ctx.profile.get_item_by_guid(gold_id))["quantity"]
     item_guid = (await request.ctx.profile.find_item_by_template_id(request.json.get("itemTemplateId")))[0]
