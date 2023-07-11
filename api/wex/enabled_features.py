@@ -16,13 +16,14 @@ wex_enabled_features = sanic.Blueprint("wex_enabled_features")
 
 
 # https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/v2/versioncheck/Windows.md
-@wex_enabled_features.route("/api/v2/enabled_features", methods=['GET'])
+@wex_enabled_features.route("/api/game/v2/enabled_features", methods=['GET'])
 @compress.compress()
 async def enabled_features(request: sanic.request.Request, platform: str) -> sanic.response.JSONResponse:
     """
-    Handles the enabled features check. I HATE all those stupid clones of the same open source "private server"; none of them give correct or accurate responses ffs. i dont know what should actually be here ;/
+    Handles the enabled features check.
     :param request: The request object
     :param platform: The platform
     :return: The response object
     """
+    # Unsure what could/should be here, this feature was disabled via config files after 1.80 on pc
     return sanic.response.json(["store", "pvp"])
