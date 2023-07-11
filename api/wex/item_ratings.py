@@ -37,8 +37,10 @@ async def item_ratings(request: sanic.request.Request, accountId: str, templateI
     data = await request.app.ctx.read_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json")
     template_id = urllib.parse.unquote(templateId)
     character_datatable = await request.app.ctx.load_datatable("Content/Characters/Datatables/CharacterStats")
-    rating_key = character_datatable[0]["Rows"].get(f"CD.{template_id.split(':')[1].replace('_', '.')}", {}).get(
-        "RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")
+    # TODO: rating key compatability for older versions
+    rating_key = character_datatable[0]["Rows"].get(
+        (await request.app.ctx.load_character_data(template_id))[0]["Properties"]["CharacterStatsHandle"]["RowName"],
+        {}).get("RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")
     if rating_key in data:
         my_rating = data[rating_key]
     overall_ratings = await request.app.ctx.read_file("res/wex/api/game/v2/item_ratings/ratings.json")
@@ -99,8 +101,9 @@ async def set_item_rating(request: sanic.request.Request, accountId: str,
     data = await request.app.ctx.read_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json")
     template_id = urllib.parse.unquote(templateId)
     character_datatable = await request.app.ctx.load_datatable("Content/Characters/Datatables/CharacterStats")
-    rating_key = character_datatable[0]["Rows"].get(f"CD.{template_id.split(':')[1].replace('_', '.')}", {}).get(
-        "RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")
+    rating_key = character_datatable[0]["Rows"].get(
+        (await request.app.ctx.load_character_data(template_id))[0]["Properties"]["CharacterStatsHandle"]["RowName"],
+        {}).get("RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")
     data[rating_key] = {
         "gameplayRating": request.json["gameplayRating"],
         "appearanceRating": request.json["appearanceRating"]
