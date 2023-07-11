@@ -80,6 +80,7 @@ app.ctx.find_best_match = utils.find_best_match
 app.ctx.get_path_from_template_id = utils.get_path_from_template_id
 app.ctx.extract_version_info = utils.extract_version_info
 app.ctx.room_generator = utils.room_generator
+app.ctx.load_character_data = utils.load_character_data
 app.ctx.parse_template_id = utils.parse_template_id
 app.error_handler = error_handler.CustomErrorHandler()
 app.register_middleware(middleware.mcp_middleware.add_mcp_headers, "response")

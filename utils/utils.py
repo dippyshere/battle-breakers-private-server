@@ -782,6 +782,19 @@ async def room_generator(level_id: str, room_number: int, level_info: dict) -> d
     return room
 
 
+@alru_cache(maxsize=256)
+async def load_character_data(character_id: str) -> dict:
+    """
+    Loads character data from the datatable
+    :param character_id: The character id to load
+    :return: The character data as a dict
+    """
+    character_id = character_id.replace("Character:", "CD_")
+    best_match = await find_best_match(character_id, character_files_list, True)
+    return await load_datatable(
+        best_match.replace("res/Game/WorldExplorers/", "").replace(".json", "").replace("\\", "/"))
+
+
 async def parse_template_id(template_id: str) -> dict:
     """
     Parses a template id into a dict
