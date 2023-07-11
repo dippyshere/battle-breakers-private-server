@@ -29,11 +29,12 @@ async def remove_from_monster_pit(request: sanic.request.Request, accountId: str
     :param accountId: The account id
     :return: The modified profile
     """
+    if not request.json.get("characterItemId").startswith("Character:"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     mtx_item_id = (await request.ctx.profile.find_item_by_template_id("Currency:MtxGiveaway"))[0]
     mtx_quantity = (await request.ctx.profile.get_item_by_guid(mtx_item_id))["quantity"]
     if mtx_quantity < 50:  # TODO: dont hardcode this value
-        raise errors.com.epicgames.modules.gamesubcatalog.purchase_not_allowed(
-            errorMessage="Cannot afford to remove item")
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough mtx")
     await request.ctx.profile.change_item_quantity(mtx_item_id, mtx_quantity - 50)
     character_item_id = request.json.get("characterItemId")
     character = await request.ctx.profile.get_item_by_guid(character_item_id, request.ctx.profile_id)

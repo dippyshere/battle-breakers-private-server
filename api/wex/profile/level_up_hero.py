@@ -10,6 +10,7 @@ Handles leveling up heroes.
 import sanic
 
 from utils.enums import ProfileType
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -30,6 +31,8 @@ async def level_up_hero(request: sanic.request.Request, accountId: str) -> sanic
     :return: The modified profile
     """
     # TODO: Validation
+    if not request.json.get("heroItemId").startswith("Character:"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     xp_guid = (await request.ctx.profile.find_item_by_template_id("Currency:HeroXp_Basic"))[0]
     current_xp = (await request.ctx.profile.get_item_by_guid(xp_guid))["quantity"]
     if request.json.get("bIsInPit"):
@@ -41,6 +44,8 @@ async def level_up_hero(request: sanic.request.Request, accountId: str) -> sanic
     xp_datatable = (await request.app.ctx.load_datatable("Content/Balance/Datatables/XPUnitLevels"))[0]["Rows"][
         "UnitXPTNLNormal"]["Keys"]
     for i in range(current_hero_level, new_level):
+        if current_xp < int(xp_datatable[i - 1]["Value"]):
+            break
         await request.ctx.profile.change_item_quantity(xp_guid, current_xp - int(xp_datatable[i - 1]["Value"]))
         current_xp -= int(xp_datatable[i - 1]["Value"])
         if request.json.get("bIsInPit"):

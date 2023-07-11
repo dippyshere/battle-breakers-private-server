@@ -67,30 +67,48 @@ async def bulk_improve_heroes(request: sanic.request.Request, accountId: str) ->
                 "ConsumptionCostGold"]
             match potion_upgrade.get("templateId"):
                 case "UpgradePotion:UpgradeStrengthMinor":
+                    if potion_upgrade["quantity"] > strength_ma_potion_quantity:
+                        raise errors.com.epicgames.world_explorers.bad_request(
+                            errorMessage=f"Invalid quantity for {potion_upgrade.get('templateId')}")
                     hero_upgrades[0] += potion_upgrade["quantity"]
                     for _ in range(potion_upgrade.get("quantity")):
+                        if current_gold < potion_cost:
+                            break
                         await request.ctx.profile.change_item_quantity(gold_id, current_gold - potion_cost)
                         current_gold -= potion_cost
                         await request.ctx.profile.change_item_quantity(strength_mi_potion_guid,
                                                                        strength_mi_potion_quantity - 1)
                         strength_mi_potion_quantity -= 1
                 case "UpgradePotion:UpgradeStrengthMajor":
+                    if potion_upgrade["quantity"] > strength_ma_potion_quantity:
+                        raise errors.com.epicgames.world_explorers.bad_request(
+                            errorMessage=f"Invalid quantity for {potion_upgrade.get('templateId')}")
                     hero_upgrades[1] += potion_upgrade["quantity"]
                     for _ in range(potion_upgrade.get("quantity")):
+                        if current_gold < potion_cost:
+                            break
                         await request.ctx.profile.change_item_quantity(gold_id, current_gold - potion_cost)
                         current_gold -= potion_cost
                         await request.ctx.profile.change_item_quantity(strength_ma_potion_guid,
                                                                        strength_ma_potion_quantity - 1)
                         strength_ma_potion_quantity -= 1
                 case "UpgradePotion:UpgradeHealthMinor":
+                    if potion_upgrade["quantity"] > health_ma_potion_quantity:
+                        raise errors.com.epicgames.world_explorers.bad_request(
+                            errorMessage=f"Invalid quantity for {potion_upgrade.get('templateId')}")
                     hero_upgrades[2] += potion_upgrade["quantity"]
                     for _ in range(potion_upgrade.get("quantity")):
+                        if current_gold < potion_cost:
+                            break
                         await request.ctx.profile.change_item_quantity(gold_id, current_gold - potion_cost)
                         current_gold -= potion_cost
                         await request.ctx.profile.change_item_quantity(health_mi_potion_guid,
                                                                        health_mi_potion_quantity - 1)
                         health_mi_potion_quantity -= 1
                 case "UpgradePotion:UpgradeHealthMajor":
+                    if potion_upgrade["quantity"] > health_ma_potion_quantity:
+                        raise errors.com.epicgames.world_explorers.bad_request(
+                            errorMessage=f"Invalid quantity for {potion_upgrade.get('templateId')}")
                     hero_upgrades[3] += potion_upgrade["quantity"]
                     for _ in range(potion_upgrade.get("quantity")):
                         await request.ctx.profile.change_item_quantity(gold_id, current_gold - potion_cost)
@@ -99,6 +117,9 @@ async def bulk_improve_heroes(request: sanic.request.Request, accountId: str) ->
                                                                        health_ma_potion_quantity - 1)
                         health_ma_potion_quantity -= 1
                 case "UpgradePotion:UpgradeMana":
+                    if potion_upgrade["quantity"] > mana_potion_quantity:
+                        raise errors.com.epicgames.world_explorers.bad_request(
+                            errorMessage=f"Invalid quantity for {potion_upgrade.get('templateId')}")
                     hero_upgrades[4] += potion_upgrade["quantity"]
                     for _ in range(potion_upgrade.get("quantity")):
                         await request.ctx.profile.change_item_quantity(gold_id, current_gold - potion_cost)
@@ -144,14 +165,20 @@ async def bulk_improve_heroes(request: sanic.request.Request, accountId: str) ->
                     "Properties"]["ConsumedItems"][0]
                 match consumed_item.get("ItemDefinition", "").get("ObjectName"):
                     case "WExpGenericAccountItemDefinition'Ore_Silver'":
+                        if current_silver < consumed_item["Count"]:
+                            break
                         await request.ctx.profile.change_item_quantity(silver_id,
                                                                        current_silver - consumed_item["Count"])
                         current_silver -= consumed_item["Count"]
                     case "WExpGenericAccountItemDefinition'Ore_Magicite'":
+                        if current_magicite < consumed_item["Count"]:
+                            break
                         await request.ctx.profile.change_item_quantity(magicite_id,
                                                                        current_magicite - consumed_item["Count"])
                         current_magicite -= consumed_item["Count"]
                     case "WExpGenericAccountItemDefinition'Ore_Iron'":
+                        if current_iron < consumed_item["Count"]:
+                            break
                         await request.ctx.profile.change_item_quantity(iron_id, current_iron - consumed_item["Count"])
                         current_iron -= consumed_item["Count"]
                     case _:
@@ -161,6 +188,8 @@ async def bulk_improve_heroes(request: sanic.request.Request, accountId: str) ->
         current_hero_level = hero_item["attributes"]["level"]
         new_level = current_hero_level + upgrade["numLevelUps"]
         for i in range(current_hero_level, new_level):
+            if current_xp < int(xp_datatable[i - 1]["Value"]):
+                break
             await request.ctx.profile.change_item_quantity(xp_guid, current_xp - int(xp_datatable[i - 1]["Value"]))
             current_xp -= int(xp_datatable[i - 1]["Value"])
             await request.ctx.profile.change_item_attribute(upgrade["heroItemId"], "level", i + 1)

@@ -9,6 +9,7 @@ Handles marking a hero as seen
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -28,6 +29,8 @@ async def mark_hero_seen(request: sanic.request.Request, accountId: str) -> sani
     :param accountId: The account id
     :return: The modified profile
     """
+    if not request.json.get("heroItemId").startswith("Character:"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "is_new", False,
                                                     request.ctx.profile_id)
     return sanic.response.json(

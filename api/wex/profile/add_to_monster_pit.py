@@ -9,6 +9,7 @@ Handles adding heroes to monster pit
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -29,6 +30,8 @@ async def add_to_monster_pit(request: sanic.request.Request, accountId: str) -> 
     :return: The modified profile
     """
     character_item_id = request.json.get("characterItemId")
+    if not character_item_id.startswith("Character:"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     character = await request.ctx.profile.get_item_by_guid(character_item_id)
     await request.ctx.profile.remove_item(character_item_id)
     await request.ctx.profile.add_item(character, character_item_id, request.ctx.profile_id)

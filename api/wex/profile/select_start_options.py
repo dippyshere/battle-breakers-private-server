@@ -10,6 +10,7 @@ import datetime
 
 import sanic
 
+from utils.exceptions import errors
 from utils.friend_system import PlayerFriends
 from utils.profile_system import PlayerProfile
 from utils.enums import ProfileType
@@ -32,6 +33,8 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
     :param accountId: The account id
     :return: The modified profile
     """
+    if await request.ctx.profile.get_stat("has_started"):
+        raise errors.com.epicgames.world_explorers.service_not_required(errorMessage="Already started game")
     await request.ctx.profile.modify_stat("has_started", True)
     await request.ctx.profile.modify_stat("starter_hero",
                                           f"starter{request.json.get('characterTemplateId').split('_')[2]}")

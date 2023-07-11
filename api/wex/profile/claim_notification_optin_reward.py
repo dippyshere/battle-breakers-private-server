@@ -9,6 +9,7 @@ Handles claiming the notification opt-in reward
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -29,6 +30,8 @@ async def claim_notification_opt_in_reward(request: sanic.request.Request,
     :param accountId: The account id
     :return: The modified profile
     """
+    if await request.ctx.profile.get_stat("notification_optin_reward_claimed"):
+        raise errors.com.epicgames.world_explorers.service_not_required(errorMessage="Already claimed reward")
     await request.ctx.profile.add_item({
         "templateId": "Giftbox:GB_NotificationOptInReward",
         "attributes": {
@@ -37,8 +40,8 @@ async def claim_notification_opt_in_reward(request: sanic.request.Request,
             "min_level": 1
         },
         "quantity": 1
-    }, profile_id=request.ctx.profile_id)
-    await request.ctx.profile.modify_stat("notification_optin_reward_claimed", True, request.ctx.profile_id)
+    })
+    await request.ctx.profile.modify_stat("notification_optin_reward_claimed", True)
     return sanic.response.json(
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
                                                      request.ctx.profile_revisions)

@@ -31,6 +31,8 @@ async def upgrade_hero(request: sanic.request.Request, accountId: str) -> sanic.
     :return: The modified profile
     """
     # TODO: validation
+    if not request.json.get("heroItemId").startswith("Character:"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     gold_id = (await request.ctx.profile.find_item_by_template_id("Currency:Gold"))[0]
     current_gold = (await request.ctx.profile.get_item_by_guid(gold_id))["quantity"]
     silver_id = (await request.ctx.profile.find_item_by_template_id("Ore:Ore_Silver"))[0]
@@ -71,11 +73,16 @@ async def upgrade_hero(request: sanic.request.Request, accountId: str) -> sanic.
                 raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid potion item template id")
         potion_guid = (await request.ctx.profile.find_item_by_template_id(potion_upgrade.get("templateId")))[0]
         current_potion_quantity = (await request.ctx.profile.get_item_by_guid(potion_guid))["quantity"]
+        if current_potion_quantity < potion_upgrade.get("quantity"):
+            raise errors.com.epicgames.world_explorers.bad_request(
+                errorMessage=f"Not enough {potion_upgrade.get('templateId')}")
         potion_cost = (await request.app.ctx.load_datatable(
             (await request.app.ctx.get_path_from_template_id(potion_upgrade.get("templateId"))).replace(
                 "res/Game/WorldExplorers/", "").replace(".json", "").replace("\\", "/")))[0]["Properties"][
             "ConsumptionCostGold"]
         for _ in range(potion_upgrade.get("quantity")):
+            if current_gold < potion_cost:
+                break
             await request.ctx.profile.change_item_quantity(gold_id, current_gold - potion_cost)
             current_gold -= potion_cost
             await request.ctx.profile.change_item_quantity(potion_guid, current_potion_quantity - 1)
@@ -114,14 +121,20 @@ async def upgrade_hero(request: sanic.request.Request, accountId: str) -> sanic.
                 "ConsumedItems"][0]
             match consumed_item.get("ItemDefinition", "").get("ObjectName"):
                 case "WExpGenericAccountItemDefinition'Ore_Silver'":
+                    if current_silver < consumed_item["Count"]:
+                        break
                     await request.ctx.profile.change_item_quantity(silver_id,
                                                                    current_silver - consumed_item["Count"])
                     current_silver -= consumed_item["Count"]
                 case "WExpGenericAccountItemDefinition'Ore_Magicite'":
+                    if current_magicite < consumed_item["Count"]:
+                        break
                     await request.ctx.profile.change_item_quantity(magicite_id,
                                                                    current_magicite - consumed_item["Count"])
                     current_magicite -= consumed_item["Count"]
                 case "WExpGenericAccountItemDefinition'Ore_Iron'":
+                    if current_iron < consumed_item["Count"]:
+                        break
                     await request.ctx.profile.change_item_quantity(iron_id, current_iron - consumed_item["Count"])
                     current_iron -= consumed_item["Count"]
                 case _:

@@ -39,7 +39,8 @@ async def sell_treasure(request: sanic.request.Request, accountId: str) -> sanic
     item_quantity = (await request.ctx.profile.get_item_by_guid(item_guid))["quantity"]
     sell_quantity = request.json.get("quantity")
     if sell_quantity > item_quantity:
-        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid quantity")
+        raise errors.com.epicgames.world_explorers.bad_request(
+            errorMessage=f"Invalid quantity to sell for item {item_guid}")
     if sell_quantity < item_quantity:
         await request.ctx.profile.change_item_quantity(item_guid, item_quantity - sell_quantity)
     else:
