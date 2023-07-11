@@ -9,7 +9,7 @@ Handles leveling up heroes.
 
 import sanic
 
-from utils.exceptions import errors
+from utils.enums import ProfileType
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -29,4 +29,32 @@ async def level_up_hero(request: sanic.request.Request, accountId: str) -> sanic
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_implemented()
+    # TODO: Validation
+    xp_guid = (await request.ctx.profile.find_item_by_template_id("Currency:HeroXp_Basic"))[0]
+    current_xp = (await request.ctx.profile.get_item_by_guid(xp_guid))["quantity"]
+    if request.json.get("bIsInPit"):
+        hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"), ProfileType.MONSTERPIT)
+    else:
+        hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"))
+    current_hero_level = hero_item["attributes"]["level"]
+    new_level = current_hero_level + request.json.get("numLevelUps")
+    xp_datatable = (await request.app.ctx.load_datatable("Content/Balance/Datatables/XPUnitLevels"))[0]["Rows"][
+        "UnitXPTNLNormal"]["Keys"]
+    for i in range(current_hero_level, new_level):
+        await request.ctx.profile.change_item_quantity(xp_guid, current_xp - int(xp_datatable[i - 1]["Value"]))
+        current_xp -= int(xp_datatable[i - 1]["Value"])
+        if request.json.get("bIsInPit"):
+            await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "level", i + 1,
+                                                            ProfileType.MONSTERPIT)
+        else:
+            await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "level", i + 1)
+        await request.ctx.profile.add_notifications({
+            "type": "CharacterLevelUp",
+            "primary": False,
+            "itemId": request.json.get("heroItemId"),
+            "level": i + 1
+        })
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions, True)
+    )

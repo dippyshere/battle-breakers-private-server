@@ -795,19 +795,29 @@ async def load_character_data(character_id: str) -> dict:
         best_match.replace("res/Game/WorldExplorers/", "").replace(".json", "").replace("\\", "/"))
 
 
-async def parse_template_id(template_id: str) -> dict:
+@alru_cache(maxsize=64)
+async def get_curvetable_value(data_table: dict, row: str, time_input: float = 0) -> float:
     """
-    Parses a template id into a dict
-    :param template_id: The template id to parse
-    :return: The parsed template id as a dict
+    Gets a value from a curvetable
+    :param data_table: The curvetable to get the value from
+    :param row: The row to get the value from
+    :param time_input: The time to get the value from
+    :return: The value from the curvetable
     """
-    if template_id.split(":")[0] == "Character":
-        return {
-            "type": template_id.split(":")[0],
-            "id": template_id.split(":")[1],
-            "class": template_id.split("_")[0].split(":")[1],
-            "rarity": template_id.split("_")[1],
-            "element": template_id.split("_")[2],
-            "name": template_id.split("_")[3],
-            "tier": template_id.split("_")[4],
-        }
+    row_data = data_table[0]['Rows'][row]
+    # ROOT[0].Rows.Default_C_T01.Keys[0].Time
+    # clamp to lower bound.
+    if time_input < row_data['Keys'][0]['Time']:
+        return row_data['Keys'][0]['Value']
+
+    # clamp to upper bound.
+    if time_input >= row_data['Keys'][-1]['Time']:
+        return row_data['Keys'][-1]['Value']
+
+    # find the two keys that the time_input is between.
+    for i in range(len(row_data['Keys']) - 1):
+        if row_data['Keys'][i]['Time'] <= time_input < row_data['Keys'][i + 1]['Time']:
+            # interpolate between the two keys.
+            return row_data['Keys'][i]['Value'] + (time_input - row_data['Keys'][i]['Time']) / (
+                    row_data['Keys'][i + 1]['Time'] - row_data['Keys'][i]['Time']) * (
+                    row_data['Keys'][i + 1]['Value'] - row_data['Keys'][i]['Value'])

@@ -835,13 +835,14 @@ class PlayerProfile:
 
     async def construct_response(self, profile_id: ProfileType = ProfileType.PROFILE0, rvn: int = -1,
                                  client_command_revision: Optional[str] = None,
-                                 clear_notification: bool = False) -> dict:
+                                 clear_notification: bool = False, clear_all: bool = False) -> dict:
         """
         Construct a response for the specified profile
         :param profile_id: The profile to construct a response for
         :param rvn: The revision number of the profile
         :param client_command_revision: The revision number of the client command
         :param clear_notification: Whether to clear the notifications after constructing the response
+        :param clear_all: Whether to clear all notifications
         :return: The response
         """
         from utils.utils import format_time
@@ -922,7 +923,11 @@ class PlayerProfile:
             response["notifications"]: list = notifications
 
         if clear_notification:
-            await self.clear_notifications(profile_id)
+            if clear_all:
+                for profile in ProfileType:
+                    await self.clear_notifications(profile)
+            else:
+                await self.clear_notifications(profile_id)
 
         await self.flush_changes()
         await self.save_profile()
