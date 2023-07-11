@@ -26,6 +26,8 @@ import orjson
 import sanic
 import aiofiles
 
+from async_lru import alru_cache
+
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
 from cryptography.hazmat.backends import default_backend
 
@@ -39,6 +41,16 @@ with open('utils/crypto/bb_private_key.pem', 'rb') as f:
 with open('utils/crypto/bb_public_key.pem', 'rb') as f:
     public_key_data = f.read()
     public_key = load_pem_public_key(public_key_data, backend=default_backend())
+
+# Cache game files
+game_files_list = []
+for root, dirs, files in os.walk('res/Game/WorldExplorers/Content/'):
+    for file in files:
+        game_files_list.append(os.path.join(root, file))
+character_files_list = []
+for root, dirs, files in os.walk('res/Game/WorldExplorers/Content/Characters'):
+    for file in files:
+        character_files_list.append(os.path.join(root, file))
 
 
 async def read_file(filename: str, json: bool = True, raw: bool = True) -> dict | bytes | str:
@@ -538,9 +550,10 @@ async def normalise_string(input_string: Optional[str]) -> Optional[str]:
     return ""
 
 
+@alru_cache()
 async def load_datatable(datatable: Optional[str]) -> Optional[dict]:
     """
-    Loads a datatable. As datatables are both static and large, this could be cached, but async cache sucks :(
+    Loads a datatable. As datatables are both static and large, this could be cached
     :param datatable: The datatable path to load
     :return: The datatable
     """
@@ -606,38 +619,41 @@ async def get_template_id_from_path(path: Optional[str]) -> Optional[str]:
     return None
 
 
-async def find_best_match(input_str: str, item_list: list) -> str:
+async def find_best_match(input_str: str, item_list: list, split_for_path: bool = False) -> str:
     """
     Finds the best match for a string in a list
     :param input_str: The string to find the best match for
     :param item_list: The list to find the best match in
+    :param split_for_path: Whether to split the string for the path
     :return: The best match
     """
     best_match = ""
     best_match_score = 0
     for item in item_list:
-        score = SequenceMatcher(None, input_str, item).ratio()
+        if split_for_path:
+            score = SequenceMatcher(None, input_str, item.split("\\")[-1].split(".")[0]).ratio()
+        else:
+            score = SequenceMatcher(None, input_str, item).ratio()
         if score > best_match_score:
             best_match_score = score
             best_match = item
+        if score >= 0.95:
+            break
     return best_match
 
 
+@alru_cache(maxsize=256)
 async def get_path_from_template_id(template_id: str) -> str:
     """
     Gets the path from a template id
     :param template_id: The template id to get the path for
     :return: The path
     """
-    # list all files in the content folder
-    file_list = []
-    for root, dirs, files in os.walk('res/Game/WorldExplorers/Content/'):
-        for file in files:
-            file_list.append(os.path.join(root, file))
-    best_match = await find_best_match(template_id, file_list)
+    best_match = await find_best_match(template_id, game_files_list, True)
     return best_match
 
 
+@alru_cache(maxsize=32)
 async def extract_version_info(user_agent: str) -> Tuple[int, int, int]:
     """
     Extracts the version info from a user agent
