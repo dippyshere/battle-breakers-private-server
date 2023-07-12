@@ -54,7 +54,7 @@ async def modify_hero_armor(request: sanic.request.Request, accountId: str) -> s
             await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "gear_armor_item_id",
                                                             request.json.get("gearArmorItemId"))
     else:
-        await request.ctx.profile.change_item_attribute(request.json.get("gearWeaponItemId"), "is_disabled", False)
+        await request.ctx.profile.change_item_attribute(request.json.get("gearArmorItemId"), "is_disabled", False)
         await request.ctx.profile.change_item_attribute(request.json.get("gearArmorItemId"), "hero_item_id", "")
         if request.json.get("bIsInPit"):
             await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "gear_armor_item_id", "",
