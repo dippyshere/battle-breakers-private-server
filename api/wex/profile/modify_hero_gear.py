@@ -32,12 +32,12 @@ async def modify_hero_gear(request: sanic.request.Request, accountId: str) -> sa
     :return: The modified profile
     """
     if request.json.get("bIsInPit"):
-        if not (await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"), ProfileType.MONSTERPIT))[
-                "templateId"].startswith("Character:"):
+        hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"), ProfileType.MONSTERPIT)
+        if not hero_item["templateId"].startswith("Character:"):
             raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid hero item id")
     else:
-        if not (await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId")))[
-                "templateId"].startswith("Character:"):
+        hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"))
+        if not hero_item["templateId"].startswith("Character:"):
             raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid hero item id")
     if request.json.get("gearHeroItemId") != "":
         sidekick_template_id = (await request.ctx.profile.get_item_by_guid(request.json.get("gearHeroItemId")))[
@@ -59,8 +59,6 @@ async def modify_hero_gear(request: sanic.request.Request, accountId: str) -> sa
             await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "sidekick_template_id",
                                                             sidekick_template_id)
     else:
-        await request.ctx.profile.change_item_attribute(request.json.get("gearHeroItemId"), "used_as_sidekick", False)
-        await request.ctx.profile.change_item_attribute(request.json.get("gearHeroItemId"), "sidekick_item_id", "")
         if request.json.get("bIsInPit"):
             await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "sidekick_item_id", "",
                                                             ProfileType.MONSTERPIT)
@@ -69,6 +67,11 @@ async def modify_hero_gear(request: sanic.request.Request, accountId: str) -> sa
         else:
             await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "sidekick_item_id", "")
             await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "sidekick_template_id", "")
+        if hero_item["attributes"]["sidekick_item_id"] != "":
+            await request.ctx.profile.change_item_attribute(hero_item["attributes"]["sidekick_item_id"],
+                                                            "used_as_sidekick", False)
+            await request.ctx.profile.change_item_attribute(hero_item["attributes"]["sidekick_item_id"],
+                                                            "sidekick_item_id", "")
     return sanic.response.json(
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
                                                      request.ctx.profile_revisions, True)
