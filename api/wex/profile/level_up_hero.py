@@ -31,8 +31,6 @@ async def level_up_hero(request: sanic.request.Request, accountId: str) -> sanic
     :return: The modified profile
     """
     # TODO: Validation
-    if not request.json.get("heroItemId").startswith("Character:"):
-        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     xp_guid = (await request.ctx.profile.find_item_by_template_id("Currency:HeroXp_Basic"))[0]
     current_xp = (await request.ctx.profile.get_item_by_guid(xp_guid))["quantity"]
     if request.json.get("bIsInPit"):
