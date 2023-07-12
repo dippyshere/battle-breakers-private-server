@@ -30,8 +30,6 @@ async def foil_hero(request: sanic.request.Request, accountId: str) -> sanic.res
     :param accountId: The account id
     :return: The modified profile
     """
-    if not request.json.get("heroItemId").startswith("Character:"):
-        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     foil_guid = (await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_Foil"))[0]
     current_foil_count = (await request.ctx.profile.get_item_by_guid(foil_guid))["quantity"]
     if request.json.get("bIsInPit"):
