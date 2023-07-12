@@ -30,28 +30,27 @@ async def upgrade_building(request: sanic.request.Request, accountId: str) -> sa
     :return: The modified profile
     """
     # TODO: modify chest activity
-    if not request.json.get("buildingItemId").startswith("HqBuilding:"):
-        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid building item id")
     building_item = await request.ctx.profile.get_item_by_guid(request.json.get("buildingItemId"),
                                                                request.ctx.profile_id)
-    if building_item["templateId"].split(":")[0] == "HqBuilding":
-        promotion_table = (await request.app.ctx.load_datatable((await request.app.ctx.load_datatable((await request.app.ctx.load_datatable(f"Content/Menus/Headquarters/{building_item['templateId'].split(':')[-1]}"))[0]["Properties"]["PromotionTable"]["ObjectPath"].replace("WorldExplorers/", "").split(".")[0]))[0]["Properties"]["RankRecipes"][building_item["attributes"]["level"]]["AssetPathName"].replace("/Game/", "Content/").split(".")[0]))[0]["Properties"]
-        for item in promotion_table["ConsumedItems"]:
-            item_template_id = await request.app.ctx.get_template_id_from_path(item["ItemDefinition"]["ObjectPath"])
-            current_item = await request.ctx.profile.find_item_by_template_id(item_template_id)
-            current_quantity = (await request.ctx.profile.get_item_by_guid(current_item[0]))["quantity"]
-            if current_quantity < item["Count"]:
-                raise errors.com.epicgames.world_explorers.bad_request(errorMessage=f"Not enough {item_template_id}")
-            # print("Cost: " + str(item["Count"]) + " " + item_template_id)
-            await request.ctx.profile.change_item_quantity(current_item[0],
-                                                           current_quantity - item["Count"])
-        if promotion_table.get("MtxCost") is not None:
-            # TODO: enforce account level
-            mtx_item_id = (await request.ctx.profile.find_item_by_template_id("Currency:MtxGiveaway"))[0]
-            mtx_quantity = (await request.ctx.profile.get_item_by_guid(mtx_item_id))["quantity"]
-            if mtx_quantity < promotion_table["MtxCost"]:
-                raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough mtx")
-            await request.ctx.profile.change_item_quantity(mtx_item_id, mtx_quantity - promotion_table["MtxCost"])
+    if not building_item.get("templateId").startswith("HqBuilding:"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid building item id")
+    promotion_table = (await request.app.ctx.load_datatable((await request.app.ctx.load_datatable((await request.app.ctx.load_datatable(f"Content/Menus/Headquarters/{building_item['templateId'].split(':')[-1]}"))[0]["Properties"]["PromotionTable"]["ObjectPath"].replace("WorldExplorers/", "").split(".")[0]))[0]["Properties"]["RankRecipes"][building_item["attributes"]["level"]]["AssetPathName"].replace("/Game/", "Content/").split(".")[0]))[0]["Properties"]
+    for item in promotion_table["ConsumedItems"]:
+        item_template_id = await request.app.ctx.get_template_id_from_path(item["ItemDefinition"]["ObjectPath"])
+        current_item = await request.ctx.profile.find_item_by_template_id(item_template_id)
+        current_quantity = (await request.ctx.profile.get_item_by_guid(current_item[0]))["quantity"]
+        if current_quantity < item["Count"]:
+            raise errors.com.epicgames.world_explorers.bad_request(errorMessage=f"Not enough {item_template_id}")
+        # print("Cost: " + str(item["Count"]) + " " + item_template_id)
+        await request.ctx.profile.change_item_quantity(current_item[0],
+                                                       current_quantity - item["Count"])
+    if promotion_table.get("MtxCost") is not None:
+        # TODO: enforce account level
+        mtx_item_id = (await request.ctx.profile.find_item_by_template_id("Currency:MtxGiveaway"))[0]
+        mtx_quantity = (await request.ctx.profile.get_item_by_guid(mtx_item_id))["quantity"]
+        if mtx_quantity < promotion_table["MtxCost"]:
+            raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough mtx")
+        await request.ctx.profile.change_item_quantity(mtx_item_id, mtx_quantity - promotion_table["MtxCost"])
     await request.ctx.profile.change_item_attribute(request.json.get("buildingItemId"), "level",
                                                     building_item["attributes"]["level"] + 1, request.ctx.profile_id)
     # print("Upgraded building " + request.json.get("buildingItemId") + " to level " + str(

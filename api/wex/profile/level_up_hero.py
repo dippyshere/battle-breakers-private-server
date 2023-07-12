@@ -39,6 +39,8 @@ async def level_up_hero(request: sanic.request.Request, accountId: str) -> sanic
         hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"), ProfileType.MONSTERPIT)
     else:
         hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"))
+    if not hero_item.get("templateId").startswith("Character:"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     current_hero_level = hero_item["attributes"]["level"]
     new_level = current_hero_level + request.json.get("numLevelUps")
     xp_datatable = (await request.app.ctx.load_datatable("Content/Balance/Datatables/XPUnitLevels"))[0]["Rows"][

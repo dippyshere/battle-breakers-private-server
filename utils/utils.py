@@ -789,6 +789,8 @@ async def load_character_data(character_id: str) -> dict:
     :param character_id: The character id to load
     :return: The character data as a dict
     """
+    if not character_id.startswith("Character:"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character id")
     character_id = character_id.replace("Character:", "CD_")
     best_match = await find_best_match(character_id, character_files_list, True)
     return await load_datatable(

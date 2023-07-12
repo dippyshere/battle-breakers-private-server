@@ -35,6 +35,7 @@ async def sell_gear(request: sanic.request.Request, accountId: str) -> sanic.res
     # EWExpRarity::VeryRare     - 8
     # EWExpRarity::SuperRare    - 20
     gear_guid = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_Shard_Gear")
+    # TODO: validate the item to sell
     match (await request.ctx.profile.get_item_by_guid(request.json.get("itemId")))["attributes"]["rarity"]:
         case "Common":
             value = 1

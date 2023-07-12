@@ -30,9 +30,9 @@ async def add_to_monster_pit(request: sanic.request.Request, accountId: str) -> 
     :return: The modified profile
     """
     character_item_id = request.json.get("characterItemId")
-    if not character_item_id.startswith("Character:"):
-        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     character = await request.ctx.profile.get_item_by_guid(character_item_id)
+    if not character.get("templateId").startswith("Character:"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     await request.ctx.profile.remove_item(character_item_id)
     await request.ctx.profile.add_item(character, character_item_id, request.ctx.profile_id)
     return sanic.response.json(

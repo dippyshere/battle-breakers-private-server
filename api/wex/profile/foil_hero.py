@@ -45,6 +45,8 @@ async def foil_hero(request: sanic.request.Request, accountId: str) -> sanic.res
                                                               "RankRecipes"][0]["AssetPathName"].replace("/Game/",
                                                                                                          "Content/").split(
             ".")[0]))[0]["Properties"]["ConsumedItems"][0]["Count"]
+        if current_foil_count < foil_cost:
+            raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough foil")
         # TODO: mark pit as dirty and recalculate power
         await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "foil_lvl", 1,
                                                         ProfileType.MONSTERPIT)
@@ -58,9 +60,9 @@ async def foil_hero(request: sanic.request.Request, accountId: str) -> sanic.res
                                                               "RankRecipes"][0]["AssetPathName"].replace("/Game/",
                                                                                                          "Content/").split(
             ".")[0]))[0]["Properties"]["ConsumedItems"][0]["Count"]
+        if current_foil_count < foil_cost:
+            raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough foil")
         await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "foil_lvl", 1)
-    if current_foil_count < foil_cost:
-        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough foil")
     await request.ctx.profile.change_item_quantity(foil_guid, current_foil_count - foil_cost)
     # TODO: foil hero activity
     return sanic.response.json(

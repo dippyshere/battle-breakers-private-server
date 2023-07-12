@@ -31,8 +31,6 @@ async def upgrade_hero(request: sanic.request.Request, accountId: str) -> sanic.
     :return: The modified profile
     """
     # TODO: validation
-    if not request.json.get("heroItemId").startswith("Character:"):
-        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     gold_id = (await request.ctx.profile.find_item_by_template_id("Currency:Gold"))[0]
     current_gold = (await request.ctx.profile.get_item_by_guid(gold_id))["quantity"]
     silver_id = (await request.ctx.profile.find_item_by_template_id("Ore:Ore_Silver"))[0]
@@ -45,6 +43,8 @@ async def upgrade_hero(request: sanic.request.Request, accountId: str) -> sanic.
         hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"), ProfileType.MONSTERPIT)
     else:
         hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"))
+    if not hero_item.get("templateId").startswith("Character:"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     hero_upgrades = hero_item["attributes"]["upgrades"]
     # [
     #     0,  UpgradePotion:UpgradeStrengthMinor

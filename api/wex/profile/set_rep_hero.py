@@ -29,8 +29,8 @@ async def set_rep_hero(request: sanic.request.Request, accountId: str) -> sanic.
     :param accountId: The account id
     :return: The modified profile
     """
-    if not request.json.get("heroId").startswith("Character:"):
-        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
+    # if not request.json.get("heroId").startswith("Character:"):
+    #     raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     # should probably verify the player's treasure hunter ownership here
     hero_id = request.json.get("heroId")
     slot_index = request.json.get("slotIdx")

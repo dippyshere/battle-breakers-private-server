@@ -30,9 +30,9 @@ async def unlock_weapon_gear(request: sanic.request.Request, accountId: str) -> 
     :return: The modified profile
     """
     # TODO: validation
-    if not request.json.get("heroItemId").startswith("Character:"):
-        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"))
+    if not hero_item.get("templateId").startswith("Character:"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     hero_data = await request.app.ctx.load_character_data(hero_item["templateId"])
     consumed_items = (await request.app.ctx.load_datatable((await request.app.ctx.load_datatable(
         hero_data[0]["Properties"]["HeroGearInfo"]["AssetPathName"].replace("/Game/", "Content/").split(".")[0]))[0][

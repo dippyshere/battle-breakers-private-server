@@ -39,6 +39,7 @@ async def sell_multiple_gear(request: sanic.request.Request, accountId: str) -> 
     if gear_guid:
         gear_quantity = (await request.ctx.profile.get_item_by_guid(gear_guid[0]))["quantity"]
     for item_guid in request.json.get("itemIds"):
+        # TODO: validate the item to sell
         match (await request.ctx.profile.get_item_by_guid(item_guid))["attributes"]["rarity"]:
             case "Common":
                 value = 1

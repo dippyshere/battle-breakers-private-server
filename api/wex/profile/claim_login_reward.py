@@ -50,7 +50,7 @@ async def claim_login_reward(request: sanic.request.Request, accountId: str) -> 
         version_info = (await request.app.ctx.extract_version_info(request.headers.get("User-Agent")))[0]
         if version_info <= 1:
             datatable = "Content/Loot/DataTables/LoginRewards 1.0"
-        elif 2 <= version_info <= 71:
+        elif version_info in [2, 3, 4, 5, 6, 7, 71]:
             if version_info == 6:
                 version_info = 7
             datatable = f"Content/Loot/DataTables/LoginRewards 1.{version_info}"
