@@ -27,6 +27,8 @@ async def price_request(request: sanic.request.Request) -> sanic.response.JSONRe
     :param request: The request object
     :return: The response object
     """
+    # TODO: Support bad input
+    # TODO: Support other currencies/countries
     offers = await request.app.ctx.read_file("res/priceengine/api/shared/offers/price.json")
     line_offers = []
     line_id = 0
@@ -72,6 +74,7 @@ async def price_request(request: sanic.request.Request) -> sanic.response.JSONRe
                 "revenueWithoutTaxCurrencyCode": offers[offer["offerId"]]["revenueWithoutTaxCurrencyCode"],
                 "payoutCurrencyExchangeRate": offers[offer["offerId"]]["payoutCurrencyExchangeRate"],
             },
+            # TODO: Price details entry
             "offerId": offer["offerId"],
             "appliedRules": [],
             "ref": offer["offerId"]

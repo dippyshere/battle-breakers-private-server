@@ -27,5 +27,12 @@ async def offers(request: sanic.request.Request) -> sanic.response.JSONResponse:
     :param request: The request object
     :return: The response object
     """
-    # Nothing changes for includemaingamedetails or includedlcdetails for bb
-    return sanic.response.json(await request.app.ctx.read_file(f"res/catalog/api/shared/bulk/offers.json"))
+    # TODO: Support locale
+    catalog_offers = await request.app.ctx.read_file(f"res/catalog/api/shared/bulk/offers.json")
+    catalog_ids = request.args.getlist("id")
+    catalog = {}
+    for catalog_id in catalog_ids:
+        if catalog_id in catalog_offers:
+            # TODO: support returnItemDetails
+            catalog[catalog_id] = catalog_offers[catalog_id]
+    return sanic.response.json(catalog)

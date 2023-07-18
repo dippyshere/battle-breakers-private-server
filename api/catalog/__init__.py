@@ -8,7 +8,7 @@ Handles the catalog endpoints
 """
 import sanic
 from .bulk import bulk
-from .namespace import namespace
+from .namespace import catalog_namespace
 from .version import catalog_version
 
-catalog = sanic.Blueprint.group(bulk, namespace, catalog_version, url_prefix="/catalog")
+catalog = sanic.Blueprint.group(bulk, catalog_namespace, catalog_version, url_prefix="/catalog")
