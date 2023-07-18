@@ -46,46 +46,46 @@ async def verify_auth(request: sanic.request.Request) -> sanic.response.JSONResp
                 "app": token["clsvc"],
                 "perms": [{
                     "resource": "wexp:cloudstorage:system",
-                    "action": 2
+                    "action": 2  # READ
                 }, {
                     "resource": "account:public:account:*",
-                    "action": 2
+                    "action": 2  # READ
                 }, {
                     "resource": "account:oauth:exchangeTokenCode",
-                    "action": 15
+                    "action": 15  # ALL (CREATE, READ, UPDATE, DELETE)
                 }, {
                     "resource": "account:public:account",
-                    "action": 2
+                    "action": 2  # READ
                 }, {
                     "resource": "priceengine:shared:offer:price",
-                    "action": 2
+                    "action": 2  # READ
                 }, {
                     "resource": "wexp:wexp_role:client",
-                    "action": 15
+                    "action": 15  # ALL (CREATE, READ, UPDATE, DELETE)
                 }, {
                     "resource": "account:public:account:externalAuths",
-                    "action": 15
+                    "action": 15  # ALL (CREATE, READ, UPDATE, DELETE)
                 }, {
                     "resource": "wexp:calendar",
-                    "action": 2
+                    "action": 2  # READ
                 }, {
                     "resource": "account:token:otherSessionsForAccountClient",
-                    "action": 8
+                    "action": 8  # DELETE
                 }, {
                     "resource": "account:token:otherSessionsForAccountClientService",
-                    "action": 8
+                    "action": 8  # DELETE
                 }, {
                     "resource": "account:public:account:deviceAuths",
-                    "action": 11
+                    "action": 11  # CREATE, READ, DELETE
                 }, {
                     "resource": "wexp:cloudstorage:system:*",
-                    "action": 2
+                    "action": 2  # READ
                 }, {
                     "resource": "serviceinstance",
-                    "action": 2
+                    "action": 2  # READ
                 }, {
                     "resource": "wexp:storefront",
-                    "action": 2
+                    "action": 2  # READ
                 }]
             })
         return sanic.response.json({
@@ -121,61 +121,61 @@ async def verify_auth(request: sanic.request.Request) -> sanic.response.JSONResp
             "device_id": token["dvid"],
             "perms": [{
                 "resource": f"blockList:{token['sub']}",
-                "action": 14
+                "action": 14  # READ, UPDATE, DELETE
             }, {
                 "resource": "wexp:cloudstorage:system",
-                "action": 2
+                "action": 2  # READ
             }, {
                 "resource": "account:public:account:*",
-                "action": 2
+                "action": 2  # READ
             }, {
                 "resource": "account:oauth:exchangeTokenCode",
-                "action": 15
+                "action": 15  # ALL (CREATE, READ, UPDATE, DELETE)
             }, {
                 "resource": "account:public:account",
-                "action": 2
+                "action": 2  # READ
             }, {
                 "resource": "priceengine:shared:offer:price",
-                "action": 2
+                "action": 2  # READ
             }, {
                 "resource": f"xmpp:session:*:{token['sub']}",
-                "action": 1
+                "action": 1  # CREATE
             }, {
                 "resource": "wexp:wexp_role:client",
-                "action": 15
+                "action": 15  # ALL (CREATE, READ, UPDATE, DELETE)
             }, {
                 "resource": f"wexp:profile:{token['sub']}:*",
-                "action": 15
+                "action": 15  # ALL (CREATE, READ, UPDATE, DELETE)
             }, {
                 "resource": "account:public:account:externalAuths",
-                "action": 15
+                "action": 15  # ALL (CREATE, READ, UPDATE, DELETE)
             }, {
                 "resource": "wexp:calendar",
-                "action": 2
+                "action": 2  # READ
             }, {
                 "resource": "account:token:otherSessionsForAccountClient",
-                "action": 8
+                "action": 8  # DELETE
             }, {
                 "resource": "account:token:otherSessionsForAccountClientService",
-                "action": 8
+                "action": 8  # DELETE
             }, {
                 "resource": "account:public:account:deviceAuths",
-                "action": 11
+                "action": 11  # CREATE, READ, DELETE
             }, {
                 "resource": "wexp:cloudstorage:system:*",
-                "action": 2
+                "action": 2  # READ
             }, {
                 "resource": "serviceinstance",
-                "action": 2
+                "action": 2  # READ
             }, {
                 "resource": "wexp:storefront",
-                "action": 2
+                "action": 2  # READ
             }, {
                 "resource": f"wexp:push:devices:{token['sub']}",
-                "action": 15
+                "action": 15  # ALL (CREATE, READ, UPDATE, DELETE)
             }, {
                 "resource": f"friends:{token['sub']}",
-                "action": 15
+                "action": 15  # ALL (CREATE, READ, UPDATE, DELETE)
             }]
         })
     return sanic.response.json({

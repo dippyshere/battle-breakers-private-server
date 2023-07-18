@@ -177,9 +177,9 @@ async def initialize_level(request: sanic.request.Request, accountId: str) -> sa
         },
         "heroInfo": []
     }
-    for i in range(3, 55):
-        level_notification["level"]["rooms"].append(await request.app.ctx.room_generator(
-            request.json.get("levelId"), i, level_info))
+    # for i in range(3, 55):
+    #     level_notification["level"]["rooms"].append(await request.app.ctx.room_generator(
+    #         request.json.get("levelId"), i, level_info))
     account_info = {
         "level": await request.ctx.profile.get_stat("level"),
         "perks": []
