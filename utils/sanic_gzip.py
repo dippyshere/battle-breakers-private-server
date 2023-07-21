@@ -5,7 +5,7 @@ https://github.com/dippyshere/battle-breakers-private-server
 This code is licensed under the MIT License.
 
 Full credit to https://github.com/koug44/sanic-gzip/blob/master/sanic_gzip/__init__.py
-Modified to work with Battle Breakers Private Server, and to add brotli support.
+Modified to work with Battle Breakers Private Server, and to add brotli support and mime types.
 """
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
@@ -17,25 +17,77 @@ from typing import Optional, Any, Callable, Coroutine
 import brotli
 import sanic.response.types
 
-DEFAULT_MIME_TYPES = frozenset(
+DEFAULT_MIME_TYPES: frozenset[str] = frozenset(
     [
-        "text/html",
-        "text/css",
-        "text/xml",
-        "text/plain",
-        "text/text",
-        "text/javascript",
-        "application/json",
-        "application/javascript",
-        "application/manifest+json",
-        "application/xml",
-        "application/xhtml+xml",
-        "application/rss+xml",
+        "application/atf",
         "application/atom+xml",
+        "application/csv",
+        "application/dash+xml",
+        "application/eot",
+        "application/font",
+        "application/font-sfnt",
+        "application/javascript",
+        "application/json",
+        "application/json+protobuf",
+        "application/ld+json",
+        "application/manifest+json",
+        "application/opentype",
+        "application/otf",
+        "application/pkcs7-mime",
+        "application/rss+xml",
+        "application/signed-exchange",
+        "application/truetype",
+        "application/ttf",
+        "application/vnd.apple.mpegurl",
+        "application/vnd.geo+json",
+        "application/vnd.ms-fontobject",
+        "application/vnd.ms-sstr+xml",
+        "application/wasm",
+        "application/x-font-opentype",
+        "application/x-font-ttf",
+        "application/x-httpd-cgi",
+        "application/x-javascript",
+        "application/x-mpegurl",
+        "application/x-nacl",
+        "application/x-opentype",
+        "application/x-otf",
+        "application/x-perl",
+        "application/x-plist",
+        "application/x-pnacl",
+        "application/x-protobuf",
+        "application/x-protobuffer",
+        "application/x-sdch-dictionary",
+        "application/x-ttf",
+        "application/x-web-app-manifest+json",
+        "application/xhtml+xml",
+        "application/xml",
+        "application/xml+rss",
+        "audio/mpegURL",
         "font/eot",
+        "font/opentype",
         "font/otf",
+        "font/truetype",
         "font/ttf",
-        "image/svg+xml"
+        "image/pwg-raster",
+        "image/svg+xml",
+        "image/vnd.microsoft.icon",
+        "image/x-icon",
+        "model/gltf-binary",
+        "text/cache-manifest",
+        "text/css",
+        "text/csv",
+        "text/html",
+        "text/javascript",
+        "text/js",
+        "text/plain",
+        "text/richtext",
+        "text/tab-separated-values",
+        "text/text",
+        "text/x-component",
+        "text/x-java-source",
+        "text/x-script",
+        "text/xml",
+        "video/vnd.mpeg.dash.mpd"
     ]
 )
 
@@ -48,7 +100,6 @@ class Compress(object):
     def __init__(
             self,
             compress_mimetypes: frozenset[str] = DEFAULT_MIME_TYPES,
-            compress_level: int = 4,
             compress_min_size: int = 512,
             max_threads: Optional[int] = None,
     ):
@@ -57,13 +108,12 @@ class Compress(object):
         self.config: dict[str, Optional[int] | frozenset[str] | int | int] = {
             "CNT_COMPRESS_THREADS": max_threads,
             "COMPRESS_MIMETYPES": compress_mimetypes,
-            "COMPRESS_LEVEL": compress_level,
             "COMPRESS_MIN_SIZE": compress_min_size,
         }
 
-        self.gzip_func: partial = partial(gzip.compress, compresslevel=self.config["COMPRESS_LEVEL"])
-        self.zlib_func: partial = partial(zlib.compress, level=self.config["COMPRESS_LEVEL"])
-        self.br_func: partial = partial(brotli.compress, quality=self.config["COMPRESS_LEVEL"])
+        self.gzip_func: partial = partial(gzip.compress, compresslevel=5)
+        self.zlib_func: partial = partial(zlib.compress, level=5)
+        self.br_func: partial = partial(brotli.compress, quality=8)
 
     async def _gzip_compress(self, response: sanic.response.types) -> sanic.response.types:
         response.body = await asyncio.get_event_loop().run_in_executor(
