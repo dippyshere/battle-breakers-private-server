@@ -9,10 +9,8 @@ Handles marking a hero as seen
 
 import sanic
 
-from utils.exceptions import errors
-from utils.utils import authorized as auth
-
 from utils.sanic_gzip import Compress
+from utils.utils import authorized as auth
 
 compress = Compress()
 wex_profile_mark_hero_seen = sanic.Blueprint("wex_profile_mark_hero_seen")

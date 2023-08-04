@@ -9,10 +9,8 @@ Handles setting friend hero
 
 import sanic
 
-from utils.exceptions import errors
-from utils.utils import authorized as auth
-
 from utils.sanic_gzip import Compress
+from utils.utils import authorized as auth
 
 compress = Compress()
 wex_profile_set_rep_hero = sanic.Blueprint("wex_profile_set_rep_hero")

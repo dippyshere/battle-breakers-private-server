@@ -6,14 +6,12 @@ This code is licensed under the [TBD] license.
 
 Handles adding epic friend and fetching their wex specific data
 """
-import datetime
 
 import sanic
 
 from utils.friend_system import PlayerFriends
-from utils.utils import authorized as auth
-
 from utils.sanic_gzip import Compress
+from utils.utils import authorized as auth
 
 compress = Compress()
 wex_profile_add_epic_friend = sanic.Blueprint("wex_profile_add_epic_friend")

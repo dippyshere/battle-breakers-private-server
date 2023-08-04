@@ -6,7 +6,6 @@ This code is licensed under the [TBD] license.
 
 Handles workshop cash out
 """
-import datetime
 
 import sanic
 

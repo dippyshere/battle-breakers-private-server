@@ -9,10 +9,8 @@ Handles generating daily quests for a profile.
 
 import sanic
 
-from utils.exceptions import errors
-from utils.utils import authorized as auth
-
 from utils.sanic_gzip import Compress
+from utils.utils import authorized as auth
 
 compress = Compress()
 wex_profile_generate_daily_quests = sanic.Blueprint("wex_profile_generate_daily_quests")
