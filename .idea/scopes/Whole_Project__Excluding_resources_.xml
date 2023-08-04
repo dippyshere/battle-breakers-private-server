@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Whole Project (Excluding resources)" pattern="(!ext:*/||file[battle-breakers-private-server]:*/)&amp;&amp;!file[battle-breakers-private-server]:res/Game//*&amp;&amp;!file[battle-breakers-private-server]:res/wex/api/game/v2/manifests//*&amp;&amp;!file[battle-breakers-private-server]:docs//*&amp;&amp;!file[battle-breakers-private-server]:.mypy_cache//*" />
+</component>

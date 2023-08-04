@@ -1,5 +1,5 @@
 orjson>=3.9.2
-sanic[ext]>=23.3.0
+sanic[ext]>=23.6.0
 colorama>=0.4.6
 tomli>=2.0.1
 pyjwt>=2.8.0
@@ -8,8 +8,8 @@ sanic-gzip>=0.4.1
 Brotli>=1.0.9
 aiofiles>=23.1.0
 bcrypt>=4.0.1
-pydantic>=2.0.3
-cryptography>=41.0.2
+pydantic>=2.1.1
+cryptography>=41.0.3
 faust-cchardet>=2.1.18
 aiohttp[speedups]>=3.8.5
 urllib3>=2.0.4
