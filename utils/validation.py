@@ -7,8 +7,10 @@ This code is licensed under the [TBD] license.
 Contains validation classes for requests
 """
 import uuid
+from typing import Callable, Any
 
 import pydantic
+import pydantic_core
 
 
 class UUIDString(str):
@@ -17,15 +19,20 @@ class UUIDString(str):
     """
 
     @classmethod
-    def __get_validators__(cls) -> iter:
-        yield cls.validate
+    def __get_pydantic_json_schema__(
+            cls, core_schema: pydantic_core.core_schema.JsonSchema, handler: pydantic.GetJsonSchemaHandler
+    ) -> pydantic.json_schema.JsonSchemaValue:
+        json_schema = handler(core_schema)
+        json_schema.update(type="string", format="binary")
+        return json_schema
 
     @classmethod
-    def validate(cls, v) -> str:
+    def validate(cls, v: Any, _: pydantic_core.core_schema.ValidationInfo) -> str:
         """
         Validates the UUID string
 
         :param v: The UUID string
+        :param _: The validation info
         :return: The UUID string
         :raises ValueError: If the UUID string is invalid
         """
@@ -37,6 +44,12 @@ class UUIDString(str):
             raise ValueError('Invalid UUID string')
         return v
 
+    @classmethod
+    def __get_pydantic_core_schema__(
+            cls, source: type[Any], handler: Callable[[Any], pydantic_core.core_schema.CoreSchema]
+    ) -> pydantic_core.core_schema.CoreSchema:
+        return pydantic_core.core_schema.general_plain_validator_function(cls.validate)
+
 
 class CharacterTemplateId(str):
     """
@@ -44,15 +57,20 @@ class CharacterTemplateId(str):
     """
 
     @classmethod
-    def __get_validators__(cls) -> iter:
-        yield cls.validate
+    def __get_pydantic_json_schema__(
+            cls, core_schema: pydantic_core.core_schema.JsonSchema, handler: pydantic.GetJsonSchemaHandler
+    ) -> pydantic.json_schema.JsonSchemaValue:
+        json_schema = handler(core_schema)
+        json_schema.update(type="string", format="binary")
+        return json_schema
 
     @classmethod
-    def validate(cls, v) -> str:
+    def validate(cls, v: Any, _: pydantic_core.core_schema.ValidationInfo) -> str:
         """
         Validates the Character Template ID
 
         :param v: The Character Template ID
+        :param _: The validation info
         :return: The Character Template ID
         :raises ValueError: If the Character Template ID is invalid
         """
@@ -66,6 +84,12 @@ class CharacterTemplateId(str):
             raise ValueError('Invalid Character Template ID')
         return v
 
+    @classmethod
+    def __get_pydantic_core_schema__(
+            cls, source: type[Any], handler: Callable[[Any], pydantic_core.core_schema.CoreSchema]
+    ) -> pydantic_core.core_schema.CoreSchema:
+        return pydantic_core.core_schema.general_plain_validator_function(cls.validate)
+
 
 class AccountId(str):
     """
@@ -73,15 +97,20 @@ class AccountId(str):
     """
 
     @classmethod
-    def __get_validators__(cls) -> iter:
-        yield cls.validate
+    def __get_pydantic_json_schema__(
+            cls, core_schema: pydantic_core.core_schema.JsonSchema, handler: pydantic.GetJsonSchemaHandler
+    ) -> pydantic.json_schema.JsonSchemaValue:
+        json_schema = handler(core_schema)
+        json_schema.update(type="string", format="binary")
+        return json_schema
 
     @classmethod
-    def validate(cls, v) -> str:
+    def validate(cls, v: Any, _: pydantic_core.core_schema.ValidationInfo) -> str:
         """
         Validates the Account ID string
 
         :param v: The Account ID string
+        :param _: The validation info
         :return: The Account ID string
         :raises ValueError: If the Account ID is invalid
         """
@@ -94,6 +123,12 @@ class AccountId(str):
         except ValueError:
             raise ValueError('Invalid Account ID string')
         return v
+
+    @classmethod
+    def __get_pydantic_core_schema__(
+            cls, source: type[Any], handler: Callable[[Any], pydantic_core.core_schema.CoreSchema]
+    ) -> pydantic_core.core_schema.CoreSchema:
+        return pydantic_core.core_schema.general_plain_validator_function(cls.validate)
 
 
 class MCPValidation:
