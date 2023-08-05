@@ -8,9 +8,11 @@ Handles level abandon/exit profile mcp
 """
 
 import sanic
+import sanic_ext
 
 from utils.enums import ProfileType
 from utils.utils import authorized as auth, format_time
+from utils.validation import MCPValidation
 
 from utils.sanic_gzip import Compress
 
@@ -21,16 +23,19 @@ wex_profile_abandon_level = sanic.Blueprint("wex_profile_abandon_level")
 # https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/game/v2/profile/accountId/AbandonLevel.md
 @wex_profile_abandon_level.route("/<accountId>/AbandonLevel", methods=["POST"])
 @auth(strict=True)
+@sanic_ext.validate(json=MCPValidation.AbandonLevel)
 @compress.compress()
-async def abandon_level(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def abandon_level(request: sanic.request.Request, accountId: str,
+                        body: MCPValidation.AbandonLevel) -> sanic.response.JSONResponse:
     """
     This endpoint is used to abandon the level
     :param request: The request object
     :param accountId: The account id
+    :param body: The request body
     :return: The modified profile
     """
     await request.ctx.profile.modify_stat("last_forgiven_abandon", await format_time(), request.ctx.profile_id)
-    await request.ctx.profile.remove_item(request.json.get("levelItemId"), request.ctx.profile_id)
+    await request.ctx.profile.remove_item(body.model_dump().get("levelItemId"), request.ctx.profile_id)
     # TODO: calculate quests + handle rewards for completed rooms
     await request.ctx.profile.clear_notifications(ProfileType.LEVELS)
     return sanic.response.json(
