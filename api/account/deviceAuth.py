@@ -29,7 +29,7 @@ async def device_auth_create(request: sanic.request.Request, accountId: str) -> 
     :return: The response object
     """
     device_authorisation = {
-        "deviceId": await request.app.ctx.token_generator(),
+        "deviceId": await request.app.ctx.uuid_generator(),
         "accountId": accountId,
         "secret": (await request.app.ctx.token_generator()).upper(),
         "userAgent": request.headers.get("User-Agent"),

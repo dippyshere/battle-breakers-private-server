@@ -141,6 +141,14 @@ async def token_generator() -> str:
     return uuid.UUID(bytes=random.randbytes(16)).hex
 
 
+async def uuid_generator() -> str:
+    """
+    Generates a dash-less UUIDv4 string
+    :return: The generated string
+    """
+    return uuid.uuid4().hex
+
+
 async def generate_eg1(sub: Optional[str] = None, dn: Optional[str] = None, clid: Optional[str] = None,
                        dvid: Optional[str] = None) -> str:
     """
@@ -152,11 +160,11 @@ async def generate_eg1(sub: Optional[str] = None, dn: Optional[str] = None, clid
     :return: The JWT token
     """
     if sub is None:
-        sub = await token_generator()
+        raise errors.com.epicgames.bad_request(errorMessage="Account ID is required")
     if clid is None:
         clid = "3cf78cd3b00b439a8755a878b160c7ad"
     if dvid is None:
-        dvid = await token_generator()
+        dvid = await uuid_generator()
     p = f"wexp:cloudstorage:system=2,account:public:account:*=2,xmpp:session:*:{sub}=1,wexp:push:devices:{sub}=15," \
         f"account:oauth:exchangeTokenCode=15,account:public:account=2,priceengine:shared:offer:price=2," \
         f"wexp:wexp_role:client=15,account:public:account:externalAuths=15,wexp:calendar=2,blockList:{sub}=14," \
@@ -218,11 +226,11 @@ async def generate_refresh_eg1(sub: Optional[str] = None, dn: Optional[str] = No
     :return: The JWT token
     """
     if sub is None:
-        sub = await token_generator()
+        raise errors.com.epicgames.bad_request(errorMessage="Account ID is required")
     if clid is None:
-        clid = await token_generator()
+        clid = "3cf78cd3b00b439a8755a878b160c7ad"
     if dvid is None:
-        dvid = await token_generator()
+        dvid = await uuid_generator()
     headers = {"alg": "RS256", "kid": str(uuid.uuid4())}
     return jwt.encode({
         "sub": sub,
@@ -246,9 +254,9 @@ async def generate_authorisation_eg1(sub: Optional[str] = None, dn: Optional[str
     :return: The JWT token
     """
     if sub is None:
-        sub = await token_generator()
+        raise errors.com.epicgames.bad_request(errorMessage="Account ID is required")
     if clid is None:
-        clid = await token_generator()
+        clid = "3cf78cd3b00b439a8755a878b160c7ad"
     headers = {"alg": "RS256", "kid": str(uuid.uuid4())}
     return jwt.encode({
         "sub": sub,
@@ -329,7 +337,7 @@ async def verify_request_auth(request: sanic.request.Request, strict: bool = Fal
                 raise errors.com.epicgames.account.auth_token.unknown_oauth_session()
             if strict:
                 if not (await verify_owner(request, token)):
-                    raise errors.com.epicgames.account.auth_app.not_authorized_for_account()
+                    raise errors.com.epicgames.account.token_account_id_does_not_match_url_accountId()
             else:
                 request.ctx.is_owner = await verify_owner(request, token)
             request.ctx.owner = token.get("sub")
@@ -340,7 +348,7 @@ async def verify_request_auth(request: sanic.request.Request, strict: bool = Fal
     except Exception as e:
         if isinstance(e, errors.com.epicgames.account.auth_token.unknown_oauth_session):
             raise e
-        elif isinstance(e, errors.com.epicgames.account.auth_app.not_authorized_for_account):
+        elif isinstance(e, errors.com.epicgames.account.token_account_id_does_not_match_url_accountId):
             raise e
         return False
 

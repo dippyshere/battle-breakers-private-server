@@ -31,8 +31,9 @@ async def quickstart(request: sanic.request.Request) -> sanic.response.HTTPRespo
     # make the new account headless, so the user can set a name
     account_info = await request.app.ctx.read_file(f"res/account/api/public/account/{new_account_id}.json")
     account_info["headless"] = True
+    device_id = await request.app.ctx.uuid_generator()
     device_authorisation = {
-        "deviceId": await request.app.ctx.token_generator(),
+        "deviceId": device_id,
         "accountId": new_account_id,
         "secret": (await request.app.ctx.token_generator()).upper(),
         "userAgent": request.headers.get("User-Agent"),
@@ -67,7 +68,7 @@ async def quickstart(request: sanic.request.Request) -> sanic.response.HTTPRespo
             "cabinedMode": False,
             "hasHashedEmail": False
         },
-        "internalAuthKey": f"eg1~{await request.app.ctx.generate_eg1(sub=new_account_id, dn=None, clid=None, dvid=None)}",
+        "internalAuthKey": f"eg1~{await request.app.ctx.generate_eg1(sub=new_account_id, dn=None, clid=None, dvid=device_id)}",
         "deviceAuth": device_authorisation,
-        "oauthSession": await request.app.ctx.oauth_response(sub=new_account_id)
+        "oauthSession": await request.app.ctx.oauth_response(sub=new_account_id, dvid=device_id)
     })

@@ -23,14 +23,10 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
     :param kwargs: Any other arguments to use
     :return: account_id
     """
-    from utils.utils import token_generator
+    from utils.utils import uuid_generator
     from utils.utils import format_time
     if account_id is None:
-        while True:
-            # this should only really happen once
-            account_id = await token_generator()
-            if not os.path.exists(f"res/account/api/public/account/{account_id}.json"):
-                break
+        account_id = await uuid_generator()
     # create the directories
     os.makedirs(f"res/account/api/public/account", exist_ok=True)
     os.makedirs(f"res/friends/api/v1", exist_ok=True)
@@ -98,7 +94,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
     # initialise wex services
     await write_file(f"res/wex/api/game/v2/item_ratings/{account_id}.json", {})
     await write_file(f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/friends.json", {
-        "_id": await token_generator(),
+        "_id": await uuid_generator(),
         "created": await format_time(),
         "updated": await format_time(),
         "rvn": 1,
@@ -117,7 +113,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
         "commandRevision": 0
     })
     await write_file(f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/levels.json", {
-        "_id": await token_generator(),
+        "_id": await uuid_generator(),
         "created": await format_time(),
         "updated": await format_time(),
         "rvn": 1,
@@ -260,7 +256,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
         "commandRevision": 0
     })
     await write_file(f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/monsterpit.json", {
-        "_id": await token_generator(),
+        "_id": await uuid_generator(),
         "created": await format_time(),
         "updated": await format_time(),
         "rvn": 1,
@@ -280,7 +276,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
         "commandRevision": 0
     })
     await write_file(f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/multiplayer.json", {
-        "_id": await token_generator(),
+        "_id": await uuid_generator(),
         "created": await format_time(),
         "updated": await format_time(),
         "rvn": 1,
@@ -323,7 +319,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
         "commandRevision": 0
     })
     await write_file(f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/profile0.json", {
-        "_id": await token_generator(),
+        "_id": await uuid_generator(),
         "created": await format_time(),
         "updated": await format_time(),
         "rvn": 1,

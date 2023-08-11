@@ -58,6 +58,7 @@ app.ctx.format_time = utils.format_time
 app.ctx.private_key = utils.private_key
 app.ctx.public_key = utils.public_key
 app.ctx.token_generator = utils.token_generator
+app.ctx.uuid_generator = utils.uuid_generator
 app.ctx.generate_eg1 = utils.generate_eg1
 app.ctx.generate_client_eg1 = utils.generate_client_eg1
 app.ctx.generate_refresh_eg1 = utils.generate_refresh_eg1

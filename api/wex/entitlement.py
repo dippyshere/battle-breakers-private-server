@@ -45,7 +45,7 @@ async def request_access(request: sanic.request.Request, accountId: str) -> sani
         if entitlement.get("catalogItemId") == "e458e71024404176addca212860f9ef2":
             raise sanic.exceptions.BadRequest(context={"errorMessage": "Already have access to this game."})
     entitlements.append({
-        "id": await request.app.ctx.token_generator(),
+        "id": await request.app.ctx.uuid_generator(),
         "entitlementName": "WorldExplorers_Free",
         "namespace": "wex",
         "catalogItemId": "e458e71024404176addca212860f9ef2",
@@ -88,7 +88,7 @@ async def redeem_access(request: sanic.request.Request, accountId: str) -> sanic
         if entitlement.get("catalogItemId") == "e458e71024404176addca212860f9ef2":
             raise sanic.exceptions.BadRequest(context={"errorMessage": "Already have access to this game."})
     entitlements.append({
-        "id": await request.app.ctx.token_generator(),
+        "id": await request.app.ctx.uuid_generator(),
         "entitlementName": "WorldExplorers_Free",
         "namespace": "wex",
         "catalogItemId": "e458e71024404176addca212860f9ef2",
