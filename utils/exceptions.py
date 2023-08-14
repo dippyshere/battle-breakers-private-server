@@ -4815,7 +4815,7 @@ class errors:
                     errorMessage: str = "Sorry, we were unable to find any friends with that search criteria"
                     numericErrorCode: int = 0
                     originatingService: str = "WEX"
-                    statusCode: int = 400
+                    statusCode: int = 404
 
                 class over_hero_limit(EpicException):
                     """

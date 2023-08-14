@@ -10,6 +10,7 @@ import urllib.parse
 
 import sanic
 
+from utils.exceptions import errors
 from utils.profile_system import PlayerProfile
 from utils.enums import ProfileType
 from utils.sanic_gzip import Compress
@@ -28,6 +29,7 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
     :param accountId: The account id
     :return: The response object
     """
+    raise errors.com.epicgames.not_implemented()
     # return sanic.response.json({
     #     "accounts": [{
     #     "accountId": "09b8744abd524d879630f7c79365e2f8",
@@ -51,6 +53,99 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
     #         request.ctx.rvn = -1
     # request.ctx.profile_id = ProfileType.from_string("friends")
     # request.ctx.profile_revisions = request.headers.get("X-EpicGames-ProfileRevisions")
+    # await request.ctx.profile.add_item({
+    #     "templateId": "Friend:Instance",
+    #     "attributes": {
+    #         "lifetime_claimed": 0,
+    #         "accountId": "1e841dc603b74eb18ef12803c2b58588",
+    #         "canBeSparred": False,
+    #         "snapshot_expires": "2022-12-29T02:14:51.022Z",
+    #         "best_gift": 0,
+    #         "lifetime_gifted": 0,
+    #         "remoteFriendId": "776590ce-df4b-4a31-b404-bd4fbf7e2599",
+    #         "snapshot": {
+    #             "displayName": "Purplereign780",
+    #             "avatarUrl": "wex-temp-avatar.png",
+    #             "repHeroes": [
+    #                 {
+    #                     "itemId": "d28e2049-5a10-4d5c-8776-c1b755480a98",
+    #                     "templateId": "Character:Mage_SR2_Water_Blizzard_T06",
+    #                     "bIsCommander": True,
+    #                     "level": 150,
+    #                     "skillLevel": 20,
+    #                     "upgrades": [
+    #                         95,
+    #                         95,
+    #                         95,
+    #                         95,
+    #                         34,
+    #                         125,
+    #                         5,
+    #                         125,
+    #                         5
+    #                     ],
+    #                     "accountInfo": {
+    #                         "level": 809,
+    #                         "perks": [
+    #                             12,
+    #                             182,
+    #                             639,
+    #                             185,
+    #                             13,
+    #                             30,
+    #                             30,
+    #                             30
+    #                         ]
+    #                     },
+    #                     "foilLevel": -1,
+    #                     "gearTemplateId": ""
+    #                 },
+    #                 {
+    #                     "itemId": "27ae29f8-110e-4ad0-84ab-cf69384e4787",
+    #                     "templateId": "Character:Cleric_SR1_Water_RevitalizingWaters_T06",
+    #                     "bIsCommander": True,
+    #                     "level": 150,
+    #                     "skillLevel": 20,
+    #                     "upgrades": [
+    #                         95,
+    #                         95,
+    #                         95,
+    #                         95,
+    #                         34,
+    #                         134,
+    #                         5,
+    #                         125,
+    #                         5
+    #                     ],
+    #                     "accountInfo": {
+    #                         "level": 809,
+    #                         "perks": [
+    #                             12,
+    #                             182,
+    #                             639,
+    #                             185,
+    #                             13,
+    #                             30,
+    #                             30,
+    #                             30
+    #                         ]
+    #                     },
+    #                     "foilLevel": -1,
+    #                     "gearTemplateId": "Character:TreasureHunter_Starter_Water_HiddenRiver_T05"
+    #                 }
+    #             ],
+    #             "lastPlayTime": "2020-12-21T11:58:46.424Z",
+    #             "numLevelsCompleted": 1068,
+    #             "numTerritoriesClaimed": 84,
+    #             "accountLevel": 809,
+    #             "numRepHeroes": 2,
+    #             "isPvPUnlocked": True
+    #         },
+    #         "status": "None",
+    #         "gifts": {}
+    #     },
+    #     "quantity": 1
+    # }, profile_id=request.ctx.profile_id)
     # return sanic.response.json(
     #     await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
     #                                                  request.ctx.profile_revisions)
