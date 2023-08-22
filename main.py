@@ -70,6 +70,7 @@ app.ctx.bcrypt_hash = utils.bcrypt_hash
 app.ctx.bcrypt_check = utils.bcrypt_check
 app.ctx.get_account_id_from_display_name = utils.get_account_id_from_display_name
 app.ctx.get_account_id_from_email = utils.get_account_id_from_email
+app.ctx.search_for_display_name = utils.search_for_display_name
 app.ctx.check_if_display_name_exists = utils.check_if_display_name_exists
 app.ctx.oauth_response = utils.oauth_response
 app.ctx.oauth_client_response = utils.oauth_client_response

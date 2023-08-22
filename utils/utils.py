@@ -471,6 +471,27 @@ async def get_account_id_from_email(email: str) -> Optional[str]:
     return None
 
 
+async def search_for_display_name(display_name: str) -> list[str]:
+    """
+    Searches for a display name
+    :param display_name: The display name to search
+    :return: A list of account ids
+    """
+    results = []
+    display_name = display_name.lower()  # TODO: handle empty display names
+    for file in os.listdir("res/account/api/public/account/"):
+        if file.endswith(".json"):
+            data = await read_file(f"res/account/api/public/account/{file}")
+            if data.get("displayName") is not None:
+                if display_name == data["displayName"].lower():
+                    results.append(data["id"])
+                if display_name in data["displayName"].lower():
+                    results.append(data["id"])
+                if data["displayName"].lower() in display_name:
+                    results.append(data["id"])
+    return results
+
+
 async def check_if_display_name_exists(display_name: str) -> bool:
     """
     Checks if a display name exists
