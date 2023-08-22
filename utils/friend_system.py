@@ -302,6 +302,18 @@ class PlayerFriends:
                 request.app.ctx.friends[account]: PlayerFriends = PlayerFriends(account)
             if request.app.ctx.friends[account].friends["settings"]["acceptInvites"] != "public":
                 accounts_list.remove(account)
+            for friend in self.friends["friends"]:
+                if friend["accountId"] == account:
+                    accounts_list.remove(account)
+                    break
+            for friend in self.friends["incoming"]:
+                if friend["accountId"] == account:
+                    accounts_list.remove(account)
+                    break
+            for friend in self.friends["outgoing"]:
+                if friend["accountId"] == account:
+                    accounts_list.remove(account)
+                    break
         for _ in range(10):
             if len(accounts_list) == 0:
                 break
