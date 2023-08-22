@@ -832,7 +832,6 @@ class PlayerProfile:
                                                                                ProfileType.FRIENDS)
             if friend_instance["attributes"]["accountId"] == friendId:
                 await self.remove_item(friend_instance_guid, ProfileType.FRIENDS)
-                return
 
     async def construct_response(self, profile_id: ProfileType = ProfileType.PROFILE0, rvn: int = -1,
                                  client_command_revision: Optional[str] = None,
