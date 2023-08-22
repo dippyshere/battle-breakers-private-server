@@ -10,7 +10,7 @@ Handles unlocking hero gear.
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, load_datatable, load_character_data
 
 from utils.sanic_gzip import Compress
 
@@ -34,8 +34,8 @@ async def unlock_hero_gear(request: sanic.request.Request, accountId: str) -> sa
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     if hero_item["attributes"]["sidekick_unlocked"]:
         raise errors.com.epicgames.world_explorers.service_not_required(errorMessage="Weapon already unlocked")
-    hero_data = await request.app.ctx.load_character_data(hero_item["templateId"])
-    consumed_items = (await request.app.ctx.load_datatable((await request.app.ctx.load_datatable(
+    hero_data = await load_character_data(hero_item["templateId"])
+    consumed_items = (await load_datatable((await load_datatable(
         hero_data[0]["Properties"]["HeroGearInfo"]["AssetPathName"].replace("/Game/", "Content/").split(".")[0]))[0][
                                                                "Properties"]["HeroGearSlotRecipe"][
                                                                "ObjectPath"].replace("WorldExplorers/", "").split(".")[

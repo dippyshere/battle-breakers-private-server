@@ -12,7 +12,8 @@ import os
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, oauth_response, parse_eg1, get_account_id_from_display_name, create_account, \
+    verify_google_token, oauth_client_response, read_file, write_file, bcrypt_check
 
 from utils.sanic_gzip import Compress
 
@@ -43,31 +44,31 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
             raise errors.com.epicgames.common.oauth.oauth_error()
         match request.form.get('grant_type'):
             case 'client_credentials':
-                return sanic.response.json((await request.app.ctx.oauth_client_response(client_id)))
+                return sanic.response.json((await oauth_client_response(client_id)))
             case 'external_auth':
                 match request.form.get('external_auth_type'):
                     case 'google':
                         # TODO: Reinvestigate what this case is
                         sub = request.form.get('external_auth_token').split(':')[0]
-                        account = await request.app.ctx.read_file(f"res/account/api/public/account/{sub}.json")
+                        account = await read_file(f"res/account/api/public/account/{sub}.json")
                         dn = account['displayName']
                         dvid = request.headers.get('X-Epic-Device-ID')
-                        return sanic.response.json((await request.app.ctx.oauth_response(client_id, dn, dvid, sub)))
+                        return sanic.response.json((await oauth_response(client_id, dn, dvid, sub)))
                     case 'google_id_token':
-                        google_token = await request.app.ctx.verify_google_token(
+                        google_token = await verify_google_token(
                             request.form.get('external_auth_token'))
                         if google_token is not None:
                             sub = google_token['sub']
                             for account in os.listdir('res/account/api/public/account'):
-                                account = await request.app.ctx.read_file(f"res/account/api/public/account/{account}")
+                                account = await read_file(f"res/account/api/public/account/{account}")
                                 if account.get('externalAuths', {}).get('google', {}).get('externalAuthId') == sub:
                                     dn = account['displayName']
                                     dvid = request.headers.get('X-Epic-Device-ID')
                                     return sanic.response.json(
-                                        (await request.app.ctx.oauth_response(client_id, dn, dvid, account['id'])))
+                                        (await oauth_response(client_id, dn, dvid, account['id'])))
                             # Create an account
-                            account_id = await request.app.ctx.create_account()
-                            account = await request.app.ctx.read_file(
+                            account_id = await create_account()
+                            account = await read_file(
                                 f"res/account/api/public/account/{account_id}.json")
                             account["externalAuths"]["google"] = {
                                 "accountId": account_id,
@@ -85,81 +86,81 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                             account["name"] = google_token.get("given_name")
                             account["lastName"] = google_token.get("family_name")
                             account["headless"] = True
-                            await request.app.ctx.write_file(f"res/account/api/public/account/{account_id}.json",
-                                                             account)
-                            profile = await request.app.ctx.read_file(
+                            await write_file(f"res/account/api/public/account/{account_id}.json",
+                                             account)
+                            profile = await read_file(
                                 f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/profile0.json")
                             profile["stats"]["attributes"]["is_headless"] = True
-                            await request.app.ctx.write_file(
+                            await write_file(
                                 f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/profile0.json", profile)
                             return sanic.response.json(
-                                (await request.app.ctx.oauth_response(sub=account_id)))
+                                (await oauth_response(sub=account_id)))
                         else:
                             raise errors.com.epicgames.account.external_auth_validate_failed()
                     case 'internal':
                         # Yeah, really! Internal external auth!
-                        token = await request.app.ctx.parse_eg1(
+                        token = await parse_eg1(
                             request.form.get('external_auth_token').split(":")[-1])
                         if token is not None:
-                            return sanic.response.json((await request.app.ctx.oauth_response(client_id, token['dn'],
-                                                                                             token['dvid'],
-                                                                                             token['sub'])))
+                            return sanic.response.json((await oauth_response(client_id, token['dn'],
+                                                                             token['dvid'],
+                                                                             token['sub'])))
                         else:
                             raise errors.com.epicgames.account.oauth.expired_exchange_code()
                     case _:
                         raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()
             case 'authorization_code':
-                token = await request.app.ctx.parse_eg1(request.form.get('code'))
+                token = await parse_eg1(request.form.get('code'))
                 if token is not None:
-                    return sanic.response.json((await request.app.ctx.oauth_response(client_id, token['dn'],
-                                                                                     request.headers.get('X-Epic-Device-ID'),
-                                                                                     token['sub'])))
+                    return sanic.response.json((await oauth_response(client_id, token['dn'],
+                                                                     request.headers.get('X-Epic-Device-ID'),
+                                                                     token['sub'])))
                 else:
                     raise errors.com.epicgames.account.oauth.expired_authorization_code()
             case 'refresh_token':
-                token = await request.app.ctx.parse_eg1(request.form.get('refresh_token'))
+                token = await parse_eg1(request.form.get('refresh_token'))
                 if token is not None:
-                    return sanic.response.json((await request.app.ctx.oauth_response(client_id, token['dn'],
-                                                                                     request.headers.get('X-Epic-Device-ID'),
-                                                                                     token['sub'])))
+                    return sanic.response.json((await oauth_response(client_id, token['dn'],
+                                                                     request.headers.get('X-Epic-Device-ID'),
+                                                                     token['sub'])))
                 else:
                     raise errors.com.epicgames.account.auth_token.invalid_refresh_token()
             case 'password':  # backwards compatibility for old clients
-                account_id = await request.app.ctx.get_account_id_from_display_name(
+                account_id = await get_account_id_from_display_name(
                     request.form.get('username').split("@")[0].strip())
                 if account_id is None:
                     raise errors.com.epicgames.account.account_not_found(
                         request.form.get('username').split("@")[0].strip())
-                account = await request.app.ctx.read_file(f"res/account/api/public/account/{account_id}.json")
-                if not await request.app.ctx.bcrypt_check(request.form.get('password'),
-                                                          account["extra"]["pwhash"].encode()):
+                account = await read_file(f"res/account/api/public/account/{account_id}.json")
+                if not await bcrypt_check(request.form.get('password'),
+                                          account["extra"]["pwhash"].encode()):
                     raise errors.com.epicgames.account.invalid_account_credentials()
                 else:
-                    return sanic.response.json((await request.app.ctx.oauth_response(client_id, account['displayName'],
-                                                                                     request.headers.get(
-                                                                                         'X-Epic-Device-ID'),
-                                                                                     account_id)))
+                    return sanic.response.json((await oauth_response(client_id, account['displayName'],
+                                                                     request.headers.get(
+                                                                         'X-Epic-Device-ID'),
+                                                                     account_id)))
             case 'exchange_code':
-                token = await request.app.ctx.parse_eg1(request.form.get('exchange_code'))
+                token = await parse_eg1(request.form.get('exchange_code'))
                 if token is not None:
-                    return sanic.response.json((await request.app.ctx.oauth_response(client_id, token['dn'],
-                                                                                     request.headers.get(
-                                                                                         'X-Epic-Device-ID'),
-                                                                                     token['sub'])))
+                    return sanic.response.json((await oauth_response(client_id, token['dn'],
+                                                                     request.headers.get(
+                                                                         'X-Epic-Device-ID'),
+                                                                     token['sub'])))
                 else:
                     raise errors.com.epicgames.account.oauth.expired_exchange_code()
             case 'device_auth':
                 if request.form.get('account_id'):
-                    account = await request.app.ctx.read_file(
+                    account = await read_file(
                         f"res/account/api/public/account/{request.form.get('account_id')}.json")
                     for device_auth in account["extra"]["deviceAuths"]:
                         if device_auth["deviceId"] == request.form.get('device_id'):
                             if device_auth["secret"] == request.form.get('secret'):
                                 return sanic.response.json(
-                                    (await request.app.ctx.oauth_response(client_id, account['displayName'],
-                                                                          request.headers.get(
-                                                                              'X-Epic-Device-ID'),
-                                                                          account["id"])))
+                                    (await oauth_response(client_id, account['displayName'],
+                                                          request.headers.get(
+                                                              'X-Epic-Device-ID'),
+                                                          account["id"])))
                             else:
                                 raise errors.com.epicgames.common.authentication.authentication_failed(
                                     request.form.get('account_id'))

@@ -9,7 +9,7 @@ Handles the store catalog
 import sanic
 
 from utils.sanic_gzip import Compress
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, format_time, get_nearest_12_hour_interval, read_file
 
 compress = Compress()
 wex_catalog = sanic.Blueprint("wex_catalog")
@@ -25,8 +25,8 @@ async def wex_catalog_request(request: sanic.request.Request) -> sanic.response.
     :param request: The request object
     :return: The response object
     """
-    catalog = await request.app.ctx.read_file("res/wex/api/storefront/v2/catalog.json")
-    catalog["expiration"] = await request.app.ctx.format_time((await request.app.ctx.get_nearest_12_hour_interval()))
+    catalog = await read_file("res/wex/api/storefront/v2/catalog.json")
+    catalog["expiration"] = await format_time((await get_nearest_12_hour_interval()))
     # TODO: troubleshoot error in 1.3 and 1.4
     #  Attempted to access index 0 from array 'ItemGrants' of length 0 in '/Script/WorldExplorers.WExpStoreButton'
     # if request.headers.get("User-Agent") == "User-Agent: game=WorldExplorers, engine=UE4, build=1.3.130-r3604802":

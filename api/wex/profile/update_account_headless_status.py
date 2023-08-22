@@ -9,7 +9,7 @@ Handles update headless mcp
 import sanic
 
 from utils.sanic_gzip import Compress
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, read_file
 
 compress = Compress()
 wex_update_headless = sanic.Blueprint("wex_update_headless")
@@ -28,9 +28,9 @@ async def update_headless(request: sanic.request.Request, accountId: str) -> san
     """
     # TODO: Determine what the request provides us with
     await request.ctx.profile.modify_stat("is_headless", False, request.ctx.profile_id)
-    data = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
+    data = await read_file(f"res/account/api/public/account/{accountId}.json")
     data["headless"] = False
-    await request.app.ctx.write_file(f"res/account/api/public/account/{accountId}.json", data)
+    await write_file(f"res/account/api/public/account/{accountId}.json", data)
     return sanic.response.json(
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
                                                      request.ctx.profile_revisions)

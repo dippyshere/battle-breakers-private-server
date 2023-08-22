@@ -12,7 +12,7 @@ import urllib.parse
 import sanic
 
 from utils.sanic_gzip import Compress
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, load_character_data, load_datatable, read_file, write_file
 
 compress = Compress()
 wex_item_ratings = sanic.Blueprint("wex_item_ratings")
@@ -34,16 +34,16 @@ async def item_ratings(request: sanic.request.Request, accountId: str, templateI
         "gameplayRating": 0,
         "appearanceRating": 0
     }
-    data = await request.app.ctx.read_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json")
+    data = await read_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json")
     template_id = urllib.parse.unquote(templateId)
-    character_datatable = await request.app.ctx.load_datatable("Content/Characters/Datatables/CharacterStats")
+    character_datatable = await load_datatable("Content/Characters/Datatables/CharacterStats")
     # TODO: rating key compatability for older versions
     rating_key = character_datatable[0]["Rows"].get(
-        (await request.app.ctx.load_character_data(template_id))[0]["Properties"]["CharacterStatsHandle"]["RowName"],
+        (await load_character_data(template_id))[0]["Properties"]["CharacterStatsHandle"]["RowName"],
         {}).get("RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")
     if rating_key in data:
         my_rating = data[rating_key]
-    overall_ratings = await request.app.ctx.read_file("res/wex/api/game/v2/item_ratings/ratings.json")
+    overall_ratings = await read_file("res/wex/api/game/v2/item_ratings/ratings.json")
     ratings = []
     if rating_key in overall_ratings:
         for rating in overall_ratings[rating_key]:
@@ -71,7 +71,7 @@ async def item_ratings(request: sanic.request.Request, accountId: str, templateI
     for file in os.listdir("res/wex/api/game/v2/item_ratings"):
         if file == "ratings.json":
             continue
-        user_data = await request.app.ctx.read_file(f"res/wex/api/game/v2/item_ratings/{file}")
+        user_data = await read_file(f"res/wex/api/game/v2/item_ratings/{file}")
         if rating_key in user_data and user_data[rating_key]["gameplayRating"] != 0:
             ratings[user_data[rating_key]["gameplayRating"] - 1]["gameplayRating"] += 1
             ratings[user_data[rating_key]["appearanceRating"] - 1]["appearanceRating"] += 1
@@ -98,11 +98,11 @@ async def set_item_rating(request: sanic.request.Request, accountId: str,
     :param templateId: The template id
     :return: The response object (204)
     """
-    data = await request.app.ctx.read_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json")
+    data = await read_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json")
     template_id = urllib.parse.unquote(templateId)
-    character_datatable = await request.app.ctx.load_datatable("Content/Characters/Datatables/CharacterStats")
+    character_datatable = await load_datatable("Content/Characters/Datatables/CharacterStats")
     rating_key = character_datatable[0]["Rows"].get(
-        (await request.app.ctx.load_character_data(template_id))[0]["Properties"]["CharacterStatsHandle"]["RowName"],
+        (await load_character_data(template_id))[0]["Properties"]["CharacterStatsHandle"]["RowName"],
         {}).get("RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")
     data[rating_key] = {
         "gameplayRating": request.json["gameplayRating"],
@@ -112,8 +112,8 @@ async def set_item_rating(request: sanic.request.Request, accountId: str,
         data[rating_key]["gameplayRating"] = 5
     if data[rating_key]["appearanceRating"] > 5:
         data[rating_key]["appearanceRating"] = 5
-    await request.app.ctx.write_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json", data)
-    overall_ratings = await request.app.ctx.read_file("res/wex/api/game/v2/item_ratings/ratings.json")
+    await write_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json", data)
+    overall_ratings = await read_file("res/wex/api/game/v2/item_ratings/ratings.json")
     ratings = []
     if rating_key in overall_ratings:
         for rating in overall_ratings[rating_key]:
@@ -141,7 +141,7 @@ async def set_item_rating(request: sanic.request.Request, accountId: str,
     for file in os.listdir("res/wex/api/game/v2/item_ratings"):
         if file == "ratings.json":
             continue
-        user_data = await request.app.ctx.read_file(f"res/wex/api/game/v2/item_ratings/{file}")
+        user_data = await read_file(f"res/wex/api/game/v2/item_ratings/{file}")
         if rating_key in user_data and user_data[rating_key]["gameplayRating"] != 0:
             ratings[user_data[rating_key]["gameplayRating"] - 1]["gameplayRating"] += 1
             ratings[user_data[rating_key]["appearanceRating"] - 1]["appearanceRating"] += 1

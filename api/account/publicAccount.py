@@ -11,7 +11,7 @@ import urllib.parse
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, get_account_id_from_email, get_account_id_from_display_name, read_file
 
 from utils.sanic_gzip import Compress
 
@@ -35,7 +35,7 @@ async def public_account_info(request: sanic.request.Request) -> sanic.response.
     for accountId in request.args.getlist("accountId"):
         # TODO: handle invalid account ids
         try:
-            account_info = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
+            account_info = await read_file(f"res/account/api/public/account/{accountId}.json")
             final_accounts.append({
                 "id": account_info["id"],
                 "displayName": account_info["displayName"],
@@ -61,10 +61,10 @@ async def account_displayname(request: sanic.request.Request, displayName: str) 
     :return: The response object
     """
     displayName = urllib.parse.unquote(displayName)
-    requested_id = await request.app.ctx.get_account_id_from_display_name(displayName)
+    requested_id = await get_account_id_from_display_name(displayName)
     if requested_id is None:
         raise errors.com.epicgames.account.account_not_found(displayName)
-    account_info = await request.app.ctx.read_file(f"res/account/api/public/account/{requested_id}.json")
+    account_info = await read_file(f"res/account/api/public/account/{requested_id}.json")
     if requested_id == request.ctx.owner:
         return sanic.response.json({
             "id": account_info["id"],
@@ -112,10 +112,10 @@ async def account_email(request: sanic.request.Request, email: str) -> sanic.res
     :param email: The email
     :return: The response object
     """
-    requested_id = await request.app.ctx.get_account_id_from_email(email)
+    requested_id = await get_account_id_from_email(email)
     if requested_id is None:
         raise errors.com.epicgames.account.account_not_found(email)
-    account_info = await request.app.ctx.read_file(f"res/account/api/public/account/{requested_id}.json")
+    account_info = await read_file(f"res/account/api/public/account/{requested_id}.json")
     if requested_id == request.ctx.owner:
         return sanic.response.json({
             "id": account_info["id"],

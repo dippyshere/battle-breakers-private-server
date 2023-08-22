@@ -14,7 +14,7 @@ import sanic
 from utils.friend_system import PlayerFriends
 from utils.profile_system import PlayerProfile
 from utils.enums import ProfileType, FriendStatus
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, read_file, format_time
 
 from utils.sanic_gzip import Compress
 
@@ -64,7 +64,7 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
         if datetime.datetime.strptime(friend_instance["attributes"]["snapshot_expires"],
                                       "%Y-%m-%dT%H:%M:%S.%fZ") <= datetime.datetime.utcnow():
             try:
-                account_data = await request.app.ctx.read_file(
+                account_data = await read_file(
                     f"res/account/api/public/account/{friend_instance['attributes']['accountId']}.json")
             except FileNotFoundError:
                 # This friend isn't on the private server / was deleted
@@ -74,7 +74,7 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
                 await request.ctx.profile.change_item_attribute(itemId, "status", "SuggestedLegacy",
                                                                 request.ctx.profile_id)
                 await request.ctx.profile.change_item_attribute(itemId, "snapshot_expires",
-                                                                await request.app.ctx.format_time(
+                                                                await format_time(
                                                                     datetime.datetime.utcnow() + datetime.timedelta(
                                                                         hours=3)), request.ctx.profile_id)
                 continue
@@ -122,7 +122,7 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
                                                             request.ctx.profile_id)
             await request.ctx.profile.change_item_attribute(itemId, "status", "Friend", request.ctx.profile_id)
             await request.ctx.profile.change_item_attribute(itemId, "snapshot_expires",
-                                                            await request.app.ctx.format_time(
+                                                            await format_time(
                                                                 datetime.datetime.utcnow() + datetime.timedelta(
                                                                     hours=3)), request.ctx.profile_id)
     for friend in result:

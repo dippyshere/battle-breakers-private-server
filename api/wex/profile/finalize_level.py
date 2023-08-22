@@ -40,7 +40,8 @@ async def finalize_level(request: sanic.request.Request, accountId: str) -> sani
                 request.ctx.profile_id)
             level_id = level_item["attributes"]["debug_name"]
         except:
-            raise errors.com.epicgames.world_explorers.level_not_found(errorMessage="Sorry, the level you completed could not be found.")
+            raise errors.com.epicgames.world_explorers.level_not_found(
+                errorMessage="Sorry, the level you completed could not be found.")
     stars = await request.ctx.profile.get_stat("num_levels_completed")
     try:
         difficulty = int(level_id[-1])

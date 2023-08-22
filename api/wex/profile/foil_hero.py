@@ -11,7 +11,7 @@ import sanic
 
 from utils.enums import ProfileType
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, load_datatable, load_character_data
 
 from utils.sanic_gzip import Compress
 
@@ -33,12 +33,12 @@ async def foil_hero(request: sanic.request.Request, accountId: str) -> sanic.res
     foil_guid = (await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_Foil"))[0]
     current_foil_count = (await request.ctx.profile.get_item_by_guid(foil_guid))["quantity"]
     if request.json.get("bIsInPit"):
-        character_data = await request.app.ctx.load_character_data(
+        character_data = await load_character_data(
             (await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"), ProfileType.MONSTERPIT))[
                 "templateId"])
         foil_table = character_data[0]["Properties"]["FoilTable"]["AssetPathName"].replace("/Game/", "Content/").split(
             ".")[0]
-        foil_cost = (await request.app.ctx.load_datatable((await request.app.ctx.load_datatable(foil_table))[0][
+        foil_cost = (await load_datatable((await load_datatable(foil_table))[0][
                                                               "Properties"][
                                                               "RankRecipes"][0]["AssetPathName"].replace("/Game/",
                                                                                                          "Content/").split(
@@ -49,11 +49,11 @@ async def foil_hero(request: sanic.request.Request, accountId: str) -> sanic.res
         await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "foil_lvl", 1,
                                                         ProfileType.MONSTERPIT)
     else:
-        character_data = await request.app.ctx.load_character_data(
+        character_data = await load_character_data(
             (await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId")))["templateId"])
         foil_table = character_data[0]["Properties"]["FoilTable"]["AssetPathName"].replace("/Game/", "Content/").split(
             ".")[0]
-        foil_cost = (await request.app.ctx.load_datatable((await request.app.ctx.load_datatable(foil_table))[0][
+        foil_cost = (await load_datatable((await load_datatable(foil_table))[0][
                                                               "Properties"][
                                                               "RankRecipes"][0]["AssetPathName"].replace("/Game/",
                                                                                                          "Content/").split(

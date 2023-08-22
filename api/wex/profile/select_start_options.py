@@ -14,7 +14,7 @@ from utils.exceptions import errors
 from utils.friend_system import PlayerFriends
 from utils.profile_system import PlayerProfile
 from utils.enums import ProfileType
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, normalise_string, format_time, read_file
 
 from utils.sanic_gzip import Compress
 
@@ -77,7 +77,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
         "templateId": "Party:Instance",
         "attributes": {
             "commander_index": 3,
-            "date_created": await request.app.ctx.format_time(),
+            "date_created": await format_time(),
             "character_ids": [
                 "",
                 "",
@@ -97,7 +97,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "templateId": "Party:Instance",
             "attributes": {
                 "commander_index": 0,
-                "date_created": await request.app.ctx.format_time(),
+                "date_created": await format_time(),
                 "character_ids": [],
                 "friend_index": 5,
                 "party_icon": "None"
@@ -129,19 +129,19 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
     })
     await request.ctx.profile.modify_stat("display_name", request.json.get("displayName"))
     await request.ctx.profile.modify_stat("normalized_name",
-                                          await request.app.ctx.normalise_string(request.json.get("displayName")))
-    account_data = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
+                                          await normalise_string(request.json.get("displayName")))
+    account_data = await read_file(f"res/account/api/public/account/{accountId}.json")
     account_data["displayName"] = request.json.get("displayName")
     account_data["email"] = f'{request.json.get("displayName")}@dippy.com'
     await request.ctx.profile.modify_stat("suggestion_timeout",
-                                          await request.app.ctx.format_time(
+                                          await format_time(
                                               datetime.datetime.utcnow() + datetime.timedelta(hours=1)),
                                           ProfileType.FRIENDS)
     if accountId not in request.app.ctx.friends:
         request.app.ctx.friends[accountId] = PlayerFriends(accountId)
     suggested_accounts = await request.app.ctx.friends[accountId].suggest_friends(request)
     for account in suggested_accounts:
-        account_data = await request.app.ctx.read_file(f"res/account/api/public/account/{account}.json")
+        account_data = await read_file(f"res/account/api/public/account/{account}.json")
         if account not in request.app.ctx.profiles:
             request.app.ctx.profiles[account] = PlayerProfile(account)
         wex_data = await request.app.ctx.profiles[account].get_profile(ProfileType.PROFILE0)
@@ -172,7 +172,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
                 "lifetime_claimed": 0,
                 "accountId": account_data["id"],
                 "canBeSparred": False,
-                "snapshot_expires": await request.app.ctx.format_time(
+                "snapshot_expires": await format_time(
                     datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
                 "best_gift": 0,  # These stats are unique to the friend instance on the profile, not the friend
                 "lifetime_gifted": 0,

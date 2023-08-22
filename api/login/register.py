@@ -14,6 +14,7 @@ import sanic
 import urllib.parse
 
 from utils.sanic_gzip import Compress
+from utils.utils import oauth_response
 
 compress = Compress()
 register_login = sanic.Blueprint("register_login")
@@ -66,7 +67,7 @@ async def register_test(request: sanic.request.Request) -> sanic.response.JSONRe
     :return: The response object
     """
     return sanic.response.json(
-        await request.app.ctx.oauth_response("3cf78cd3b00b439a8755a878b160c7ad", "Dippyshere MbnM",
-                                             None,
-                                             "ec0ebb7e56f6454e86c62299a7b32e20"))
+        await oauth_response("3cf78cd3b00b439a8755a878b160c7ad", "Dippyshere MbnM",
+                             None,
+                             "ec0ebb7e56f6454e86c62299a7b32e20"))
     # return sanic.response.text(str(request.app.ctx.profiles))

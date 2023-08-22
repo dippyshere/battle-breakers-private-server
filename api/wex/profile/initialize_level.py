@@ -12,7 +12,7 @@ import sanic
 
 from utils.exceptions import errors
 from utils.enums import ProfileType
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, load_datatable, format_time
 
 from utils.sanic_gzip import Compress
 
@@ -31,7 +31,7 @@ async def initialize_level(request: sanic.request.Request, accountId: str) -> sa
     :param accountId: The account id
     :return: The modified profile
     """
-    level_info = (await request.app.ctx.load_datatable("Content/World/Datatables/LevelInfo"))[0]["Rows"].get(
+    level_info = (await load_datatable("Content/World/Datatables/LevelInfo"))[0]["Rows"].get(
         request.json.get("levelId"))
     if level_info is None:
         raise errors.com.epicgames.world_explorers.level_not_found()
@@ -48,7 +48,7 @@ async def initialize_level(request: sanic.request.Request, accountId: str) -> sa
     energy_cost = level_info.get("EntranceEnergy", 0) + (
             level_info.get("EnergyPerRoom", 0) + level_info.get("NumExpectedRooms", 0))
     await request.ctx.profile.change_item_quantity(energy_id, energy_quantity - energy_cost)
-    await request.ctx.profile.change_item_attribute(energy_id, "updated", await request.app.ctx.format_time())
+    await request.ctx.profile.change_item_attribute(energy_id, "updated", await format_time())
     # TODO: activity energy spent
     level_notification = {
         "type": "WExpLevelCreated",
@@ -178,7 +178,7 @@ async def initialize_level(request: sanic.request.Request, accountId: str) -> sa
         "heroInfo": []
     }
     # for i in range(3, 55):
-    #     level_notification["level"]["rooms"].append(await request.app.ctx.room_generator(
+    #     level_notification["level"]["rooms"].append(await room_generator(
     #         request.json.get("levelId"), i, level_info))
     account_info = {
         "level": await request.ctx.profile.get_stat("level"),

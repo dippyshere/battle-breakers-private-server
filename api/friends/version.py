@@ -9,6 +9,8 @@ Handles the silly version info
 
 import sanic
 
+from utils.utils import format_time
+
 friends_version = sanic.Blueprint("friends_ver")
 
 
@@ -23,7 +25,7 @@ async def friends_version_route(request: sanic.request.Request) -> sanic.respons
     """
     return sanic.response.json({
         "app": "friends",
-        "serverDate": await request.app.ctx.format_time(),
+        "serverDate": await format_time(),
         "overridePropertiesVersion": "unknown",
         "cln": "34c899d2658aeae83527fa3dc6ec4d2ddafef3eb",
         "build": "b3133",

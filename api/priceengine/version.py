@@ -10,6 +10,7 @@ Handles the silly version info
 import sanic
 
 from utils.sanic_gzip import Compress
+from utils.utils import format_time
 
 compress = Compress()
 pe_version = sanic.Blueprint("pe_ver")
@@ -27,7 +28,7 @@ async def priceengine_version_route(request: sanic.request.Request) -> sanic.res
     """
     return sanic.response.json({
         "app": "com.epicgames.priceengine.public",
-        "serverDate": await request.app.ctx.format_time(),
+        "serverDate": await format_time(),
         "overridePropertiesVersion": "unknown",
         "cln": "f145af92d4871c35b8419983349f47d1c7c071bb",
         "build": "b4735",

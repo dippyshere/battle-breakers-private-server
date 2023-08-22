@@ -10,6 +10,7 @@ Handles the silly version info
 import sanic
 
 from utils.sanic_gzip import Compress
+from utils.utils import format_time
 
 compress = Compress()
 lightswitch_version = sanic.Blueprint("lightswitch_ver")
@@ -27,7 +28,7 @@ async def lightswitch_version_route(request: sanic.request.Request) -> sanic.res
     """
     return sanic.response.json({
         "app": "lightswitch",
-        "serverDate": await request.app.ctx.format_time(),
+        "serverDate": await format_time(),
         "overridePropertiesVersion": "unknown",
         "cln": "unknown",
         "build": "unknown",

@@ -9,7 +9,7 @@ Handles the sac code api
 
 import sanic
 
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, get_account_id_from_display_name
 
 from utils.sanic_gzip import Compress
 
@@ -29,7 +29,7 @@ async def sac_code_info(request: sanic.request.Request, sacSlug: str) -> sanic.r
     :param sacSlug: The sac slug
     :return: The response object
     """
-    search_dn = await request.app.ctx.get_account_id_from_display_name(sacSlug)
+    search_dn = await get_account_id_from_display_name(sacSlug)
     if search_dn is not None:
         return sanic.response.json({
             "id": search_dn,

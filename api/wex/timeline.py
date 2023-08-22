@@ -10,7 +10,7 @@ Handles the events timeline
 import sanic
 import datetime
 
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, format_time, read_file
 
 from utils.sanic_gzip import Compress
 
@@ -31,9 +31,9 @@ async def calendar(request: sanic.request.Request) -> sanic.response.JSONRespons
     # with open("res/wex/api/calendar/v1/timeline.json", "r", encoding='utf-8') as file:
     #     return sanic.response.json(orjson.loads(file.read()))
     # return await sanic.response.file_stream("res/wex/api/calendar/v1/timeline.json", mime_type="application/json")
-    valid_from = await request.app.ctx.format_time(
+    valid_from = await format_time(
         (datetime.datetime.utcnow() - datetime.timedelta(hours=1)))
-    cache_expire = await request.app.ctx.format_time(
+    cache_expire = await format_time(
         (datetime.datetime.utcnow() + datetime.timedelta(hours=2)))
     calendar_channels = {
         "news": {
@@ -107,15 +107,15 @@ async def calendar(request: sanic.request.Request) -> sanic.response.JSONRespons
             "cacheExpire": cache_expire
         }
     }
-    timeline = await request.app.ctx.read_file("res/wex/api/calendar/v1/timeline.json")
+    timeline = await read_file("res/wex/api/calendar/v1/timeline.json")
     for channel in timeline["channels"]:
         for state in timeline["channels"][channel]["states"]:
-            state["validFrom"] = await request.app.ctx.format_time((datetime.datetime.utcnow() - datetime.timedelta(hours=1)))
-        timeline["channels"][channel]["cacheExpire"] = await request.app.ctx.format_time((datetime.datetime.utcnow() + datetime.timedelta(hours=2)))
+            state["validFrom"] = await format_time((datetime.datetime.utcnow() - datetime.timedelta(hours=1)))
+        timeline["channels"][channel]["cacheExpire"] = await format_time((datetime.datetime.utcnow() + datetime.timedelta(hours=2)))
     # return sanic.response.json({
     #     "channels": calendar_channels,
     #     "eventsTimeOffsetHrs": 0.0,
     #     "cacheIntervalMins": 15.0,
-    #     "currentTime": await request.app.ctx.format_time()
+    #     "currentTime": await format_time()
     # })
     return sanic.response.json(timeline)

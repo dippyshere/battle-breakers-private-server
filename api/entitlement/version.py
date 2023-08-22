@@ -9,6 +9,8 @@ Handles the silly version info
 
 import sanic
 
+from utils.utils import format_time
+
 entitlement_version = sanic.Blueprint("entitlement_ver")
 
 
@@ -23,7 +25,7 @@ async def entitlement_version_route(request: sanic.request.Request) -> sanic.res
     """
     return sanic.response.json({
         "app": "com.epicgames.entitlement.public",
-        "serverDate": await request.app.ctx.format_time(),
+        "serverDate": await format_time(),
         "overridePropertiesVersion": "unknown",
         "cln": "7f4d5cae3e9c42acf3c2c297071a482095843110",
         "build": "b2350",

@@ -11,7 +11,7 @@ import sanic
 
 from utils.enums import ProfileType
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, load_datatable
 
 from utils.sanic_gzip import Compress
 
@@ -41,7 +41,7 @@ async def level_up_hero(request: sanic.request.Request, accountId: str) -> sanic
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     current_hero_level = hero_item["attributes"]["level"]
     new_level = current_hero_level + request.json.get("numLevelUps")
-    xp_datatable = (await request.app.ctx.load_datatable("Content/Balance/Datatables/XPUnitLevels"))[0]["Rows"][
+    xp_datatable = (await load_datatable("Content/Balance/Datatables/XPUnitLevels"))[0]["Rows"][
         "UnitXPTNLNormal"]["Keys"]
     for i in range(current_hero_level, new_level):
         if current_xp < int(xp_datatable[i - 1]["Value"]):

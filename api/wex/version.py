@@ -51,7 +51,7 @@ async def wex_version_route(request: sanic.request.Request) -> sanic.response.JS
         cpu_info = "unknown"
     return sanic.response.json({
         "app": "WEX",
-        "serverDate": await request.app.ctx.format_time(),
+        "serverDate": await format_time(),
         "overridePropertiesVersion": "unknown",
         "cln": "19310354",
         "build": "107",

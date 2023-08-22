@@ -10,6 +10,7 @@ Handles the silly version info
 import sanic
 
 from utils.sanic_gzip import Compress
+from utils.utils import format_time
 
 compress = Compress()
 catalog_version = sanic.Blueprint("catalog_ver")
@@ -27,7 +28,7 @@ async def catalog_version_route(request: sanic.request.Request) -> sanic.respons
     """
     return sanic.response.json({
         "app": "com.epicgames.catalog.public",
-        "serverDate": await request.app.ctx.format_time(),
+        "serverDate": await format_time(),
         "overridePropertiesVersion": "unknown",
         "cln": "605b456849d4a0de36d7d75c0514ba345905921f",
         "build": "b11675",

@@ -10,6 +10,7 @@ Handles the silly version info
 import sanic
 
 from utils.sanic_gzip import Compress
+from utils.utils import format_time
 
 compress = Compress()
 affiliate_version = sanic.Blueprint("affiliate_ver")
@@ -27,7 +28,7 @@ async def affiliate_version_route(request: sanic.request.Request) -> sanic.respo
     """
     return sanic.response.json({
         "app": "com.epicgames.affiliate.public",
-        "serverDate": await request.app.ctx.format_time(),
+        "serverDate": await format_time(),
         "overridePropertiesVersion": "unknown",
         "cln": "ae16ea55f35941e131f313f8086336a3aa4f318e",
         "build": "b2592",

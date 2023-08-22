@@ -10,7 +10,7 @@ Handles the account token kill request
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, parse_eg1
 
 from utils.sanic_gzip import Compress
 
@@ -30,7 +30,7 @@ async def kill_auth(request: sanic.request.Request, token: str) -> sanic.respons
     :return: The response object
     """
     # TODO: support killAllWithSameSource query param
-    token = await request.app.ctx.parse_eg1(token)
+    token = await parse_eg1(token)
     if token is not None:
         request.app.ctx.invalid_tokens.append(token["jti"])
     return sanic.response.empty()
@@ -50,7 +50,7 @@ async def kill_others(request: sanic.request.Request) -> sanic.response.HTTPResp
         case "OTHERS_ACCOUNT_CLIENT_SERVICE":
             # TODO: kill all other tokens (client + account + service)
             # request.app.ctx.invalid_tokens.append(
-            #    (await request.app.ctx.parse_eg1(request.headers.get("Authorization", "")))["jti"])
+            #    (await parse_eg1(request.headers.get("Authorization", "")))["jti"])
             return sanic.response.empty()
         case "OTHERS_ACCOUNT_CLIENT":
             # TODO: kill all other tokens (client for the account)
@@ -64,12 +64,12 @@ async def kill_others(request: sanic.request.Request) -> sanic.response.HTTPResp
         case "ALL":
             # TODO: kill all tokens (client + account)
             request.app.ctx.invalid_tokens.append(
-                (await request.app.ctx.parse_eg1(request.headers.get("Authorization", "")))["jti"])
+                (await parse_eg1(request.headers.get("Authorization", "")))["jti"])
             return sanic.response.empty()
         case "ALL_ACCOUNT_CLIENT":
             # TODO: kill all tokens (client + account for the client)
             request.app.ctx.invalid_tokens.append(
-                (await request.app.ctx.parse_eg1(request.headers.get("Authorization", "")))["jti"])
+                (await parse_eg1(request.headers.get("Authorization", "")))["jti"])
             return sanic.response.empty()
         case _:
             raise errors.com.epicgames.bad_request()

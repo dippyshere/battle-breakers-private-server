@@ -10,6 +10,7 @@ Handles the silly version info
 import sanic
 
 from utils.sanic_gzip import Compress
+from utils.utils import format_time
 
 compress = Compress()
 eulatracking_version = sanic.Blueprint("eulatracking_ver")
@@ -27,7 +28,7 @@ async def eula_version_route(request: sanic.request.Request) -> sanic.response.J
     """
     return sanic.response.json({
         "app": "com.epicgames.eulatracking.public",
-        "serverDate": await request.app.ctx.format_time(),
+        "serverDate": await format_time(),
         "overridePropertiesVersion": "unknown",
         "cln": "5199f29252ead0c49871729f6049c4b8dcc0418c",
         "build": "b2039",

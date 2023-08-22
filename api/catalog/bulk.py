@@ -9,7 +9,7 @@ Handles the bulk offers for wex catalog
 
 import sanic
 
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, read_file
 
 from utils.sanic_gzip import Compress
 
@@ -28,7 +28,7 @@ async def offers(request: sanic.request.Request) -> sanic.response.JSONResponse:
     :return: The response object
     """
     # TODO: Support locale
-    catalog_offers = await request.app.ctx.read_file(f"res/catalog/api/shared/bulk/offers.json")
+    catalog_offers = await read_file(f"res/catalog/api/shared/bulk/offers.json")
     catalog_ids = request.args.getlist("id")
     catalog = {}
     for catalog_id in catalog_ids:

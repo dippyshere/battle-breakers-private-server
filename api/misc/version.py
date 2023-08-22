@@ -17,6 +17,7 @@ import sanic
 import git
 
 from utils.sanic_gzip import Compress
+from utils.utils import format_time
 
 compress = Compress()
 version = sanic.Blueprint("server_ver")
@@ -51,7 +52,7 @@ async def version_route(request: sanic.request.Request) -> sanic.response.JSONRe
         cpu_info = "unknown"
     return sanic.response.json({
         "app": "WEX",
-        "serverDate": await request.app.ctx.format_time(),
+        "serverDate": await format_time(),
         "overridePropertiesVersion": "unknown",
         "cln": "19310354",
         "build": "107",

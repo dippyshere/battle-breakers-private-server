@@ -9,7 +9,7 @@ Handles the account metadata endpoints
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, read_file, write_file
 
 from utils.sanic_gzip import Compress
 
@@ -28,7 +28,7 @@ async def get_metadata(request: sanic.request.Request, accountId: str) -> sanic.
     :param accountId: The account id
     :return: The response object
     """
-    account = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
+    account = await read_file(f"res/account/api/public/account/{accountId}.json")
     return sanic.response.json(account.get("metadata", {}))
 
 
@@ -45,16 +45,16 @@ async def get_delete_metadata(request: sanic.request.Request, accountId: str, ke
     :return: The response object
     """
     if request.method == "GET":
-        account = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
+        account = await read_file(f"res/account/api/public/account/{accountId}.json")
         try:
             return sanic.response.text(account.get("metadata", {})[key])
         except KeyError:
             raise errors.com.epicgames.account.metadata_key_not_found()
     else:
-        account = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
+        account = await read_file(f"res/account/api/public/account/{accountId}.json")
         if key in account.get("metadata", {}):
             del account["metadata"][key]
-            await request.app.ctx.write_file(f"res/account/api/public/account/{accountId}.json", account)
+            await write_file(f"res/account/api/public/account/{accountId}.json", account)
         else:
             raise errors.com.epicgames.account.metadata_key_not_found()
         return sanic.response.empty()
@@ -71,11 +71,11 @@ async def set_metadata(request: sanic.request.Request, accountId: str) -> sanic.
     :param accountId: The account id
     :return: The response object
     """
-    account = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
+    account = await read_file(f"res/account/api/public/account/{accountId}.json")
     if "metadata" not in account:
         account["metadata"] = {}
     if len(account["metadata"]) > 1000:
         raise errors.com.epicgames.account.metadata.too_many_keys()
     account["metadata"][request.json["key"]] = request.json["value"]
-    await request.app.ctx.write_file(f"res/account/api/public/account/{accountId}.json", account)
+    await write_file(f"res/account/api/public/account/{accountId}.json", account)
     return sanic.response.empty()

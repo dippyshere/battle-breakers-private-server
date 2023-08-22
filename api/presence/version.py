@@ -10,6 +10,7 @@ Handles the silly version info
 import sanic
 
 from utils.sanic_gzip import Compress
+from utils.utils import format_time
 
 compress = Compress()
 presence_version = sanic.Blueprint("presence_ver")
@@ -27,7 +28,7 @@ async def presence_version_route(request: sanic.request.Request) -> sanic.respon
     """
     return sanic.response.json({
         "app": "presence",
-        "serverDate": await request.app.ctx.format_time(),
+        "serverDate": await format_time(),
         "overridePropertiesVersion": "unknown",
         "cln": "871585423",
         "build": "b1245",

@@ -9,7 +9,7 @@ Handles the device auth creation for mobile
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, uuid_generator, token_generator, write_file, format_time, read_file
 
 from utils.sanic_gzip import Compress
 
@@ -29,19 +29,19 @@ async def device_auth_create(request: sanic.request.Request, accountId: str) -> 
     :return: The response object
     """
     device_authorisation = {
-        "deviceId": await request.app.ctx.uuid_generator(),
+        "deviceId": await uuid_generator(),
         "accountId": accountId,
-        "secret": (await request.app.ctx.token_generator()).upper(),
+        "secret": (await token_generator()).upper(),
         "userAgent": request.headers.get("User-Agent"),
         "created": {
             "location": None,
             "ipAddress": request.ip,
-            "dateTime": await request.app.ctx.format_time()
+            "dateTime": await format_time()
         },
         "lastAccess": {
             "location": None,
             "ipAddress": request.ip,
-            "dateTime": await request.app.ctx.format_time()
+            "dateTime": await format_time()
         },
         "deviceInfo": {
             "type": "",
@@ -49,9 +49,9 @@ async def device_auth_create(request: sanic.request.Request, accountId: str) -> 
             "os": ""
         }
     }
-    account = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
+    account = await read_file(f"res/account/api/public/account/{accountId}.json")
     account["extra"]["deviceAuths"].append(device_authorisation)
-    await request.app.ctx.write_file(f"res/account/api/public/account/{accountId}.json", account)
+    await write_file(f"res/account/api/public/account/{accountId}.json", account)
     return sanic.response.json(device_authorisation)
 
 
@@ -67,7 +67,7 @@ async def device_auth_get(request: sanic.request.Request, accountId: str) -> san
     :return: The response object
     """
     # TODO: remove secret info from response
-    account = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
+    account = await read_file(f"res/account/api/public/account/{accountId}.json")
     return sanic.response.json(account["extra"]["deviceAuths"])
 
 
@@ -84,7 +84,7 @@ async def device_auth_info(request: sanic.request.Request, accountId: str,
     :param deviceId: The device id
     :return: The response object
     """
-    account = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
+    account = await read_file(f"res/account/api/public/account/{accountId}.json")
     for device in account["extra"]["deviceAuths"]:
         if device["deviceId"] == deviceId:
             return sanic.response.json(device)
@@ -104,12 +104,12 @@ async def device_auth_deletion(request: sanic.request.Request, accountId: str,
     :param deviceId: The device id
     :return: The response object
     """
-    account = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
+    account = await read_file(f"res/account/api/public/account/{accountId}.json")
     for device in account["extra"]["deviceAuths"]:
         if device["deviceId"] == deviceId:
             account["extra"]["deviceAuths"].remove(device)
             break
     else:
         raise errors.com.epicgames.account.device_auth.invalid_device_info()
-    await request.app.ctx.write_file(f"res/account/api/public/account/{accountId}.json", account)
+    await write_file(f"res/account/api/public/account/{accountId}.json", account)
     return sanic.response.empty()

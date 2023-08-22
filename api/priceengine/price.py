@@ -9,7 +9,7 @@ Handles the tax calculation
 
 import sanic
 
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, read_file
 
 from utils.sanic_gzip import Compress
 
@@ -29,7 +29,7 @@ async def price_request(request: sanic.request.Request) -> sanic.response.JSONRe
     """
     # TODO: Support bad input
     # TODO: Support other currencies/countries
-    offers = await request.app.ctx.read_file("res/priceengine/api/shared/offers/price.json")
+    offers = await read_file("res/priceengine/api/shared/offers/price.json")
     line_offers = []
     line_id = 0
     totals = {

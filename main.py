@@ -16,7 +16,6 @@ import sanic
 import sanic_ext
 import colorama
 
-
 try:
     import tomllib as toml
 except ModuleNotFoundError:
@@ -50,40 +49,7 @@ with open("utils/config.toml", "rb") as config_file:
     config: dict[str, Any] = toml.load(config_file)
     config_file.close()
 
-app.ctx.read_file = utils.read_file
-app.ctx.write_file = utils.write_file
-app.ctx.get_nearest_12_hour_interval = utils.get_nearest_12_hour_interval
-app.ctx.get_current_12_hour_interval = utils.get_current_12_hour_interval
-app.ctx.format_time = utils.format_time
-app.ctx.private_key = utils.private_key
 app.ctx.public_key = utils.public_key
-app.ctx.token_generator = utils.token_generator
-app.ctx.uuid_generator = utils.uuid_generator
-app.ctx.generate_eg1 = utils.generate_eg1
-app.ctx.generate_client_eg1 = utils.generate_client_eg1
-app.ctx.generate_refresh_eg1 = utils.generate_refresh_eg1
-app.ctx.generate_authorisation_eg1 = utils.generate_authorisation_eg1
-app.ctx.parse_eg1 = utils.parse_eg1
-app.ctx.verify_google_token = utils.verify_google_token
-app.ctx.to_insecure_hash = utils.to_insecure_hash
-app.ctx.bcrypt_hash = utils.bcrypt_hash
-app.ctx.bcrypt_check = utils.bcrypt_check
-app.ctx.get_account_id_from_display_name = utils.get_account_id_from_display_name
-app.ctx.get_account_id_from_email = utils.get_account_id_from_email
-app.ctx.search_for_display_name = utils.search_for_display_name
-app.ctx.check_if_display_name_exists = utils.check_if_display_name_exists
-app.ctx.oauth_response = utils.oauth_response
-app.ctx.oauth_client_response = utils.oauth_client_response
-app.ctx.create_account = utils.create_account
-app.ctx.normalise_string = utils.normalise_string
-app.ctx.load_datatable = utils.load_datatable
-app.ctx.get_template_id_from_path = utils.get_template_id_from_path
-app.ctx.find_best_match = utils.find_best_match
-app.ctx.get_path_from_template_id = utils.get_path_from_template_id
-app.ctx.extract_version_info = utils.extract_version_info
-app.ctx.room_generator = utils.room_generator
-app.ctx.load_character_data = utils.load_character_data
-app.ctx.get_curvetable_value = utils.get_curvetable_value
 app.error_handler = error_handler.CustomErrorHandler()
 app.register_middleware(middleware.mcp_middleware.add_mcp_headers, "response")
 app.ctx.accounts = {}

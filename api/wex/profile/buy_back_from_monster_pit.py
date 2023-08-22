@@ -11,7 +11,7 @@ import sanic
 
 from utils.enums import ProfileType
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, load_character_data, load_datatable, get_template_id_from_path
 
 from utils.sanic_gzip import Compress
 
@@ -33,10 +33,10 @@ async def buy_back_from_monster_pit(request: sanic.request.Request, accountId: s
     # TODO: validation
     if not request.json.get("characterTemplateId").startswith("Character:"):
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
-    hero_data = await request.app.ctx.load_character_data(request.json.get("characterTemplateId"))
+    hero_data = await load_character_data(request.json.get("characterTemplateId"))
     pit_unlocks = await request.ctx.profile.find_item_by_template_id("MonsterPitUnlock:Character",
                                                                      ProfileType.MONSTERPIT)
-    sell_rewards = (await request.app.ctx.load_datatable(
+    sell_rewards = (await load_datatable(
         hero_data[0]["Properties"]["SellRewards"]["AssetPathName"].replace("/Game/", "Content/").split(".")[0]))[0][
         "Properties"]["RequiredItems"]
     for pit_unlock_guid in pit_unlocks:
@@ -57,7 +57,7 @@ async def buy_back_from_monster_pit(request: sanic.request.Request, accountId: s
             "quantity": 1
         }, ProfileType.MONSTERPIT)
     for sell_reward in sell_rewards:
-        reward_template_id = await request.app.ctx.get_template_id_from_path(
+        reward_template_id = await get_template_id_from_path(
             sell_reward["ItemDefinition"]["ObjectPath"])
         current_item = await request.ctx.profile.find_item_by_template_id(reward_template_id)
         if current_item:

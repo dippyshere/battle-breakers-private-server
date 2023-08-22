@@ -10,7 +10,7 @@ Handles entitlement check
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, uuid_generator, read_file, write_file, format_time
 
 wex_entitlement = sanic.Blueprint("wex_entitlement")
 
@@ -24,7 +24,7 @@ async def entitlement_check(request: sanic.request.Request) -> sanic.response.HT
     :param request: The request object
     :return: The response object (204)
     """
-    entitlements = await request.app.ctx.read_file(f"res/entitlement/api/account/{request.ctx.owner}.json")
+    entitlements = await read_file(f"res/entitlement/api/account/{request.ctx.owner}.json")
     for entitlement in entitlements:
         if entitlement.get("catalogItemId") == "e458e71024404176addca212860f9ef2":
             return sanic.response.empty()
@@ -40,19 +40,19 @@ async def request_access(request: sanic.request.Request, accountId: str) -> sani
     :param accountId: The account id
     :return: The response object (204)
     """
-    entitlements = await request.app.ctx.read_file(f"res/entitlement/api/account/{request.ctx.owner}.json")
+    entitlements = await read_file(f"res/entitlement/api/account/{request.ctx.owner}.json")
     for entitlement in entitlements:
         if entitlement.get("catalogItemId") == "e458e71024404176addca212860f9ef2":
             raise sanic.exceptions.BadRequest(context={"errorMessage": "Already have access to this game."})
     entitlements.append({
-        "id": await request.app.ctx.uuid_generator(),
+        "id": await uuid_generator(),
         "entitlementName": "WorldExplorers_Free",
         "namespace": "wex",
         "catalogItemId": "e458e71024404176addca212860f9ef2",
         "accountId": request.ctx.owner,
         "identityId": request.ctx.owner,
         "entitlementType": "AUDIENCE",
-        "grantDate": await request.app.ctx.format_time(),
+        "grantDate": await format_time(),
         "consumed": False,
         "status": "ACTIVE",
         "active": True,
@@ -64,7 +64,7 @@ async def request_access(request: sanic.request.Request, accountId: str) -> sani
         "groupEntitlement": False,
         "country": None
     })
-    await request.app.ctx.write_file(f"res/entitlement/api/account/{request.ctx.owner}.json", entitlements)
+    await write_file(f"res/entitlement/api/account/{request.ctx.owner}.json", entitlements)
     return sanic.response.empty()
     # TODO Check for bans
     # raise errors.com.epicgames.world_explorers.banned_access_found_when_granting()
@@ -83,19 +83,19 @@ async def redeem_access(request: sanic.request.Request, accountId: str) -> sanic
     :param accountId: The account id
     :return: The response object (204)
     """
-    entitlements = await request.app.ctx.read_file(f"res/entitlement/api/account/{request.ctx.owner}.json")
+    entitlements = await read_file(f"res/entitlement/api/account/{request.ctx.owner}.json")
     for entitlement in entitlements:
         if entitlement.get("catalogItemId") == "e458e71024404176addca212860f9ef2":
             raise sanic.exceptions.BadRequest(context={"errorMessage": "Already have access to this game."})
     entitlements.append({
-        "id": await request.app.ctx.uuid_generator(),
+        "id": await uuid_generator(),
         "entitlementName": "WorldExplorers_Free",
         "namespace": "wex",
         "catalogItemId": "e458e71024404176addca212860f9ef2",
         "accountId": request.ctx.owner,
         "identityId": request.ctx.owner,
         "entitlementType": "AUDIENCE",
-        "grantDate": await request.app.ctx.format_time(),
+        "grantDate": await format_time(),
         "consumed": False,
         "status": "ACTIVE",
         "active": True,
@@ -107,7 +107,7 @@ async def redeem_access(request: sanic.request.Request, accountId: str) -> sanic
         "groupEntitlement": False,
         "country": None
     })
-    await request.app.ctx.write_file(f"res/entitlement/api/account/{request.ctx.owner}.json", entitlements)
+    await write_file(f"res/entitlement/api/account/{request.ctx.owner}.json", entitlements)
     return sanic.response.empty()
     # TODO Check for bans
     # raise errors.com.epicgames.world_explorers.banned_access_found_when_granting()
@@ -122,7 +122,7 @@ async def real_game_access(request: sanic.request.Request, accountId: str) -> sa
     :param accountId: The account id
     :return: The response object
     """
-    entitlements = await request.app.ctx.read_file(f"res/entitlement/api/account/{request.ctx.owner}.json")
+    entitlements = await read_file(f"res/entitlement/api/account/{request.ctx.owner}.json")
     for entitlement in entitlements:
         if entitlement.get("catalogItemId") == "e458e71024404176addca212860f9ef2":
             return sanic.response.json({

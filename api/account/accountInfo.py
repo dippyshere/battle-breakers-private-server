@@ -9,7 +9,7 @@ Handles the account endpoint
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, read_file
 
 from utils.sanic_gzip import Compress
 
@@ -30,7 +30,7 @@ async def account_route(request: sanic.request.Request, accountId: str) -> sanic
     """
     if not request.ctx.is_owner:
         try:
-            account_info = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
+            account_info = await read_file(f"res/account/api/public/account/{accountId}.json")
             return sanic.response.json({
                 "id": account_info["id"],
                 "displayName": account_info["displayName"],
@@ -41,7 +41,7 @@ async def account_route(request: sanic.request.Request, accountId: str) -> sanic
             })
         except FileNotFoundError:
             raise errors.com.epicgames.account.account_not_found(accountId)
-    account = await request.app.ctx.read_file(f"res/account/api/public/account/{accountId}.json")
+    account = await read_file(f"res/account/api/public/account/{accountId}.json")
     return sanic.response.json({
         "id": account["id"],
         "displayName": account["displayName"],

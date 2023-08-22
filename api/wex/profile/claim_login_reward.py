@@ -12,7 +12,7 @@ import sanic
 
 from utils.exceptions import errors
 from utils.sanic_gzip import Compress
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, load_datatable, get_template_id_from_path, extract_version_info, format_time
 
 compress = Compress()
 wex_profile_claim_login = sanic.Blueprint("wex_profile_claim_login")
@@ -35,7 +35,7 @@ async def claim_login_reward(request: sanic.request.Request, accountId: str) -> 
                                                                                                 second=0,
                                                                                                 microsecond=0):
         raise errors.com.epicgames.world_explorers.login_reward_not_available(current_day,
-                                                                              await request.app.ctx.format_time(
+                                                                              await format_time(
                                                                                   datetime.datetime.utcnow().replace(
                                                                                       hour=0, minute=0, second=0,
                                                                                       microsecond=0)))
@@ -47,7 +47,7 @@ async def claim_login_reward(request: sanic.request.Request, accountId: str) -> 
         })
     else:
         # ugly but it works
-        version_info = (await request.app.ctx.extract_version_info(request.headers.get("User-Agent")))[0]
+        version_info = (await extract_version_info(request.headers.get("User-Agent")))[0]
         if version_info <= 1:
             datatable = "Content/Loot/DataTables/LoginRewards 1.0"
         elif version_info in [2, 3, 4, 5, 6, 7, 71]:
@@ -62,14 +62,14 @@ async def claim_login_reward(request: sanic.request.Request, accountId: str) -> 
             datatable = "Content/Loot/DataTables/LoginRewards 1.85"
         else:
             datatable = "Content/Loot/DataTables/LoginRewards 1.86"
-        login_reward = (await request.app.ctx.load_datatable(datatable))[0]["Rows"][str(current_day)]
+        login_reward = (await load_datatable(datatable))[0]["Rows"][str(current_day)]
         reward_path = login_reward['ItemDefinition']
         reward_quantity = login_reward['ItemCount']
         try:
             reward_path = reward_path["AssetPathName"]
         except:
             pass  # Backwards compat for datatables in the UE4.16 format
-        reward_template_id = await request.app.ctx.get_template_id_from_path(reward_path)
+        reward_template_id = await get_template_id_from_path(reward_path)
         if reward_template_id.split(':')[0] == "Character":
             await request.ctx.profile.add_item({"templateId": reward_template_id,
                                                 "attributes": {"gear_weapon_item_id": "", "weapon_unlocked": False,
@@ -90,7 +90,7 @@ async def claim_login_reward(request: sanic.request.Request, accountId: str) -> 
                 await request.ctx.profile.add_item(
                     {"templateId": reward_template_id, "attributes": {}, "quantity": reward_quantity})
         await request.ctx.profile.modify_stat("login_reward", {
-            "last_claim_time": await request.app.ctx.format_time(),
+            "last_claim_time": await format_time(),
             "next_level": current_day + 1
         })
     await request.ctx.profile.modify_stat("hammer_quest_energy", {

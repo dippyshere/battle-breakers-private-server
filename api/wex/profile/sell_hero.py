@@ -11,7 +11,7 @@ import sanic
 
 from utils.enums import ProfileType
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, get_template_id_from_path, load_datatable, load_character_data
 
 from utils.sanic_gzip import Compress
 
@@ -38,11 +38,11 @@ async def sell_hero(request: sanic.request.Request, accountId: str) -> sanic.res
         hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"))
     if not hero_item.get("templateId").startswith("Character:"):
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
-    hero_data = await request.app.ctx.load_character_data(hero_item["templateId"])
-    sell_rewards = (await request.app.ctx.load_datatable(
+    hero_data = await load_character_data(hero_item["templateId"])
+    sell_rewards = (await load_datatable(
         hero_data[0]["Properties"]["SellRewards"]["AssetPathName"].replace("/Game/", "Content/").split(".")[0]))[0][
         "Properties"]["RequiredItems"]
-    foil_sell_rewards = (await request.app.ctx.load_datatable(
+    foil_sell_rewards = (await load_datatable(
         hero_data[0]["Properties"]["FoilSellRewards"]["AssetPathName"].replace("/Game/", "Content/").split(".")[0]))[0][
         "Properties"]["RequiredItems"]
     pit_unlocks = await request.ctx.profile.find_item_by_template_id("MonsterPitUnlock:Character",
@@ -56,7 +56,7 @@ async def sell_hero(request: sanic.request.Request, accountId: str) -> sanic.res
                                                             hero_item["attributes"]["foil_lvl"], ProfileType.MONSTERPIT)
         elif pit_copy["attributes"]["foil_lvl"] > 0 and hero_item["attributes"]["foil_lvl"] > 0:
             for foil_reward in foil_sell_rewards:
-                reward_template_id = await request.app.ctx.get_template_id_from_path(
+                reward_template_id = await get_template_id_from_path(
                     foil_reward["ItemDefinition"]["ObjectPath"])
                 current_item = await request.ctx.profile.find_item_by_template_id(reward_template_id)
                 if current_item:
@@ -86,7 +86,7 @@ async def sell_hero(request: sanic.request.Request, accountId: str) -> sanic.res
             "quantity": 1
         }, ProfileType.MONSTERPIT)
     for sell_reward in sell_rewards:
-        reward_template_id = await request.app.ctx.get_template_id_from_path(
+        reward_template_id = await get_template_id_from_path(
             sell_reward["ItemDefinition"]["ObjectPath"])
         current_item = await request.ctx.profile.find_item_by_template_id(reward_template_id)
         if current_item:

@@ -19,6 +19,7 @@ import orjson
 import sanic.request
 
 from utils.enums import ProfileType, FriendStatus
+from utils.utils import read_file, format_time
 
 MCPTypes: UnionType = str | int | float | list | dict | bool
 
@@ -743,7 +744,7 @@ class PlayerProfile:
         rep_heroes: list = []
         account_perks: list = []
         # TODO: Move to database
-        account_data: dict = await request.app.ctx.read_file(f"res/account/api/public/account/{friendId}.json")
+        account_data: dict = await read_file(f"res/account/api/public/account/{friendId}.json")
         for account_perk in ["MaxHitPoints", "RegenStat", "PetStrength", "BasicAttack", "Attack", "SpecialAttack",
                              "DamageReduction", "MaxMana"]:
             account_perks.append(wex_data["stats"]["attributes"].get("account_perks").get(account_perk, 0))
@@ -774,7 +775,7 @@ class PlayerProfile:
                 await self.change_item_attribute(friend_instance_guid, "status", friendStatus.value,
                                                  ProfileType.FRIENDS)
                 await self.change_item_attribute(friend_instance_guid, "snapshot_expires",
-                                                 await request.app.ctx.format_time(
+                                                 await format_time(
                                                      datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
                                                  ProfileType.FRIENDS)
                 await self.change_item_attribute(friend_instance_guid, "canBeSparred",
@@ -798,7 +799,7 @@ class PlayerProfile:
                 "lifetime_claimed": 0,
                 "accountId": account_data["id"],
                 "canBeSparred": False,
-                "snapshot_expires": await request.app.ctx.format_time(
+                "snapshot_expires": await format_time(
                     datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
                 "best_gift": 0,  # These stats are unique to the friend instance on the profile, not the friend
                 "lifetime_gifted": 0,

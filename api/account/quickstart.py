@@ -8,7 +8,8 @@ Handles the quick start account creation
 """
 import sanic
 
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, oauth_response, generate_eg1, uuid_generator, create_account, read_file, \
+    token_generator, format_time, write_file
 
 from utils.sanic_gzip import Compress
 
@@ -27,28 +28,28 @@ async def quickstart(request: sanic.request.Request) -> sanic.response.HTTPRespo
     :param request: The request object
     :return: The response object
     """
-    new_account_id = await request.app.ctx.create_account()
+    new_account_id = await create_account()
     # make the new account headless, so the user can set a name
-    account_info = await request.app.ctx.read_file(f"res/account/api/public/account/{new_account_id}.json")
+    account_info = await read_file(f"res/account/api/public/account/{new_account_id}.json")
     account_info["headless"] = True
-    device_id = await request.app.ctx.uuid_generator()
+    device_id = await uuid_generator()
     device_authorisation = {
         "deviceId": device_id,
         "accountId": new_account_id,
-        "secret": (await request.app.ctx.token_generator()).upper(),
+        "secret": (await token_generator()).upper(),
         "userAgent": request.headers.get("User-Agent"),
         "created": {
             "location": None,
             "ipAddress": request.ip,
-            "dateTime": await request.app.ctx.format_time()
+            "dateTime": await format_time()
         }
     }
     account_info["extra"]["deviceAuths"].append(device_authorisation)
-    await request.app.ctx.write_file(f"res/account/api/public/account/{new_account_id}.json", account_info)
-    profile = await request.app.ctx.read_file(
+    await write_file(f"res/account/api/public/account/{new_account_id}.json", account_info)
+    profile = await read_file(
         f"res/wex/api/game/v2/profile/{new_account_id}/QueryProfile/profile0.json")
     profile["stats"]["attributes"]["is_headless"] = True
-    await request.app.ctx.write_file(
+    await write_file(
         f"res/wex/api/game/v2/profile/{new_account_id}/QueryProfile/profile0.json", profile)
     return sanic.response.json({
         "accountInfo": {
@@ -68,7 +69,7 @@ async def quickstart(request: sanic.request.Request) -> sanic.response.HTTPRespo
             "cabinedMode": False,
             "hasHashedEmail": False
         },
-        "internalAuthKey": f"eg1~{await request.app.ctx.generate_eg1(sub=new_account_id, dn=None, clid=None, dvid=device_id)}",
+        "internalAuthKey": f"eg1~{await generate_eg1(sub=new_account_id, dn=None, clid=None, dvid=device_id)}",
         "deviceAuth": device_authorisation,
-        "oauthSession": await request.app.ctx.oauth_response(sub=new_account_id, dvid=device_id)
+        "oauthSession": await oauth_response(sub=new_account_id, dvid=device_id)
     })

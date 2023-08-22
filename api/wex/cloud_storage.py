@@ -14,7 +14,7 @@ import sanic
 
 from utils.exceptions import errors
 from utils.sanic_gzip import Compress
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, read_file, format_time
 
 compress = Compress()
 wex_cloud = sanic.Blueprint("wex_cloud")
@@ -66,7 +66,7 @@ async def cloudstorage_system_config(request: sanic.request.Request) -> sanic.re
     :return: The response object
     """
     return sanic.response.json({
-        "lastUpdated": await request.app.ctx.format_time(os.path.getmtime("api/wex/cloud_storage.py")),
+        "lastUpdated": await format_time(os.path.getmtime("api/wex/cloud_storage.py")),
         "disableV2": False,
         "isAuthenticated": True,
         "enumerateFilesPath": "/api/cloudstorage/system",
@@ -124,7 +124,7 @@ async def cloudstorage_system_get_file(request: sanic.request.Request, filename:
         filename = "DefaultGame.ini"
     if not os.path.exists(f"res/wex/api/cloudstorage/system/{filename}"):
         raise errors.com.epicgames.cloudstorage.file_not_found(filename)
-    data = await request.app.ctx.read_file(f"res/wex/api/cloudstorage/system/{filename}", False)
+    data = await read_file(f"res/wex/api/cloudstorage/system/{filename}", False)
     return sanic.response.raw(data, content_type="application/octet-stream")
 
 
@@ -140,7 +140,7 @@ async def cloudstorage_storage_info(request: sanic.request.Request, accountId: s
     """
     total_used = 0
     for file in os.listdir("res/wex/api/cloudstorage/user"):
-        data = await request.app.ctx.read_file(f"res/wex/api/cloudstorage/user/{file}")
+        data = await read_file(f"res/wex/api/cloudstorage/user/{file}")
         total_used += len(data)
     return sanic.response.json({
         "accountId": accountId,
@@ -161,7 +161,7 @@ async def cloudstorage_user(request: sanic.request.Request, accountId: str) -> s
     """
     files = []
     for file in os.listdir("res/wex/api/cloudstorage/user"):
-        data = await request.app.ctx.read_file(f"res/wex/api/cloudstorage/user/{file}")
+        data = await read_file(f"res/wex/api/cloudstorage/user/{file}")
         files.append({
             "uniqueFilename": file,
             "filename": file,
@@ -221,7 +221,7 @@ async def cloudstorage_user_config(request: sanic.request.Request) -> sanic.resp
     :return: The response object
     """
     return sanic.response.json({
-        "lastUpdated": await request.app.ctx.format_time(os.path.getmtime("api/wex/cloud_storage.py")),
+        "lastUpdated": await format_time(os.path.getmtime("api/wex/cloud_storage.py")),
         "disableV2": False,
         "isAuthenticated": True,
         "enumerateFilesPath": "/api/cloudstorage/user",

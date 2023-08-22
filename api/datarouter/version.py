@@ -10,6 +10,7 @@ Handles the silly version info
 import sanic
 
 from utils.sanic_gzip import Compress
+from utils.utils import format_time
 
 compress = Compress()
 datarouter_version = sanic.Blueprint("datarouter_ver")
@@ -27,7 +28,7 @@ async def daatarouter_version_route(request: sanic.request.Request) -> sanic.res
     """
     return sanic.response.json({
         "app": "datarouter",
-        "serverDate": await request.app.ctx.format_time(),
+        "serverDate": await format_time(),
         "overridePropertiesVersion": "unknown",
         "cln": "04e1eec103849796502f0c58b08075c5d254f09f",
         "build": "b1290",

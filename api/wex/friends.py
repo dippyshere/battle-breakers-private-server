@@ -14,6 +14,7 @@ from utils.exceptions import errors
 from utils.profile_system import PlayerProfile
 from utils.enums import ProfileType
 from utils.sanic_gzip import Compress
+from utils.utils import search_for_display_name, read_file
 
 compress = Compress()
 wex_friend = sanic.Blueprint("wex_friend")
@@ -32,16 +33,16 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
     account_ids = []
     results = []
     display_name = urllib.parse.unquote(request.args.get("name", ""))
-    # requested_id = await request.app.ctx.get_account_id_from_display_name(display_name)
+    # requested_id = await get_account_id_from_display_name(display_name)
     # if requested_id is not None:
     #     account_ids.append(requested_id)
-    search_results = await request.app.ctx.search_for_display_name(display_name)
+    search_results = await search_for_display_name(display_name)
     # if requested_id is not None and requested_id in search_results:
     #     search_results.remove(requested_id)
     if search_results:
         account_ids.extend(search_results)
     for account_id in account_ids:
-        account_data = await request.app.ctx.read_file(f"res/account/api/public/account/{account_id}.json")
+        account_data = await read_file(f"res/account/api/public/account/{account_id}.json")
         if account_id not in request.app.ctx.profiles:
             request.app.ctx.profiles[account_id] = PlayerProfile(account_id)
         wex_data = await request.app.ctx.profiles[account_id].get_profile(ProfileType.PROFILE0)

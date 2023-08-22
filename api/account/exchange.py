@@ -7,7 +7,7 @@ This code is licensed under the [TBD] license.
 Handles the exchange request
 """
 import sanic
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, generate_authorisation_eg1, parse_eg1
 
 from utils.sanic_gzip import Compress
 
@@ -26,12 +26,12 @@ async def exchange_route(request: sanic.request.Request) -> sanic.response.JSONR
     :return: The response object
     """
     if request.headers.get('Authorization'):
-        token = await request.app.ctx.parse_eg1(request.headers.get("Authorization"))
+        token = await parse_eg1(request.headers.get("Authorization"))
         if token is not None:
             return sanic.response.json({
                 "expiresInSeconds": 28800,
-                "code": await request.app.ctx.generate_authorisation_eg1(token.get('sub'), token.get('dn'),
-                                                                         token.get('clid')),
+                "code": await generate_authorisation_eg1(token.get('sub'), token.get('dn'),
+                                                         token.get('clid')),
                 "creatingClientId": token.get('clid'),
             })
         else:

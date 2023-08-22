@@ -11,7 +11,7 @@ import sanic
 
 from utils.enums import ProfileType
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, load_datatable, get_path_from_template_id
 
 from utils.sanic_gzip import Compress
 
@@ -76,8 +76,8 @@ async def upgrade_hero(request: sanic.request.Request, accountId: str) -> sanic.
         if current_potion_quantity < potion_upgrade.get("quantity"):
             raise errors.com.epicgames.world_explorers.bad_request(
                 errorMessage=f"Not enough {potion_upgrade.get('templateId')}")
-        potion_cost = (await request.app.ctx.load_datatable(
-            (await request.app.ctx.get_path_from_template_id(potion_upgrade.get("templateId"))).replace(
+        potion_cost = (await load_datatable(
+            (await get_path_from_template_id(potion_upgrade.get("templateId"))).replace(
                 "res/Game/WorldExplorers/", "").replace(".json", "").replace("\\", "/")))[0]["Properties"][
             "ConsumptionCostGold"]
         for _ in range(potion_upgrade.get("quantity")):
@@ -93,30 +93,30 @@ async def upgrade_hero(request: sanic.request.Request, accountId: str) -> sanic.
                 current_level = hero_upgrades[5]
                 hero_upgrades[5] += weapon_upgrade["numUpgrades"]
                 promotion_table = \
-                    (await request.app.ctx.load_datatable("Content/Recipes/PT_WeaponLevel"))[0]["Properties"][
+                    (await load_datatable("Content/Recipes/PT_WeaponLevel"))[0]["Properties"][
                         "RankRecipes"]
             case "WeaponStars":
                 current_level = hero_upgrades[6]
                 hero_upgrades[6] += weapon_upgrade["numUpgrades"]
                 promotion_table = \
-                    (await request.app.ctx.load_datatable("Content/Recipes/PT_WeaponTier"))[0]["Properties"][
+                    (await load_datatable("Content/Recipes/PT_WeaponTier"))[0]["Properties"][
                         "RankRecipes"]
             case "ArmorLevel":
                 current_level = hero_upgrades[7]
                 hero_upgrades[7] += weapon_upgrade["numUpgrades"]
                 promotion_table = \
-                    (await request.app.ctx.load_datatable("Content/Recipes/PT_ArmorLevel"))[0]["Properties"][
+                    (await load_datatable("Content/Recipes/PT_ArmorLevel"))[0]["Properties"][
                         "RankRecipes"]
             case "ArmorStars":
                 current_level = hero_upgrades[8]
                 hero_upgrades[8] += weapon_upgrade["numUpgrades"]
                 promotion_table = \
-                    (await request.app.ctx.load_datatable("Content/Recipes/PT_ArmorTier"))[0]["Properties"][
+                    (await load_datatable("Content/Recipes/PT_ArmorTier"))[0]["Properties"][
                         "RankRecipes"]
             case _:
                 raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid weapon upgrade type")
         for i in range(current_level, current_level + weapon_upgrade.get("numUpgrades")):
-            consumed_item = (await request.app.ctx.load_datatable(
+            consumed_item = (await load_datatable(
                 promotion_table[i].get("AssetPathName").replace("/Game/", "Content/").split(".")[0]))[0]["Properties"][
                 "ConsumedItems"][0]
             match consumed_item.get("ItemDefinition", "").get("ObjectName"):

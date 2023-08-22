@@ -9,7 +9,7 @@ verify if a token is valid
 import jwt
 import sanic
 import datetime
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, public_key
 
 from utils.sanic_gzip import Compress
 
@@ -29,7 +29,7 @@ async def verify_auth(request: sanic.request.Request) -> sanic.response.JSONResp
     """
     if request.headers.get("Authorization", "").startswith("basic "):
         token = jwt.decode(request.headers.get("Authorization", "").replace("basic ", "").replace("eg1~", ""),
-                           request.app.ctx.public_key,
+                           public_key,
                            algorithms=["RS256"], leeway=20)
         # yes, i know this should be handled by the middleware, but it isn't with the compression :(
         if request.args.get("includePerms"):
@@ -101,7 +101,7 @@ async def verify_auth(request: sanic.request.Request) -> sanic.response.JSONResp
             "app": token["clsvc"]
         })
     token = jwt.decode(request.headers.get("Authorization", "").replace("bearer ", "").replace("eg1~", ""),
-                       request.app.ctx.public_key,
+                       public_key,
                        algorithms=["RS256"], leeway=20)
     if request.args.get("includePerms"):
         return sanic.response.json({
