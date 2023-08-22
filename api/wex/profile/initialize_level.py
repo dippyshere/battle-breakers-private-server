@@ -203,15 +203,25 @@ async def initialize_level(request: sanic.request.Request, accountId: str) -> sa
                 })
             elif party_instance.get("attributes").get("friend_index") == party_instance.get("attributes").get(
                     "character_ids").index(character_id):
-                if request.json.get("friendInstanceId") == "":
+                if request.json.get("friendInstanceId") == "" and request.json.get("commanderId") == "":
                     party_members.append({
                         "heroType": "DefaultCommander",
                         "heroItemId": ""
                     })
-                else:
+                elif request.json.get("friendInstanceId") != "":
                     party_members.append({
                         "heroType": "FriendCommander",
                         "heroItemId": request.json.get("commanderId")
+                    })
+                elif request.json.get("commanderId") != "":
+                    party_members.append({
+                        "heroType": "LocalCommander",
+                        "heroItemId": request.json.get("commanderId")
+                    })
+                else:
+                    party_members.append({
+                        "heroType": "DefaultCommander",
+                        "heroItemId": ""
                     })
             else:
                 party_members.append({
