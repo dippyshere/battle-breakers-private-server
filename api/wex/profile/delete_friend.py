@@ -33,13 +33,15 @@ async def delete_friend(request: sanic.request.Request, accountId: str) -> sanic
     if isinstance(request.json.get("friendInstanceIds"), list):
         for friend_id in request.json.get("friendInstanceIds"):
             friend_acc_id = (await request.ctx.profile.get_item_by_guid(friend_id,
-                                                                        request.ctx.profile_id)).get("attributes").get(
-                "accountId")
+                                                                        request.ctx.profile_id)).get("attributes",
+                                                                                                     "").get(
+                "accountId", "")
             await request.app.ctx.friends[accountId].remove_friend(request, friend_acc_id)
     else:
         friend_acc_id = (await request.ctx.profile.get_item_by_guid(request.json.get("friendInstanceId"),
-                                                                    request.ctx.profile_id)).get(
-            "attributes").get("accountId")
+                                                                    request.ctx.profile_id)).get("attributes",
+                                                                                                 "").get(
+            "accountId", "")
         await request.app.ctx.friends[accountId].remove_friend(request, friend_acc_id)
     return sanic.response.json(
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
