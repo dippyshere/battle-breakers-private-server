@@ -30,9 +30,12 @@ async def sell_treasure(request: sanic.request.Request, accountId: str) -> sanic
     :return: The modified profile
     """
     item_path = (await get_path_from_template_id(request.json.get("itemTemplateId")))
-    value = (await load_datatable(
-        item_path.replace("res/Game/WorldExplorers/", "").replace(".json", "").replace("\\", "/")))[0]["Properties"][
-        "GoldValue"]
+    try:
+        value = (await load_datatable(
+            item_path.replace("res/Game/WorldExplorers/", "").replace(".json", "").replace("\\", "/")))[0][
+            "Properties"]["GoldValue"]
+    except KeyError:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="This item cannot be sold.")
     gold_id = (await request.ctx.profile.find_item_by_template_id("Currency:Gold"))[0]
     current_gold = (await request.ctx.profile.get_item_by_guid(gold_id))["quantity"]
     item_guid = (await request.ctx.profile.find_item_by_template_id(request.json.get("itemTemplateId")))[0]
