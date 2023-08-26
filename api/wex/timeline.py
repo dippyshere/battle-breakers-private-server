@@ -111,7 +111,8 @@ async def calendar(request: sanic.request.Request) -> sanic.response.JSONRespons
     for channel in timeline["channels"]:
         for state in timeline["channels"][channel]["states"]:
             state["validFrom"] = await format_time((datetime.datetime.utcnow() - datetime.timedelta(hours=1)))
-        timeline["channels"][channel]["cacheExpire"] = await format_time((datetime.datetime.utcnow() + datetime.timedelta(hours=2)))
+        timeline["channels"][channel]["cacheExpire"] = await format_time(
+            (datetime.datetime.utcnow() + datetime.timedelta(hours=2)))
     # return sanic.response.json({
     #     "channels": calendar_channels,
     #     "eventsTimeOffsetHrs": 0.0,

@@ -9,7 +9,7 @@ Handles update headless mcp
 import sanic
 
 from utils.sanic_gzip import Compress
-from utils.utils import authorized as auth, read_file
+from utils.utils import authorized as auth, read_file, write_file
 
 compress = Compress()
 wex_update_headless = sanic.Blueprint("wex_update_headless")

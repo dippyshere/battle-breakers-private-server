@@ -38,11 +38,9 @@ async def foil_hero(request: sanic.request.Request, accountId: str) -> sanic.res
                 "templateId"])
         foil_table = character_data[0]["Properties"]["FoilTable"]["AssetPathName"].replace("/Game/", "Content/").split(
             ".")[0]
-        foil_cost = (await load_datatable((await load_datatable(foil_table))[0][
-                                                              "Properties"][
-                                                              "RankRecipes"][0]["AssetPathName"].replace("/Game/",
-                                                                                                         "Content/").split(
-            ".")[0]))[0]["Properties"]["ConsumedItems"][0]["Count"]
+        foil_cost = (await load_datatable((await load_datatable(foil_table))[0]["Properties"]["RankRecipes"][0][
+                                              "AssetPathName"].replace("/Game/", "Content/").split(".")[0]))[0][
+            "Properties"]["ConsumedItems"][0]["Count"]
         if current_foil_count < foil_cost:
             raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough foil")
         # TODO: mark pit as dirty and recalculate power
@@ -53,11 +51,9 @@ async def foil_hero(request: sanic.request.Request, accountId: str) -> sanic.res
             (await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId")))["templateId"])
         foil_table = character_data[0]["Properties"]["FoilTable"]["AssetPathName"].replace("/Game/", "Content/").split(
             ".")[0]
-        foil_cost = (await load_datatable((await load_datatable(foil_table))[0][
-                                                              "Properties"][
-                                                              "RankRecipes"][0]["AssetPathName"].replace("/Game/",
-                                                                                                         "Content/").split(
-            ".")[0]))[0]["Properties"]["ConsumedItems"][0]["Count"]
+        foil_cost = (await load_datatable((await load_datatable(foil_table))[0]["Properties"]["RankRecipes"][0][
+                                              "AssetPathName"].replace("/Game/", "Content/").split(".")[0]))[0][
+            "Properties"]["ConsumedItems"][0]["Count"]
         if current_foil_count < foil_cost:
             raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough foil")
         await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "foil_lvl", 1)

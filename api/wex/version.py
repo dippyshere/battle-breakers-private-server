@@ -17,6 +17,7 @@ import sanic
 import git
 
 from utils.sanic_gzip import Compress
+from utils.utils import format_time
 
 compress = Compress()
 wex_version = sanic.Blueprint("wex_ver")

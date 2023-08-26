@@ -12,8 +12,9 @@ import os
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth, oauth_response, parse_eg1, get_account_id_from_display_name, create_account, \
-    verify_google_token, oauth_client_response, read_file, write_file, bcrypt_check
+from utils.utils import (authorized as auth, oauth_response, parse_eg1, get_account_id_from_display_name,
+                         create_account, verify_google_token, oauth_client_response, read_file, write_file,
+                         bcrypt_check)
 
 from utils.sanic_gzip import Compress
 

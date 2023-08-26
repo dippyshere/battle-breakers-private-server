@@ -34,7 +34,12 @@ async def upgrade_building(request: sanic.request.Request, accountId: str) -> sa
                                                                request.ctx.profile_id)
     if not building_item.get("templateId").startswith("HqBuilding:"):
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid building item id")
-    promotion_table = (await load_datatable((await load_datatable((await load_datatable(f"Content/Menus/Headquarters/{building_item['templateId'].split(':')[-1]}"))[0]["Properties"]["PromotionTable"]["ObjectPath"].replace("WorldExplorers/", "").split(".")[0]))[0]["Properties"]["RankRecipes"][building_item["attributes"]["level"]]["AssetPathName"].replace("/Game/", "Content/").split(".")[0]))[0]["Properties"]
+    promotion_table = (await load_datatable((await load_datatable(
+        (await load_datatable(f"Content/Menus/Headquarters/{building_item['templateId'].split(':')[-1]}"))[0][
+            "Properties"]["PromotionTable"]["ObjectPath"].replace("WorldExplorers/", "").split(".")[0]))[0][
+                                                "Properties"]["RankRecipes"][building_item["attributes"]["level"]][
+                                                "AssetPathName"].replace("/Game/", "Content/").split(".")[0]))[0][
+        "Properties"]
     for item in promotion_table["ConsumedItems"]:
         item_template_id = await get_template_id_from_path(item["ItemDefinition"]["ObjectPath"])
         current_item = await request.ctx.profile.find_item_by_template_id(item_template_id)
