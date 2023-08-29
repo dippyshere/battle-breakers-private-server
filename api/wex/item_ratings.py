@@ -12,7 +12,7 @@ import urllib.parse
 import sanic
 
 from utils.sanic_gzip import Compress
-from utils.utils import authorized as auth, load_character_data, load_datatable, read_file, write_file
+from utils.utils import authorized as auth, load_character_data, load_datatable, read_file
 
 compress = Compress()
 wex_item_ratings = sanic.Blueprint("wex_item_ratings")
@@ -34,51 +34,52 @@ async def item_ratings(request: sanic.request.Request, accountId: str, templateI
         "gameplayRating": 0,
         "appearanceRating": 0
     }
-    data = await read_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json")
     template_id = urllib.parse.unquote(templateId)
     character_datatable = await load_datatable("Content/Characters/Datatables/CharacterStats")
     # TODO: rating key compatability for older versions
-    rating_key = character_datatable[0]["Rows"].get(
+    rating_key = (character_datatable[0]["Rows"].get(
         (await load_character_data(template_id))[0]["Properties"]["CharacterStatsHandle"]["RowName"],
-        {}).get("RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")
+        {}).get("RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")).replace(".", "_")
+    data = await request.app.ctx.database["item_ratings"].find_one({"_id": accountId}, {rating_key: 1, "_id": 0})
     if rating_key in data:
         my_rating = data[rating_key]
-    overall_ratings = await read_file("res/wex/api/game/v2/item_ratings/ratings.json")
-    ratings = []
-    if rating_key in overall_ratings:
-        for rating in overall_ratings[rating_key]:
-            ratings.append({
+    base_ratings = await read_file("res/wex/api/game/v2/item_ratings/base_ratings.json")
+    user_ratings = request.app.ctx.database["item_ratings"].find({rating_key: {'$ne': None}},
+                                                                 {rating_key: 1, "_id": 0})
+    ratings = [{
+        "gameplayRating": 0,
+        "appearanceRating": 0
+    }, {
+        "gameplayRating": 0,
+        "appearanceRating": 0
+    }, {
+        "gameplayRating": 0,
+        "appearanceRating": 0
+    }, {
+        "gameplayRating": 0,
+        "appearanceRating": 0
+    }, {
+        "gameplayRating": 0,
+        "appearanceRating": 0
+    }]
+    if rating_key in base_ratings:
+        i = 0
+        for rating in base_ratings[rating_key]:
+            ratings[i] = {
                 "gameplayRating": rating[0],
                 "appearanceRating": rating[1]
-            })
-    else:
-        ratings = [{
-            "gameplayRating": 0,
-            "appearanceRating": 0
-        }, {
-            "gameplayRating": 0,
-            "appearanceRating": 0
-        }, {
-            "gameplayRating": 0,
-            "appearanceRating": 0
-        }, {
-            "gameplayRating": 0,
-            "appearanceRating": 0
-        }, {
-            "gameplayRating": 0,
-            "appearanceRating": 0
-        }]
-    for file in os.listdir("res/wex/api/game/v2/item_ratings"):
-        if file == "ratings.json":
-            continue
-        user_data = await read_file(f"res/wex/api/game/v2/item_ratings/{file}")
-        if rating_key in user_data and user_data[rating_key]["gameplayRating"] != 0:
-            ratings[user_data[rating_key]["gameplayRating"] - 1]["gameplayRating"] += 1
-            ratings[user_data[rating_key]["appearanceRating"] - 1]["appearanceRating"] += 1
+            }
+            i += 1
+    async for rating in user_ratings:
+        if rating_key in rating:
+            if rating[rating_key]["gameplayRating"] != 0:
+                ratings[rating[rating_key]["gameplayRating"] - 1]["gameplayRating"] += 1
+            if rating[rating_key]["appearanceRating"] != 0:
+                ratings[rating[rating_key]["appearanceRating"] - 1]["appearanceRating"] += 1
     return sanic.response.json({
         "myRating": my_rating,
         "overallRatings": {
-            "ratingsKey": rating_key,
+            "ratingsKey": rating_key.replace("_", "."),
             "discussUrl": "https://discord.gg/stw-dailies-757765475823517851",
             "ratings": ratings
         }
@@ -98,60 +99,63 @@ async def set_item_rating(request: sanic.request.Request, accountId: str,
     :param templateId: The template id
     :return: The response object (204)
     """
-    data = await read_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json")
     template_id = urllib.parse.unquote(templateId)
     character_datatable = await load_datatable("Content/Characters/Datatables/CharacterStats")
-    rating_key = character_datatable[0]["Rows"].get(
+    # TODO: rating key compatability for older versions
+    rating_key = (character_datatable[0]["Rows"].get(
         (await load_character_data(template_id))[0]["Properties"]["CharacterStatsHandle"]["RowName"],
-        {}).get("RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")
-    data[rating_key] = {
+        {}).get("RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")).replace(".", "_")
+    rating_data = {
         "gameplayRating": request.json["gameplayRating"],
         "appearanceRating": request.json["appearanceRating"]
     }
-    if data[rating_key]["gameplayRating"] > 5:
-        data[rating_key]["gameplayRating"] = 5
-    if data[rating_key]["appearanceRating"] > 5:
-        data[rating_key]["appearanceRating"] = 5
-    await write_file(f"res/wex/api/game/v2/item_ratings/{accountId}.json", data)
-    overall_ratings = await read_file("res/wex/api/game/v2/item_ratings/ratings.json")
-    ratings = []
-    if rating_key in overall_ratings:
-        for rating in overall_ratings[rating_key]:
-            ratings.append({
+    if rating_data["gameplayRating"] > 5:
+        rating_data["gameplayRating"] = 5
+    elif rating_data["gameplayRating"] < 0:
+        rating_data["gameplayRating"] = 0
+    if rating_data["appearanceRating"] > 5:
+        rating_data["appearanceRating"] = 5
+    elif rating_data["appearanceRating"] < 0:
+        rating_data["appearanceRating"] = 0
+    await request.app.ctx.database["item_ratings"].update_one({"_id": accountId}, {"$set": {rating_key: rating_data}},
+                                                              upsert=True)
+    base_ratings = await read_file("res/wex/api/game/v2/item_ratings/base_ratings.json")
+    user_ratings = request.app.ctx.database["item_ratings"].find({rating_key: {'$ne': None}},
+                                                                 {rating_key: 1, "_id": 0})
+    ratings = [{
+        "gameplayRating": 0,
+        "appearanceRating": 0
+    }, {
+        "gameplayRating": 0,
+        "appearanceRating": 0
+    }, {
+        "gameplayRating": 0,
+        "appearanceRating": 0
+    }, {
+        "gameplayRating": 0,
+        "appearanceRating": 0
+    }, {
+        "gameplayRating": 0,
+        "appearanceRating": 0
+    }]
+    if rating_key in base_ratings:
+        i = 0
+        for rating in base_ratings[rating_key]:
+            ratings[i] = {
                 "gameplayRating": rating[0],
                 "appearanceRating": rating[1]
-            })
-    else:
-        ratings = [{
-            "gameplayRating": 0,
-            "appearanceRating": 0
-        }, {
-            "gameplayRating": 0,
-            "appearanceRating": 0
-        }, {
-            "gameplayRating": 0,
-            "appearanceRating": 0
-        }, {
-            "gameplayRating": 0,
-            "appearanceRating": 0
-        }, {
-            "gameplayRating": 0,
-            "appearanceRating": 0
-        }]
-    for file in os.listdir("res/wex/api/game/v2/item_ratings"):
-        if file == "ratings.json":
-            continue
-        user_data = await read_file(f"res/wex/api/game/v2/item_ratings/{file}")
-        if rating_key in user_data and user_data[rating_key]["gameplayRating"] != 0:
-            ratings[user_data[rating_key]["gameplayRating"] - 1]["gameplayRating"] += 1
-            ratings[user_data[rating_key]["appearanceRating"] - 1]["appearanceRating"] += 1
+            }
+            i += 1
+    async for rating in user_ratings:
+        if rating_key in rating:
+            if rating[rating_key]["gameplayRating"] != 0:
+                ratings[rating[rating_key]["gameplayRating"] - 1]["gameplayRating"] += 1
+            if rating[rating_key]["appearanceRating"] != 0:
+                ratings[rating[rating_key]["appearanceRating"] - 1]["appearanceRating"] += 1
     return sanic.response.json({
-        "myRating": {
-            "gameplayRating": request.json["gameplayRating"],
-            "appearanceRating": request.json["appearanceRating"]
-        },
+        "myRating": rating_data,
         "overallRatings": {
-            "ratingsKey": rating_key,
+            "ratingsKey": rating_key.replace("_", "."),
             "discussUrl": "https://discord.gg/stw-dailies-757765475823517851",
             "ratings": ratings
         }
