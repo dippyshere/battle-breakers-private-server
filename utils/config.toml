@@ -1,2 +1,6 @@
 # Dippy Breakers private server config file
 # You shouldn't need to touch anything in this file
+
+[database]
+uri = "mongodb://localhost:27017"
+database = "dippy_battle_breakers"

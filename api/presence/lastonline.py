@@ -42,7 +42,7 @@ async def last_online(request: sanic.request.Request, accountId: str) -> sanic.r
     for friend in (await request.ctx.friends.get_friends())["friends"]:
         if friend["accountId"] in accounts_list:
             if friend["accountId"] not in request.app.ctx.profiles:
-                request.app.ctx.profiles[friend["accountId"]] = PlayerProfile(friend["accountId"])
+                request.app.ctx.profiles[friend["accountId"]] = await PlayerProfile.init_profile(friend["accountId"])
             wex_data = await request.app.ctx.profiles[friend["accountId"]].get_profile(ProfileType.PROFILE0)
             response[friend["accountId"]] = [
                 {

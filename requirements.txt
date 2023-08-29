@@ -13,3 +13,4 @@ cryptography>=41.0.3
 faust-cchardet>=2.1.18
 aiohttp[speedups]>=3.8.5
 urllib3>=2.0.4
+motor>=3.3.0

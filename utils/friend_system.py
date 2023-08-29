@@ -141,7 +141,7 @@ class PlayerFriends:
             if blocked["accountId"] == friendId:
                 raise errors.com.epicgames.friends.cannot_friend_due_to_target_settings()
         if self.account_id not in request.app.ctx.profiles:
-            request.app.ctx.profiles[self.account_id]: PlayerProfile = PlayerProfile(self.account_id)
+            request.app.ctx.profiles[self.account_id]: PlayerProfile = await PlayerProfile.init_profile(self.account_id)
         await request.app.ctx.profiles[self.account_id].add_friend_instance(request, friendId, FriendStatus.REQUESTED)
         self.friends["outgoing"].append({
             "accountId": friendId,
@@ -151,7 +151,7 @@ class PlayerFriends:
         })
         await self.save_friends()
         if friendId not in request.app.ctx.profiles:
-            request.app.ctx.profiles[friendId]: PlayerProfile = PlayerProfile(friendId)
+            request.app.ctx.profiles[friendId]: PlayerProfile = await PlayerProfile.init_profile(friendId)
         await request.app.ctx.profiles[friendId].add_friend_instance(request, self.account_id, FriendStatus.INVITED)
         other_friend.friends["incoming"].append({
             "accountId": self.account_id,
@@ -172,7 +172,7 @@ class PlayerFriends:
             if friend["accountId"] == friendId:
                 return
         if friendId not in request.app.ctx.profiles:
-            request.app.ctx.profiles[friendId]: PlayerProfile = PlayerProfile(friendId)
+            request.app.ctx.profiles[friendId]: PlayerProfile = await PlayerProfile.init_profile(friendId)
         await request.app.ctx.profiles[friendId].add_friend_instance(request, self.account_id,
                                                                      FriendStatus.FRIEND)
         for friend in self.friends["incoming"]:
@@ -237,7 +237,7 @@ class PlayerFriends:
                 self.friends["outgoing"].remove(friend)
                 break
         if self.account_id not in request.app.ctx.profiles:
-            request.app.ctx.profiles[self.account_id]: PlayerProfile = PlayerProfile(self.account_id)
+            request.app.ctx.profiles[self.account_id]: PlayerProfile = await PlayerProfile.init_profile(self.account_id)
         await request.app.ctx.profiles[self.account_id].remove_friend_instance(friendId)
         await self.save_friends()
         try:
@@ -257,7 +257,7 @@ class PlayerFriends:
                     other_friend.friends["outgoing"].remove(friend)
                     break
             if friendId not in request.app.ctx.profiles:
-                request.app.ctx.profiles[friendId]: PlayerProfile = PlayerProfile(friendId)
+                request.app.ctx.profiles[friendId]: PlayerProfile = await PlayerProfile.init_profile(friendId)
             await request.app.ctx.profiles[friendId].remove_friend_instance(self.account_id)
             await other_friend.save_friends()
         except:

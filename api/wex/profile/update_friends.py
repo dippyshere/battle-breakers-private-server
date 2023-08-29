@@ -79,7 +79,7 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
                                                                         hours=3)), request.ctx.profile_id)
                 continue
             if friend_instance["attributes"]["accountId"] not in request.app.ctx.profiles:
-                request.app.ctx.profiles[friend_instance["attributes"]["accountId"]] = PlayerProfile(
+                request.app.ctx.profiles[friend_instance["attributes"]["accountId"]] = await PlayerProfile.init_profile(
                     friend_instance["attributes"]["accountId"])
             wex_data = await request.app.ctx.profiles[friend_instance["attributes"]["accountId"]].get_profile(
                 ProfileType.PROFILE0)

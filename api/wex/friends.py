@@ -44,7 +44,7 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
     for account_id in account_ids:
         account_data = await read_file(f"res/account/api/public/account/{account_id}.json")
         if account_id not in request.app.ctx.profiles:
-            request.app.ctx.profiles[account_id] = PlayerProfile(account_id)
+            request.app.ctx.profiles[account_id] = await PlayerProfile.init_profile(account_id)
         wex_data = await request.app.ctx.profiles[account_id].get_profile(ProfileType.PROFILE0)
         rep_heroes = []
         account_perks = []

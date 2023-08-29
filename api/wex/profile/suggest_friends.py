@@ -38,7 +38,7 @@ async def suggest_friends(request: sanic.request.Request, accountId: str) -> san
     for account in suggested_accounts:
         account_data = await read_file(f"res/account/api/public/account/{account}.json")
         if account not in request.app.ctx.profiles:
-            request.app.ctx.profiles[account] = PlayerProfile(account)
+            request.app.ctx.profiles[account] = await PlayerProfile.init_profile(account)
         wex_data = await request.app.ctx.profiles[account].get_profile(ProfileType.PROFILE0)
         rep_heroes = []
         account_perks = []

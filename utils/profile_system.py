@@ -7,16 +7,14 @@ This code is licensed under the [TBD] license.
 Class based system to handle the profile management for wex mcp service
 """
 import ast
-import asyncio
 import datetime
 import uuid
-from concurrent.futures.thread import ThreadPoolExecutor
 from types import UnionType
-from typing import Any, Optional
+from typing import Any, Optional, Self
 
-import aiofiles
-import orjson
-import sanic.request
+import motor.core
+import motor.motor_asyncio
+import sanic
 
 from utils.enums import ProfileType, FriendStatus
 from utils.utils import read_file, format_time
@@ -292,12 +290,6 @@ class MCPProfile:
         self.items: Optional[dict[str, MCPItem]] = None
         self.stats: Optional[dict[str, dict[str, MCPTypes]]] = None
         self.commandRevision: Optional[int] = None
-        try:
-            asyncio.get_running_loop()
-            with ThreadPoolExecutor() as pool:
-                pool.submit(lambda: asyncio.run(self.load_profile())).result()
-        except RuntimeError:
-            asyncio.run(self.load_profile())
 
     def __repr__(self) -> str:
         """
@@ -445,29 +437,51 @@ class MCPProfile:
         """
         return self.profile.get(key, default)
 
-    async def load_profile(self) -> None:
+    @classmethod
+    async def init_profile(cls, account_id: str, profile_type: ProfileType,
+                           database: motor.core.AgnosticDatabase) -> Self:
+        """
+        Initialise the profile
+
+        :param account_id: The account ID of the profile to initialise
+        :param profile_type: The profile type of the profile to initialise
+        :param database: The database to use
+        :return:
+        """
+        self: MCPProfile = cls(account_id, profile_type)
+        await self.load_profile(database)
+        return self
+
+    async def load_profile(self, database: motor.core.AgnosticDatabase) -> None:
         """
         Load the profile
+
+        :param database: The database to use
         """
-        # TODO: move to database
-        # noinspection IncorrectFormatting
-        async with aiofiles.open(
-                f"res/wex/api/game/v2/profile/{self.accountId}/QueryProfile/{self.profile_type}.json",
-                "rb") as f:
-            profile: dict[str, str | int | dict] = orjson.loads(await f.read())
-        self._id: str = profile["_id"]
-        self.created: str = profile["created"]
-        self.updated: str = profile["updated"]
-        self.rvn: int = profile["rvn"]
-        self.wipeNumber: int = profile["wipeNumber"]
-        self.version: str = profile["version"]
+        collection = database[f"profile_{self.profile_type}"]
+        profile = await collection.find_one({"_id": self.accountId})
+        self._id: str = profile.get("_id")
+        self.created: str = profile.get("created")
+        self.updated: str = profile.get("updated")
+        self.rvn: int = profile.get("rvn")
+        self.wipeNumber: int = profile.get("wipeNumber")
+        self.version: str = profile.get("version")
         if self.items is None:
             self.items: dict[str, MCPItem] = {}
-        for item, item_data in profile["items"].items():
+        for item, item_data in profile.get("items").items():
             self.items[item]: MCPItem = MCPItem(item, item_data["templateId"], item_data["attributes"],
                                                 item_data["quantity"])
-        self.stats: dict[str, dict[str, MCPTypes]] = profile["stats"]
-        self.commandRevision: int = profile["commandRevision"]
+        self.stats: dict[str, dict[str, MCPTypes]] = profile.get("stats")
+        self.commandRevision: int = profile.get("commandRevision")
+
+    async def save_profile(self, database: motor.core.AgnosticDatabase) -> None:
+        """
+        Save the profile
+
+        :param database: The database to use
+        """
+        collection = database[f"profile_{self.profile_type}"]
+        await collection.replace_one({"_id": self.accountId}, self.profile, upsert=True)
 
 
 class PlayerProfile:
@@ -506,13 +520,6 @@ class PlayerProfile:
         self.profile_revisions: list[
             dict[str, str | int], dict[str, str | int], dict[str, str | int], dict[str, str | int], dict[
                 str, str | int]] = []
-        for profile_type in ProfileType:
-            mcp_profile: MCPProfile = MCPProfile(account_id, profile_type)
-            setattr(self, f"_{profile_type.value}", mcp_profile)
-            setattr(self, f"{profile_type.value}_changes", [])
-            setattr(self, f"{profile_type.value}_notifications", [])
-            self.profile_revisions.append(
-                {"profileId": profile_type.value, "clientCommandRevision": mcp_profile.commandRevision})
 
     def __repr__(self) -> str:
         """
@@ -528,7 +535,35 @@ class PlayerProfile:
         """
         return self.__repr__()
 
-    async def get_profile(self, profile_id: ProfileType = ProfileType.PROFILE0) -> dict:
+    @classmethod
+    async def init_profile(cls, account_id: str) -> Self:
+        """
+        Initialise the profile
+
+        :param account_id: The account ID of the profile to initialise
+        :return: The initialised profile
+        """
+        self: PlayerProfile = cls(account_id)
+        await self.load_profiles(account_id)
+        return self
+
+    async def load_profiles(self, account_id: str) -> None:
+        """
+        Load the profiles
+
+        :param account_id: The account ID of the profile to load
+        :return: None
+        """
+        sanic_app = sanic.Sanic.get_app()
+        for profile_type in ProfileType:
+            mcp_profile: MCPProfile = await MCPProfile.init_profile(account_id, profile_type, sanic_app.ctx.database)
+            setattr(self, f"_{profile_type.value}", mcp_profile)
+            setattr(self, f"{profile_type.value}_changes", [])
+            setattr(self, f"{profile_type.value}_notifications", [])
+            self.profile_revisions.append(
+                {"profileId": profile_type.value, "clientCommandRevision": mcp_profile.commandRevision})
+
+    async def get_profile(self, profile_id: ProfileType = ProfileType.PROFILE0) -> MCPProfile:
         """
         Get the profile data
         :param profile_id: The profile ID to get
@@ -739,7 +774,7 @@ class PlayerProfile:
         :return: None
         """
         if friendId not in request.app.ctx.profiles:
-            request.app.ctx.profiles[friendId]: PlayerProfile = PlayerProfile(friendId)
+            request.app.ctx.profiles[friendId]: PlayerProfile = await PlayerProfile.init_profile(friendId)
         wex_data: dict = await request.app.ctx.profiles[friendId].get_profile(ProfileType.PROFILE0)
         rep_heroes: list = []
         account_perks: list = []
@@ -964,8 +999,4 @@ class PlayerProfile:
         if save_profile:
             for profile_type in ProfileType:
                 profile = await self.get_profile(profile_type)
-                # noinspection IncorrectFormatting
-                async with aiofiles.open(
-                        f"res/wex/api/game/v2/profile/{self.account_id}/QueryProfile/{profile_type.value}.json",
-                        "wb") as file:
-                    await file.write(orjson.dumps(profile))
+                await profile.save_profile(sanic.Sanic.get_app().ctx.database)

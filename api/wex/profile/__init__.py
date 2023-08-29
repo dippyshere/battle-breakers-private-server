@@ -117,7 +117,7 @@ async def add_mcp_profile(request: sanic.request.Request) -> None:
     account_id = request.match_info.get('accountId')
     if account_id is not None:
         if account_id not in request.app.ctx.profiles:
-            request.app.ctx.profiles[account_id] = PlayerProfile(account_id)
+            request.app.ctx.profiles[account_id] = await PlayerProfile.init_profile(account_id)
         request.ctx.profile = request.app.ctx.profiles[account_id]
     else:
         request.ctx.profile = None

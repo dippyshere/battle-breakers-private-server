@@ -15,6 +15,7 @@ import orjson
 import sanic
 import sanic_ext
 import colorama
+import motor.motor_asyncio
 
 try:
     import tomllib as toml
@@ -52,6 +53,7 @@ with open("utils/config.toml", "rb") as config_file:
 app.ctx.public_key = utils.public_key
 app.error_handler = error_handler.CustomErrorHandler()
 app.register_middleware(middleware.mcp_middleware.add_mcp_headers, "response")
+app.ctx.database = motor.motor_asyncio.AsyncIOMotorClient(config["database"]["uri"])[config["database"]["database"]]
 app.ctx.accounts = {}
 app.ctx.friends = {}
 app.ctx.profiles = {}
