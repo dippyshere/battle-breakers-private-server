@@ -9,7 +9,7 @@ Handles the entitlement checks for the launcher
 
 import sanic
 
-from utils.utils import authorized as auth, read_file
+from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
 
@@ -28,4 +28,6 @@ async def entitlements_route(request: sanic.request.Request, accountId: str) -> 
     :param accountId: The account id
     :return: The response object (204)
     """
-    return sanic.response.json(await read_file(f"res/entitlement/api/account/{accountId}.json"))
+    return sanic.response.json(
+        (await request.app.ctx.database["entitlements"].find_one({"_id": accountId}, {"_id": 0}))["entitlements"]
+    )
