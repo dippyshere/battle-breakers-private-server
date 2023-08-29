@@ -27,7 +27,7 @@ async def add_friends_profile(request: sanic.request.Request) -> None:
     account_id = request.match_info.get('accountId')
     if account_id is not None:
         if account_id not in request.app.ctx.friends:
-            request.app.ctx.friends[account_id] = PlayerFriends(account_id)
+            request.app.ctx.friends[account_id] = await PlayerFriends.init_friends(account_id)
         request.ctx.friends = request.app.ctx.friends[account_id]
     else:
         request.ctx.friends = None

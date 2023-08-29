@@ -29,7 +29,7 @@ async def add_friend(request: sanic.request.Request, accountId: str) -> sanic.re
     :return: The modified profile
     """
     if accountId not in request.app.ctx.friends:
-        request.app.ctx.friends[accountId] = PlayerFriends(accountId)
+        request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
     await request.app.ctx.friends[accountId].send_friend_request(request, request.json.get("friendAccountId"))
     return sanic.response.json(
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,

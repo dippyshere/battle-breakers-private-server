@@ -37,7 +37,7 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
     accounts_list = [acc.split(".")[0] for acc in os.listdir("res/account/api/public/account/")]
     pending_changes = request.ctx.profile.friends_changes
     if accountId not in request.app.ctx.friends:
-        request.app.ctx.friends[accountId] = PlayerFriends(accountId)
+        request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
     friends_list = (await request.app.ctx.friends[accountId].get_summary())["friends"]
     incoming_list = (await request.app.ctx.friends[accountId].get_summary())["incoming"]
     outgoing_list = (await request.app.ctx.friends[accountId].get_summary())["outgoing"]

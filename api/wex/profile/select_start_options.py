@@ -138,7 +138,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
                                               datetime.datetime.utcnow() + datetime.timedelta(hours=1)),
                                           ProfileType.FRIENDS)
     if accountId not in request.app.ctx.friends:
-        request.app.ctx.friends[accountId] = PlayerFriends(accountId)
+        request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
     suggested_accounts = await request.app.ctx.friends[accountId].suggest_friends(request)
     for account in suggested_accounts:
         account_data = await read_file(f"res/account/api/public/account/{account}.json")

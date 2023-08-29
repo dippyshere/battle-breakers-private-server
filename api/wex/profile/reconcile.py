@@ -34,7 +34,7 @@ async def reconcile(request: sanic.request.Request, accountId: str) -> sanic.res
     await request.ctx.profile.clear_notifications()
     results = {}
     if accountId not in request.app.ctx.friends:
-        request.app.ctx.friends[accountId] = PlayerFriends(accountId)
+        request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
     friends_list = request.json["friendIdList"]
     friends_list.extend(request.json["outgoingIdList"])
     friends_list.extend(request.json["incomingIdList"])

@@ -34,7 +34,7 @@ async def last_online(request: sanic.request.Request, accountId: str) -> sanic.r
     :return: The response object
     """
     if accountId not in request.app.ctx.friends:
-        request.app.ctx.friends[accountId] = PlayerFriends(accountId)
+        request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
     request.ctx.friends = request.app.ctx.friends[accountId]
     accounts_list = os.listdir("res/account/api/public/account")
     accounts_list = [account.split(".")[0] for account in accounts_list]

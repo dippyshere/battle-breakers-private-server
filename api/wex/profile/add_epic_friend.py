@@ -38,7 +38,7 @@ async def add_epic_friend(request: sanic.request.Request, accountId: str) -> san
     :return: The modified profile
     """
     if accountId not in request.app.ctx.friends:
-        request.app.ctx.friends[accountId] = PlayerFriends(accountId)
+        request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
     if request.json.get("friendAccountId") == "":
         incoming_list = (await request.app.ctx.friends[accountId].get_summary())["incoming"]
         for friend in incoming_list:

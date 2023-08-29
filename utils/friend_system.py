@@ -6,14 +6,12 @@ This code is licensed under the [TBD] license.
 
 Class based system to handle the friends service management
 """
-import asyncio
 import os
 import random
-from concurrent.futures.thread import ThreadPoolExecutor
-from typing import Optional
+from typing import Optional, Self
 
-import aiofiles
-import orjson
+import motor.core
+import motor.motor_asyncio
 import sanic
 
 from utils.enums import FriendStatus
@@ -35,12 +33,6 @@ class PlayerFriends:
         """
         self.account_id: str = account_id
         self.friends: Optional[dict] = None
-        try:
-            asyncio.get_running_loop()
-            with ThreadPoolExecutor() as pool:
-                pool.submit(lambda: asyncio.run(self.load_friends())).result()
-        except RuntimeError:
-            asyncio.run(self.load_friends())
 
     def __str__(self) -> str:
         """
@@ -56,13 +48,26 @@ class PlayerFriends:
         """
         return self.account_id
 
-    async def load_friends(self) -> None:
+    @classmethod
+    async def init_friends(cls, account_id: str) -> Self:
+        """
+        Initialise the friends class.
+
+        :param account_id: The account ID of the profile
+        :return: The friends class
+        """
+        self: PlayerFriends = cls(account_id)
+        await self.load_friends(sanic.Sanic.get_app().ctx.database)
+        return self
+
+    async def load_friends(self, database: motor.core.AgnosticDatabase) -> None:
         """
         Load the profile based on the account ID and setup the variables
         :return: None
         """
-        async with aiofiles.open(f"res/friends/api/v1/{self.account_id}.json", "rb") as file:
-            self.friends: dict = orjson.loads(await file.read())
+        collection = database[f"friends"]
+        friends = await collection.find_one({"_id": self.account_id})
+        self.friends = friends
 
     async def get_friends(self) -> dict:
         """
@@ -125,7 +130,7 @@ class PlayerFriends:
             if friend["accountId"] == friendId:
                 raise errors.com.epicgames.friends.friend_request_already_sent()
         if friendId not in request.app.ctx.friends:
-            request.app.ctx.friends[friendId]: PlayerFriends = PlayerFriends(friendId)
+            request.app.ctx.friends[friendId]: PlayerFriends = await PlayerFriends.init_friends(friendId)
         other_friend: PlayerFriends = request.app.ctx.friends[friendId]
         for friend in self.friends["incoming"]:
             if friend["accountId"] == friendId:
@@ -242,7 +247,7 @@ class PlayerFriends:
         await self.save_friends()
         try:
             if friendId not in request.app.ctx.friends:
-                request.app.ctx.friends[friendId]: PlayerFriends = PlayerFriends(friendId)
+                request.app.ctx.friends[friendId]: PlayerFriends = await PlayerFriends.init_friends(friendId)
             other_friend: PlayerFriends = request.app.ctx.friends[friendId]
             for friend in other_friend.friends["friends"]:
                 if friend["accountId"] == self.account_id:
@@ -279,8 +284,8 @@ class PlayerFriends:
         """
         save_friends: bool = False
         if save_friends:
-            async with aiofiles.open(f"res/friends/api/v1/{self.account_id}.json", "wb") as file:
-                await file.write(orjson.dumps(self.friends))
+            collection = sanic.Sanic.get_app().ctx.database["friends"]
+            await collection.replace_one({"_id": self.account_id}, self.friends, upsert=True)
 
     async def suggest_friends(self, request: sanic.request.Request) -> list[str]:
         """
@@ -299,7 +304,7 @@ class PlayerFriends:
             accounts_list.remove(self.account_id)
         for account in accounts_list:
             if account not in request.app.ctx.friends:
-                request.app.ctx.friends[account]: PlayerFriends = PlayerFriends(account)
+                request.app.ctx.friends[account]: PlayerFriends = await PlayerFriends.init_friends(account)
             if request.app.ctx.friends[account].friends["settings"]["acceptInvites"] != "public":
                 accounts_list.remove(account)
             for friend in self.friends["friends"]:

@@ -29,7 +29,7 @@ async def delete_friend(request: sanic.request.Request, accountId: str) -> sanic
     :return: The modified profile
     """
     if accountId not in request.app.ctx.friends:
-        request.app.ctx.friends[accountId] = PlayerFriends(accountId)
+        request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
     if isinstance(request.json.get("friendInstanceIds"), list):
         for friend_id in request.json.get("friendInstanceIds"):
             friend_acc_id = (await request.ctx.profile.get_item_by_guid(friend_id,
