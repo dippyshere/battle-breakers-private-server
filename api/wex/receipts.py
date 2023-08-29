@@ -28,4 +28,6 @@ async def receipts(request: sanic.request.Request, accountId: str) -> sanic.resp
     :param accountId: The account id
     :return: The response object
     """
-    return sanic.response.json(await read_file(f"res/wex/api/receipts/v1/account/{accountId}.json"))
+    return sanic.response.json(
+        (await request.app.ctx.database["receipts"].find_one({"_id": accountId})).get("receipts", [])
+    )
