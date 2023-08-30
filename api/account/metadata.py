@@ -9,7 +9,7 @@ Handles the account metadata endpoints
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth, read_file, write_file
+from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
 
@@ -28,7 +28,9 @@ async def get_metadata(request: sanic.request.Request, accountId: str) -> sanic.
     :param accountId: The account id
     :return: The response object
     """
-    account = await read_file(f"res/account/api/public/account/{accountId}.json")
+    account = await request.app.ctx.database["accounts"].find_one({"_id": accountId})
+    if not account:
+        raise errors.com.epicgames.account.account_not_found()
     return sanic.response.json(account.get("metadata", {}))
 
 
@@ -45,17 +47,21 @@ async def get_delete_metadata(request: sanic.request.Request, accountId: str, ke
     :return: The response object
     """
     if request.method == "GET":
-        account = await read_file(f"res/account/api/public/account/{accountId}.json")
-        try:
-            return sanic.response.text(account.get("metadata", {})[key])
-        except KeyError:
+        account = await request.app.ctx.database["accounts"].find_one({"_id": accountId}, {"metadata": 1})
+        if account and "metadata" in account:
+            metadata = account["metadata"]
+            try:
+                return sanic.response.text(metadata.get(key, ""))
+            except KeyError:
+                raise errors.com.epicgames.account.metadata_key_not_found()
+        else:
             raise errors.com.epicgames.account.metadata_key_not_found()
     else:
-        account = await read_file(f"res/account/api/public/account/{accountId}.json")
-        if key in account.get("metadata", {}):
-            del account["metadata"][key]
-            await write_file(f"res/account/api/public/account/{accountId}.json", account)
-        else:
+        update_result = await request.app.ctx.database["accounts"].update_one(
+            {"_id": accountId, f"metadata.{key}": {"$exists": True}},
+            {"$unset": {f"metadata.{key}": 1}}
+        )
+        if update_result.modified_count == 0:
             raise errors.com.epicgames.account.metadata_key_not_found()
         return sanic.response.empty()
 
@@ -71,11 +77,16 @@ async def set_metadata(request: sanic.request.Request, accountId: str) -> sanic.
     :param accountId: The account id
     :return: The response object
     """
-    account = await read_file(f"res/account/api/public/account/{accountId}.json")
+    account = await request.app.ctx.database["accounts"].find_one({"_id": accountId})
+    if not account:
+        raise errors.com.epicgames.account.account_not_found()
     if "metadata" not in account:
         account["metadata"] = {}
     if len(account["metadata"]) > 1000:
         raise errors.com.epicgames.account.metadata.too_many_keys()
-    account["metadata"][request.json["key"]] = request.json["value"]
-    await write_file(f"res/account/api/public/account/{accountId}.json", account)
+    account["metadata"][request.json.get("key")] = request.json.get("value")
+    await request.app.ctx.database["accounts"].update_one(
+        {"_id": accountId},
+        {"$set": {"metadata": account["metadata"]}}
+    )
     return sanic.response.empty()

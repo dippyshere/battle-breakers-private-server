@@ -17,7 +17,7 @@ import motor.motor_asyncio
 import sanic
 
 from utils.enums import ProfileType, FriendStatus
-from utils.utils import read_file, format_time
+from utils.utils import format_time
 
 MCPTypes: UnionType = str | int | float | list | dict | bool
 
@@ -779,7 +779,9 @@ class PlayerProfile:
         rep_heroes: list = []
         account_perks: list = []
         # TODO: Move to database
-        account_data: dict = await read_file(f"res/account/api/public/account/{friendId}.json")
+        account_data: dict = await request.app.ctx.database["accounts"].find_one({"_id": friendId}, {
+            "displayName": 1,
+        })
         for account_perk in ["MaxHitPoints", "RegenStat", "PetStrength", "BasicAttack", "Attack", "SpecialAttack",
                              "DamageReduction", "MaxMana"]:
             account_perks.append(wex_data["stats"]["attributes"].get("account_perks").get(account_perk, 0))
@@ -803,7 +805,7 @@ class PlayerProfile:
         for friend_instance_guid in friend_instance_guids:
             friend_instance: dict[str, MCPTypes] = await self.get_item_by_guid(friend_instance_guid,
                                                                                ProfileType.FRIENDS)
-            if friend_instance["attributes"]["accountId"] == account_data["id"]:
+            if friend_instance["attributes"]["accountId"] == account_data["_id"]:
                 if friend_instance["attributes"]["status"] == "Suggested" and friendStatus == FriendStatus.REQUESTED:
                     # noinspection PyPep8Naming
                     friendStatus: FriendStatus = FriendStatus.SUGGESTEDREQUEST
@@ -832,7 +834,7 @@ class PlayerProfile:
             "templateId": "Friend:Instance",
             "attributes": {
                 "lifetime_claimed": 0,
-                "accountId": account_data["id"],
+                "accountId": account_data["_id"],
                 "canBeSparred": False,
                 "snapshot_expires": await format_time(
                     datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
@@ -849,7 +851,7 @@ class PlayerProfile:
                     "numRepHeroes": len(wex_data["stats"]["attributes"].get("rep_hero_ids", [])),
                     "isPvPUnlocked": wex_data["stats"]["attributes"].get("is_pvp_unlocked", False)
                 },
-                "remoteFriendId": account_data["id"],
+                "remoteFriendId": "",  # TODO: figure out what the hell remotefrendid is supposed to be
                 "status": friendStatus.value,
                 "gifts": {}
             },

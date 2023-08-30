@@ -11,7 +11,8 @@ import urllib.parse
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth, get_account_id_from_email, get_account_id_from_display_name, read_file
+from utils.utils import authorized as auth, get_account_id_from_email, get_account_id_from_display_name, \
+    get_account_data, get_account_data_owner
 
 from utils.sanic_gzip import Compress
 
@@ -29,23 +30,22 @@ async def public_account_info(request: sanic.request.Request) -> sanic.response.
     :param request: The request object
     :return: The response object
     """
-    if len(request.args.getlist("accountId")) > 100:
+    account_ids = request.args.getlist("accountId")
+    if len(account_ids) > 100:
         raise errors.com.epicgames.account.invalid_account_id_count(100)
-    final_accounts = []
-    for accountId in request.args.getlist("accountId"):
-        # TODO: handle invalid account ids
-        try:
-            account_info = await read_file(f"res/account/api/public/account/{accountId}.json")
-            final_accounts.append({
-                "id": account_info["id"],
-                "displayName": account_info["displayName"],
-                "minorVerified": account_info["minorVerified"],
-                "minorStatus": account_info["minorStatus"],
-                "cabinedMode": account_info["cabinedMode"],
-                "externalAuths": account_info["externalAuths"]
-            })
-        except FileNotFoundError:
-            pass
+    account_cursor = request.app.ctx.database["accounts"].find(
+        {"_id": {"$in": account_ids}},
+        {
+            "displayName": 1,
+            "minorVerified": 1,
+            "minorStatus": 1,
+            "cabinedMode": 1,
+            "externalAuths": 1
+        }
+    )
+    final_accounts = await account_cursor.to_list(length=len(account_ids))
+    for account in final_accounts:
+        account["id"] = account.pop("_id")
     return sanic.response.json(final_accounts)
 
 
@@ -61,45 +61,18 @@ async def account_displayname(request: sanic.request.Request, displayName: str) 
     :return: The response object
     """
     displayName = urllib.parse.unquote(displayName)
-    requested_id = await get_account_id_from_display_name(displayName)
+    requested_id = await get_account_id_from_display_name(request.app.ctx.database, displayName)
     if requested_id is None:
         raise errors.com.epicgames.account.account_not_found(displayName)
-    account_info = await read_file(f"res/account/api/public/account/{requested_id}.json")
     if requested_id == request.ctx.owner:
-        return sanic.response.json({
-            "id": account_info["id"],
-            "displayName": account_info["displayName"],
-            "minorVerified": account_info["minorVerified"],
-            "minorStatus": account_info["minorStatus"],
-            "cabinedMode": account_info["cabinedMode"],
-            "name": account_info["name"],
-            "email": account_info["email"],
-            "failedLoginAttempts": account_info["failedLoginAttempts"],
-            "lastLogin": account_info["lastLogin"],
-            "numberOfDisplayNameChanges": account_info["numberOfDisplayNameChanges"],
-            "dateOfBirth": account_info["dateOfBirth"],
-            "ageGroup": account_info["ageGroup"],
-            "headless": account_info["headless"],
-            "country": account_info["country"],
-            "lastName": account_info["lastName"],
-            "phoneNumber": account_info["phoneNumber"],
-            "preferredLanguage": account_info["preferredLanguage"],
-            "lastDisplayNameChange": account_info["lastDisplayNameChange"],
-            "canUpdateDisplayName": account_info["canUpdateDisplayName"],
-            "tfaEnabled": account_info["tfaEnabled"],
-            "emailVerified": account_info["emailVerified"],
-            "minorExpected": account_info["minorExpected"],
-            "hasHashedEmail": account_info["hasHashedEmail"],
-            "externalAuths": account_info["externalAuths"]
-        })
-    return sanic.response.json({
-        "id": account_info["id"],
-        "displayName": account_info["displayName"],
-        "minorVerified": account_info["minorVerified"],
-        "minorStatus": account_info["minorStatus"],
-        "cabinedMode": account_info["cabinedMode"],
-        "externalAuths": account_info["externalAuths"]
-    })
+        account_data = await get_account_data_owner(request.app.ctx.database, requested_id)
+        if not account_data:
+            raise errors.com.epicgames.account.account_not_found(displayName)
+        return sanic.response.json(account_data)
+    account_data = await get_account_data(request.app.ctx.database, requested_id)
+    if not account_data:
+        raise errors.com.epicgames.account.account_not_found(displayName)
+    return sanic.response.json(account_data)
 
 
 @public_account.route("/api/public/account/email/<email>", methods=["GET"])
@@ -112,45 +85,18 @@ async def account_email(request: sanic.request.Request, email: str) -> sanic.res
     :param email: The email
     :return: The response object
     """
-    requested_id = await get_account_id_from_email(email)
+    requested_id = await get_account_id_from_email(request.app.ctx.database, email)
     if requested_id is None:
         raise errors.com.epicgames.account.account_not_found(email)
-    account_info = await read_file(f"res/account/api/public/account/{requested_id}.json")
     if requested_id == request.ctx.owner:
-        return sanic.response.json({
-            "id": account_info["id"],
-            "displayName": account_info["displayName"],
-            "minorVerified": account_info["minorVerified"],
-            "minorStatus": account_info["minorStatus"],
-            "cabinedMode": account_info["cabinedMode"],
-            "name": account_info["name"],
-            "email": account_info["email"],
-            "failedLoginAttempts": account_info["failedLoginAttempts"],
-            "lastLogin": account_info["lastLogin"],
-            "numberOfDisplayNameChanges": account_info["numberOfDisplayNameChanges"],
-            "dateOfBirth": account_info["dateOfBirth"],
-            "ageGroup": account_info["ageGroup"],
-            "headless": account_info["headless"],
-            "country": account_info["country"],
-            "lastName": account_info["lastName"],
-            "phoneNumber": account_info["phoneNumber"],
-            "preferredLanguage": account_info["preferredLanguage"],
-            "lastDisplayNameChange": account_info["lastDisplayNameChange"],
-            "canUpdateDisplayName": account_info["canUpdateDisplayName"],
-            "tfaEnabled": account_info["tfaEnabled"],
-            "emailVerified": account_info["emailVerified"],
-            "minorExpected": account_info["minorExpected"],
-            "hasHashedEmail": account_info["hasHashedEmail"],
-            "externalAuths": account_info["externalAuths"]
-        })
-    return sanic.response.json({
-        "id": account_info["id"],
-        "displayName": account_info["displayName"],
-        "minorVerified": account_info["minorVerified"],
-        "minorStatus": account_info["minorStatus"],
-        "cabinedMode": account_info["cabinedMode"],
-        "externalAuths": account_info["externalAuths"]
-    })
+        account_data = await get_account_data_owner(request.app.ctx.database, requested_id)
+        if not account_data:
+            raise errors.com.epicgames.account.account_not_found(email)
+        return sanic.response.json(account_data)
+    account_data = await get_account_data(request.app.ctx.database, requested_id)
+    if not account_data:
+        raise errors.com.epicgames.account.account_not_found(email)
+    return sanic.response.json(account_data)
 
 
 # undocumented

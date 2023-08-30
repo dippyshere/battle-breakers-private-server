@@ -11,8 +11,7 @@ import re
 
 import sanic
 
-from utils.utils import authorized as auth, generate_authorisation_eg1, bcrypt_hash, create_account, \
-    get_account_id_from_display_name, read_file, bcrypt_check
+from utils.utils import authorized as auth, generate_authorisation_eg1, bcrypt_hash, create_account, bcrypt_check
 
 from utils.sanic_gzip import Compress
 
@@ -45,15 +44,19 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
                         "errorMessage": "Your account ID doesn't exist...\nAlready have an account to import? Contact "
                                         "us on Discord.\nTrying to create an account? Sign up instead."})
                 else:
-                    account = await read_file(f"res/account/api/public/account/{username}.json")
-                    if account["extra"]["pwhash"] != password:
+                    account_data: dict = await request.app.ctx.database["accounts"].find_one({"_id": username}, {
+                        "_id": 0,
+                        "displayName": 1,
+                        "extra.pwhash": 1
+                    })
+                    if account_data["extra"]["pwhash"] != password:
                         raise sanic.exceptions.Unauthorized("Invalid password", context={
                             "errorMessage": "The password you entered is incorrect"})
                     else:
                         return sanic.response.json(
-                            {"username": account["displayName"],
+                            {"username": account_data["displayName"],
                              "authorisationCode": await generate_authorisation_eg1(username,
-                                                                                   account[
+                                                                                   account_data[
                                                                                        "displayName"]),
                              "id": username, "heading": "Complete Login"
                              }
@@ -65,22 +68,26 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
             raise sanic.exceptions.InvalidUsage("Invalid username", context={
                 "errorMessage": "Username/Account ID too long"})
         else:
-            account_id = await get_account_id_from_display_name(username.split("@")[0].strip())
-            if account_id is None:
+            # TODO: support email and displayname login
+            account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                {"_id": username.split("@")[0].strip()}, {
+                    "displayName": 1,
+                    "extra.pwhash": 1
+                })
+            if account_data is None:
                 raise sanic.exceptions.InvalidUsage("Invalid username", context={
                     "errorMessage": "Your username doesn't exist...\nAlready have an account to import? Contact us on "
                                     "Discord.\nTrying to create an account? Sign up instead."})
             else:
-                account = await read_file(f"res/account/api/public/account/{account_id}.json")
-                if not await bcrypt_check(password, account["extra"]["pwhash"].encode()):
+                if not await bcrypt_check(password, account_data["extra"]["pwhash"].encode()):
                     raise sanic.exceptions.Unauthorized("Invalid password", context={
                         "errorMessage": "The password you entered is incorrect"})
                 else:
                     return sanic.response.json(
-                        {"username": account["displayName"],
-                         "authorisationCode": await generate_authorisation_eg1(account_id,
-                                                                               account["displayName"]),
-                         "id": account_id, "heading": "Complete Login"
+                        {"username": account_data["displayName"],
+                         "authorisationCode": await generate_authorisation_eg1(account_data["_id"],
+                                                                               account_data["displayName"]),
+                         "id": account_data["_id"], "heading": "Complete Login"
                          }
                     )
     elif request.headers.get("X-Request-Source-Form") == "signup-form":
@@ -99,28 +106,31 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
             raise sanic.exceptions.InvalidUsage("Invalid password", context={
                 "errorMessage": "Your password is too long"})
         else:
-            account_id = await get_account_id_from_display_name(username.split("@")[0].strip())
-            if account_id is None:
+            # TODO: implement better signup system
+            account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                {"_id": username.split("@")[0].strip()}, {
+                    "displayName": 1,
+                    "extra.pwhash": 1
+                })
+            if account_data is None:
                 account_id = await create_account(username, await bcrypt_hash(password))
-                account = await read_file(f"res/account/api/public/account/{account_id}.json")
                 return sanic.response.json(
-                    {"username": account["displayName"],
+                    {"username": username,
                      "authorisationCode": await generate_authorisation_eg1(account_id,
-                                                                           account["displayName"]),
+                                                                           username),
                      "id": account_id, "heading": "Complete Sign Up"
                      }
                 )
             else:
-                account = await read_file(f"res/account/api/public/account/{account_id}.json")
-                if not await bcrypt_check(password, account["extra"]["pwhash"].encode()):
+                if not await bcrypt_check(password, account_data["extra"]["pwhash"].encode()):
                     raise sanic.exceptions.Unauthorized("Invalid password", context={
                         "errorMessage": "Your account already exists. The password you entered is incorrect."})
                 else:
                     return sanic.response.json(
-                        {"username": account["displayName"],
-                         "authorisationCode": await generate_authorisation_eg1(account_id,
-                                                                               account["displayName"]),
-                         "id": account_id, "heading": "Complete Login"
+                        {"username": account_data["displayName"],
+                         "authorisationCode": await generate_authorisation_eg1(account_data["_id"],
+                                                                               account_data["displayName"]),
+                         "id": account_data["_id"], "heading": "Complete Login"
                          }
                     )
     else:

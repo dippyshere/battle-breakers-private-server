@@ -11,10 +11,11 @@ import urllib.parse
 import sanic
 
 from utils.exceptions import errors
+from utils.friend_system import PlayerFriends
 from utils.profile_system import PlayerProfile
 from utils.enums import ProfileType
 from utils.sanic_gzip import Compress
-from utils.utils import search_for_display_name, read_file
+from utils.utils import search_for_display_name
 
 compress = Compress()
 wex_friend = sanic.Blueprint("wex_friend")
@@ -33,16 +34,21 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
     account_ids = []
     results = []
     display_name = urllib.parse.unquote(request.args.get("name", ""))
-    # requested_id = await get_account_id_from_display_name(display_name)
-    # if requested_id is not None:
-    #     account_ids.append(requested_id)
-    search_results = await search_for_display_name(display_name)
-    # if requested_id is not None and requested_id in search_results:
-    #     search_results.remove(requested_id)
+    search_results = await search_for_display_name(request.app.ctx.database, display_name)
     if search_results:
         account_ids.extend(search_results)
+    if accountId in account_ids:
+        account_ids.remove(accountId)
+    # TODO: investigate incoming / outgoing friend requests in search results
+    if accountId not in request.app.ctx.friends:
+        request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
+    for friend in request.app.ctx.friends[accountId].friends["friends"]:
+        if friend["accountId"] in account_ids:
+            account_ids.remove(friend["accountId"])
     for account_id in account_ids:
-        account_data = await read_file(f"res/account/api/public/account/{account_id}.json")
+        account_data: dict = await request.app.ctx.database["accounts"].find_one({"_id": account_id}, {
+            "displayName": 1,
+        })
         if account_id not in request.app.ctx.profiles:
             request.app.ctx.profiles[account_id] = await PlayerProfile.init_profile(account_id)
         wex_data = await request.app.ctx.profiles[account_id].get_profile(ProfileType.PROFILE0)
@@ -68,7 +74,7 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
                 "gearTemplateId": hero_data.get("attributes").get("sidekick_template_id", ""),
             })
         results.append({
-            "accountId": account_data["id"],
+            "accountId": account_data["_id"],
             "best_gift": 0,  # These stats are unique to the friend instance on the profile, not the friend
             "lifetime_gifted": 0,  # TODO: implement gift statistics per profile
             "snapshot": {

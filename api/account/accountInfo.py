@@ -9,7 +9,7 @@ Handles the account endpoint
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth, read_file
+from utils.utils import authorized as auth, get_account_data, get_account_data_owner
 
 from utils.sanic_gzip import Compress
 
@@ -28,43 +28,11 @@ async def account_route(request: sanic.request.Request, accountId: str) -> sanic
     :param accountId: The account id
     :return: The response object
     """
-    if not request.ctx.is_owner:
-        try:
-            account_info = await read_file(f"res/account/api/public/account/{accountId}.json")
-            return sanic.response.json({
-                "id": account_info["id"],
-                "displayName": account_info["displayName"],
-                "minorVerified": account_info["minorVerified"],
-                "minorStatus": account_info["minorStatus"],
-                "cabinedMode": account_info["cabinedMode"],
-                "externalAuths": account_info["externalAuths"]
-            })
-        except FileNotFoundError:
+    if request.ctx.is_owner:
+        account_data = await get_account_data_owner(request.app.ctx.database, accountId)
+        if not account_data:
             raise errors.com.epicgames.account.account_not_found(accountId)
-    account = await read_file(f"res/account/api/public/account/{accountId}.json")
-    return sanic.response.json({
-        "id": account["id"],
-        "displayName": account["displayName"],
-        "minorVerified": account["minorVerified"],
-        "minorStatus": account["minorStatus"],
-        "cabinedMode": account["cabinedMode"],
-        "name": account["name"],
-        "email": account["email"],
-        "failedLoginAttempts": account["failedLoginAttempts"],
-        "lastLogin": account["lastLogin"],
-        "numberOfDisplayNameChanges": account["numberOfDisplayNameChanges"],
-        "dateOfBirth": account["dateOfBirth"],
-        "ageGroup": account["ageGroup"],
-        "headless": account["headless"],
-        "country": account["country"],
-        "lastName": account["lastName"],
-        "phoneNumber": account["phoneNumber"],
-        "preferredLanguage": account["preferredLanguage"],
-        "lastDisplayNameChange": account["lastDisplayNameChange"],
-        "canUpdateDisplayName": account["canUpdateDisplayName"],
-        "tfaEnabled": account["tfaEnabled"],
-        "emailVerified": account["emailVerified"],
-        "minorExpected": account["minorExpected"],
-        "hasHashedEmail": account["hasHashedEmail"],
-        "externalAuths": account["externalAuths"]
-    })
+        return sanic.response.json(account_data)
+    account_data = await get_account_data(request.app.ctx.database, accountId)
+    if not account_data:
+        raise errors.com.epicgames.account.account_not_found(accountId)

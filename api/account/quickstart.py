@@ -28,10 +28,8 @@ async def quickstart(request: sanic.request.Request) -> sanic.response.HTTPRespo
     :param request: The request object
     :return: The response object
     """
+    # TODO: better signup system
     new_account_id = await create_account()
-    # make the new account headless, so the user can set a name
-    account_info = await read_file(f"res/account/api/public/account/{new_account_id}.json")
-    account_info["headless"] = True
     device_id = await uuid_generator()
     device_authorisation = {
         "deviceId": device_id,
@@ -44,8 +42,13 @@ async def quickstart(request: sanic.request.Request) -> sanic.response.HTTPRespo
             "dateTime": await format_time()
         }
     }
-    account_info["extra"]["deviceAuths"].append(device_authorisation)
-    await write_file(f"res/account/api/public/account/{new_account_id}.json", account_info)
+    await request.app.ctx.database["accounts"].update_one(
+        {"_id": new_account_id},
+        {
+            "$set": {"headless": True},
+            "$push": {"extra.deviceAuths": device_authorisation}
+        }
+    )
     profile = await read_file(
         f"res/wex/api/game/v2/profile/{new_account_id}/QueryProfile/profile0.json")
     profile["stats"]["attributes"]["is_headless"] = True

@@ -36,7 +36,9 @@ async def suggest_friends(request: sanic.request.Request, accountId: str) -> san
         request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
     suggested_accounts = await request.app.ctx.friends[accountId].suggest_friends(request)
     for account in suggested_accounts:
-        account_data = await read_file(f"res/account/api/public/account/{account}.json")
+        account_data: dict = await request.app.ctx.database["accounts"].find_one({"_id": account}, {
+            "displayName": 1,
+        })
         if account not in request.app.ctx.profiles:
             request.app.ctx.profiles[account] = await PlayerProfile.init_profile(account)
         wex_data = await request.app.ctx.profiles[account].get_profile(ProfileType.PROFILE0)
@@ -65,7 +67,7 @@ async def suggest_friends(request: sanic.request.Request, accountId: str) -> san
             "templateId": "Friend:Instance",
             "attributes": {
                 "lifetime_claimed": 0,
-                "accountId": account_data["id"],
+                "accountId": account_data["_id"],
                 "canBeSparred": False,
                 "snapshot_expires": await format_time(
                     datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
@@ -82,7 +84,7 @@ async def suggest_friends(request: sanic.request.Request, accountId: str) -> san
                     "numRepHeroes": len(wex_data["stats"]["attributes"].get("rep_hero_ids", [])),
                     "isPvPUnlocked": wex_data["stats"]["attributes"].get("is_pvp_unlocked", False)
                 },
-                "remoteFriendId": account_data["id"],
+                "remoteFriendId": "",
                 "status": "Suggested",
                 "gifts": {}
             },

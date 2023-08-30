@@ -7,14 +7,13 @@ This code is licensed under the [TBD] license.
 Handles the token requests
 """
 import base64
-import os
+import re
 
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import (authorized as auth, oauth_response, parse_eg1, get_account_id_from_display_name,
-                         create_account, verify_google_token, oauth_client_response, read_file, write_file,
-                         bcrypt_check)
+from utils.utils import (authorized as auth, oauth_response, parse_eg1, create_account, verify_google_token,
+                         oauth_client_response, read_file, write_file, bcrypt_check)
 
 from utils.sanic_gzip import Compress
 
@@ -51,7 +50,10 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                     case 'google':
                         # TODO: Reinvestigate what this case is
                         sub = request.form.get('external_auth_token').split(':')[0]
-                        account = await read_file(f"res/account/api/public/account/{sub}.json")
+                        account: dict = await request.app.ctx.database["accounts"].find_one({"_id": sub}, {
+                            "_id": 0,
+                            "displayName": 1,
+                        })
                         dn = account['displayName']
                         dvid = request.headers.get('X-Epic-Device-ID')
                         return sanic.response.json((await oauth_response(client_id, dn, dvid, sub)))
@@ -60,35 +62,37 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                             request.form.get('external_auth_token'))
                         if google_token is not None:
                             sub = google_token['sub']
-                            for account in os.listdir('res/account/api/public/account'):
-                                account = await read_file(f"res/account/api/public/account/{account}")
-                                if account.get('externalAuths', {}).get('google', {}).get('externalAuthId') == sub:
-                                    dn = account['displayName']
-                                    dvid = request.headers.get('X-Epic-Device-ID')
-                                    return sanic.response.json(
-                                        (await oauth_response(client_id, dn, dvid, account['id'])))
+                            account = await request.app.ctx.database["accounts"].find_one(
+                                {"externalAuths.google.externalAuthId": sub}, {"displayName": 1})
+                            if account:
+                                dn = account['displayName']
+                                dvid = request.headers.get('X-Epic-Device-ID')
+                                return sanic.response.json(await oauth_response(client_id, dn, dvid, account['id']))
                             # Create an account
                             account_id = await create_account()
-                            account = await read_file(
-                                f"res/account/api/public/account/{account_id}.json")
-                            account["externalAuths"]["google"] = {
-                                "accountId": account_id,
-                                "type": "google",
-                                "externalAuthId": google_token.get("sub"),
-                                "externalAuthIdType": "google_id_token",
-                                "externalDisplayName": google_token.get("name"),
-                                "authIds": [
-                                    {
-                                        "id": google_token.get("sub"),
-                                        "type": "google_id_token"
+                            await request.app.ctx.database["accounts"].update_one(
+                                {"_id": account_id},
+                                {
+                                    "$set": {
+                                        f"externalAuths.google": {
+                                            "accountId": account_id,
+                                            "type": "google",
+                                            "externalAuthId": google_token.get("sub"),
+                                            "externalAuthIdType": "google_id_token",
+                                            "externalDisplayName": google_token.get("name"),
+                                            "authIds": [
+                                                {
+                                                    "id": google_token.get("sub"),
+                                                    "type": "google_id_token"
+                                                }
+                                            ]
+                                        },
+                                        "name": google_token.get("given_name"),
+                                        "lastName": google_token.get("family_name"),
+                                        "headless": True
                                     }
-                                ]
-                            }
-                            account["name"] = google_token.get("given_name")
-                            account["lastName"] = google_token.get("family_name")
-                            account["headless"] = True
-                            await write_file(f"res/account/api/public/account/{account_id}.json",
-                                             account)
+                                }
+                            )
                             profile = await read_file(
                                 f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/profile0.json")
                             profile["stats"]["attributes"]["is_headless"] = True
@@ -127,20 +131,21 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                 else:
                     raise errors.com.epicgames.account.auth_token.invalid_refresh_token()
             case 'password':  # backwards compatibility for old clients
-                account_id = await get_account_id_from_display_name(
-                    request.form.get('username').split("@")[0].strip())
-                if account_id is None:
+                # TODO: support display name and email login
+                account_data = await request.app.ctx.database["accounts"].find_one(
+                    {"displayName": {"$regex": f"^{re.escape(request.form.get('username').split('@')[0].strip())}$",
+                                     "$options": "i"}}, {"displayName": 1, "extra.pwhash": 1})
+                if account_data is None:
                     raise errors.com.epicgames.account.account_not_found(
                         request.form.get('username').split("@")[0].strip())
-                account = await read_file(f"res/account/api/public/account/{account_id}.json")
                 if not await bcrypt_check(request.form.get('password'),
-                                          account["extra"]["pwhash"].encode()):
+                                          account_data["extra"]["pwhash"].encode()):
                     raise errors.com.epicgames.account.invalid_account_credentials()
                 else:
-                    return sanic.response.json((await oauth_response(client_id, account['displayName'],
+                    return sanic.response.json((await oauth_response(client_id, account_data['displayName'],
                                                                      request.headers.get(
                                                                          'X-Epic-Device-ID'),
-                                                                     account_id)))
+                                                                     account_data["_id"])))
             case 'exchange_code':
                 token = await parse_eg1(request.form.get('exchange_code'))
                 if token is not None:
@@ -152,21 +157,22 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                     raise errors.com.epicgames.account.oauth.expired_exchange_code()
             case 'device_auth':
                 if request.form.get('account_id'):
-                    account = await read_file(
-                        f"res/account/api/public/account/{request.form.get('account_id')}.json")
-                    for device_auth in account["extra"]["deviceAuths"]:
-                        if device_auth["deviceId"] == request.form.get('device_id'):
-                            if device_auth["secret"] == request.form.get('secret'):
-                                return sanic.response.json(
-                                    (await oauth_response(client_id, account['displayName'],
-                                                          request.headers.get(
-                                                              'X-Epic-Device-ID'),
-                                                          account["id"])))
-                            else:
-                                raise errors.com.epicgames.common.authentication.authentication_failed(
-                                    request.form.get('account_id'))
-                    raise errors.com.epicgames.common.authentication.authentication_failed(
-                        request.form.get('account_id'))
+                    account = await request.app.ctx.database["accounts"].find_one({
+                        "_id": request.form.get('account_id'),
+                        "extra.deviceAuths": {
+                            "$elemMatch": {
+                                "deviceId": request.form.get('device_id'),
+                                "secret": request.form.get('secret')
+                            }
+                        }
+                    })
+                    if account:
+                        return sanic.response.json(
+                            await oauth_response(client_id, account['displayName'], request.form.get('device_id'),
+                                                 account["id"]))
+                    else:
+                        raise errors.com.epicgames.common.authentication.authentication_failed(
+                            request.form.get('account_id'))
                 else:
                     raise errors.com.epicgames.account.device_auth.invalid_device_info()
             case _:

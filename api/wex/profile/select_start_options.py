@@ -130,9 +130,10 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
     await request.ctx.profile.modify_stat("display_name", request.json.get("displayName"))
     await request.ctx.profile.modify_stat("normalized_name",
                                           await normalise_string(request.json.get("displayName")))
-    account_data = await read_file(f"res/account/api/public/account/{accountId}.json")
-    account_data["displayName"] = request.json.get("displayName")
-    account_data["email"] = f'{request.json.get("displayName")}@dippy.com'
+    await request.app.ctx.database["accounts"].update_one(
+        {"_id": accountId},
+        {"$set": {"displayName": request.json.get("displayName")}}
+    )
     await request.ctx.profile.modify_stat("suggestion_timeout",
                                           await format_time(
                                               datetime.datetime.utcnow() + datetime.timedelta(hours=1)),
@@ -141,7 +142,9 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
         request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
     suggested_accounts = await request.app.ctx.friends[accountId].suggest_friends(request)
     for account in suggested_accounts:
-        account_data = await read_file(f"res/account/api/public/account/{account}.json")
+        account_data: dict = await request.app.ctx.database["accounts"].find_one({"_id": account}, {
+            "displayName": 1,
+        })
         if account not in request.app.ctx.profiles:
             request.app.ctx.profiles[account] = await PlayerProfile.init_profile(account)
         wex_data = await request.app.ctx.profiles[account].get_profile(ProfileType.PROFILE0)
@@ -170,7 +173,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "templateId": "Friend:Instance",
             "attributes": {
                 "lifetime_claimed": 0,
-                "accountId": account_data["id"],
+                "accountId": account_data["_id"],
                 "canBeSparred": False,
                 "snapshot_expires": await format_time(
                     datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
@@ -187,7 +190,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
                     "numRepHeroes": len(wex_data["stats"]["attributes"].get("rep_hero_ids", [])),
                     "isPvPUnlocked": wex_data["stats"]["attributes"].get("is_pvp_unlocked", False)
                 },
-                "remoteFriendId": account_data["id"],
+                "remoteFriendId": "",
                 "status": "Suggested",
                 "gifts": {}
             },

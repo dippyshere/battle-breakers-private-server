@@ -9,7 +9,7 @@ Handles the external auths endpoint
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth, verify_google_token, read_file, write_file
+from utils.utils import authorized as auth, verify_google_token
 
 from utils.sanic_gzip import Compress
 
@@ -28,10 +28,11 @@ async def external_auth(request: sanic.request.Request, accountId: str) -> sanic
     :param accountId: The account id
     :return: The response object
     """
-    data = await read_file(f"res/account/api/public/account/{accountId}.json")
-    if data["externalAuths"] != {}:
+    data = await request.app.ctx.database["accounts"].find_one({"_id": accountId}, {"externalAuths": 1, "_id": 0})
+    if data and "externalAuths" in data:
         return sanic.response.json([data["externalAuths"]])
-    return sanic.response.json([])
+    else:
+        return sanic.response.json([])
 
 
 # undocumented
@@ -45,7 +46,8 @@ async def add_external_auth(request: sanic.request.Request, accountId: str) -> s
     :param accountId: The account id
     :return: The response object
     """
-    data = await read_file(f"res/account/api/public/account/{accountId}.json")
+    data = await request.app.ctx.database["accounts"].find_one({"_id": accountId},
+                                                               {"externalAuths": 1, "_id": 0, "name": 1, "lastName": 1})
     # not bothered to add ALL of the external auths, only adding google cause mobile (fb blocked insecure sign in)
     match request.json.get("authType"):
         case "google_user_id":
@@ -78,11 +80,13 @@ async def add_external_auth(request: sanic.request.Request, accountId: str) -> s
                         }
                     ]
                 }
-                data["name"] = google_token.get("given_name")
-                data["lastName"] = google_token.get("family_name")
+                if data.get("name") is None:
+                    data["name"] = google_token.get("given_name")
+                if data.get("lastName") is None:
+                    data["lastName"] = google_token.get("family_name")
         case _:
             raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()
-    await write_file(f"res/account/api/public/account/{accountId}.json", data)
+    await request.app.ctx.database["accounts"].update_one({"_id": accountId}, {"$set": data})
     return sanic.response.json([data["externalAuths"]])
 
 
@@ -100,16 +104,19 @@ async def manage_external_auth(request: sanic.request.Request, accountId: str,
     :return: The response object
     """
     if request.method == "GET":
-        data = await read_file(f"res/account/api/public/account/{accountId}.json")
-        for external_auth_accounts in data["externalAuths"]:
-            if external_auth_accounts["type"] == type:
-                return sanic.response.json(external_auth_accounts)
-        raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()
+        external_auth_account = await request.app.ctx.database["accounts"].find_one(
+            {"_id": accountId}, {"externalAuths.$": 1, "_id": 0})
+        if external_auth_account and "externalAuths" in external_auth_account:
+            for auth_type, auth_data in external_auth_account["externalAuths"].items():
+                if auth_data.get("type") == type:
+                    return sanic.response.json(auth_data)
+            raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()
+        else:
+            raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()
     elif request.method == "DELETE":
-        data = await read_file(f"res/account/api/public/account/{accountId}.json")
-        for external_auth_accounts in data["externalAuths"]:
-            if external_auth_accounts["type"] == type:
-                del data["externalAuths"][external_auth_accounts]
-                await request.app.ctx.save_file(f"res/account/api/public/account/{accountId}.json", data)
-                return sanic.response.empty()
-        raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()
+        result = await request.app.ctx.database["accounts"].update_one({"_id": accountId},
+                                                                       {"$pull": {"externalAuths": {"type": type}}})
+        if result.matched_count == 1 and result.modified_count == 1:
+            return sanic.response.empty()
+        else:
+            raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()

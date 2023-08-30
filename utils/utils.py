@@ -9,19 +9,21 @@ This file contains utility functions for the server
 
 import base64
 import datetime
+import difflib
 import functools
 import os
 import random
 import re
 import uuid
 import zlib
-from difflib import SequenceMatcher
 from inspect import isawaitable
 from typing import Any, Tuple, Optional, Callable
 
 import aiohttp
 import bcrypt
 import jwt
+import motor.core
+import motor.motor_asyncio
 import orjson
 import sanic
 import aiofiles
@@ -441,69 +443,148 @@ async def bcrypt_check(s: str, hashed: bytes) -> bool:
     return bcrypt.checkpw(s.encode(), hashed)
 
 
-async def get_account_id_from_display_name(display_name: str) -> Optional[str]:
+async def get_account_id_from_display_name(database: motor.core.AgnosticDatabase, display_name: str) -> Optional[str]:
     """
     Gets an account id from a display name
+    :param database: The database to get the account id from
     :param display_name: The display name to get the account id for
     :return: The account id
     """
-    display_name = display_name.lower()
-    for file in os.listdir("res/account/api/public/account/"):
-        if file.endswith(".json"):
-            data = await read_file(f"res/account/api/public/account/{file}")
-            if data.get("displayName") is not None:
-                if data["displayName"].lower() == display_name:
-                    return data["id"]
-    return None
+    existing_account = await database["accounts"].find_one(
+        {"displayName": {"$regex": f"^{re.escape(display_name)}$", "$options": "i"}},
+        {"_id": 1}
+    )
+    return existing_account.get("_id") if existing_account else None
 
 
-async def get_account_id_from_email(email: str) -> Optional[str]:
+async def get_account_id_from_email(database: motor.core.AgnosticDatabase, email: str) -> Optional[str]:
     """
     Gets an account id from an email
+    :param database: The database to get the account id from
     :param email: The email to get the account id for
     :return: The account id
     """
-    for file in os.listdir("res/account/api/public/account/"):
-        if file.endswith(".json"):
-            data = await read_file(f"res/account/api/public/account/{file}")
-            if data["email"].split("@")[0] == email.split("@")[0]:
-                return data["id"]
-    return None
+    existing_account = await database["accounts"].find_one(
+        {"email": {"$regex": f"^{re.escape(email)}$", "$options": "i"}},
+        {"_id": 1}
+    )
+    return existing_account.get("_id") if existing_account else None
 
 
-async def search_for_display_name(display_name: str) -> list[str]:
+async def search_for_display_name(database: motor.core.AgnosticDatabase, display_name: str) -> list[str]:
     """
     Searches for a display name
-    :param display_name: The display name to search
+    :param database: The database to search
+    :param display_name: The display name to search for
     :return: A list of account ids
     """
-    results = []
-    display_name = display_name.lower()  # TODO: handle empty display names
-    for file in os.listdir("res/account/api/public/account/"):
-        if file.endswith(".json"):
-            data = await read_file(f"res/account/api/public/account/{file}")
-            if data.get("displayName") is not None:
-                if display_name == data["displayName"].lower():
-                    results.append(data["id"])
-                if display_name in data["displayName"].lower():
-                    results.append(data["id"])
-                if data["displayName"].lower() in display_name:
-                    results.append(data["id"])
-    return results
+    ranked_accounts = []
+    async for entry in database["accounts"].find({}, {"_id": 1, "displayName": 1}):
+        similarity_ratio = difflib.SequenceMatcher(None, entry["displayName"], display_name).ratio()
+        if similarity_ratio >= 0.6:
+            ranked_accounts.append({"_id": entry["_id"], "similarity": similarity_ratio})
+    ranked_accounts.sort(key=lambda x: x["similarity"], reverse=True)
+    return [entry["_id"] for entry in ranked_accounts]
 
 
-async def check_if_display_name_exists(display_name: str) -> bool:
+async def check_if_display_name_exists(database: motor.core.AgnosticDatabase, display_name: str) -> bool:
     """
     Checks if a display name exists
+    :param database: The database to check
     :param display_name: The display name to check
     :return: True if the display name exists, False otherwise
     """
-    for file in os.listdir("res/account/api/public/account/"):
-        if file.endswith(".json"):
-            data = await read_file(f"res/account/api/public/account/{file}")
-            if data["displayName"] == display_name:
-                return True
-    return False
+    existing_account = await database["accounts"].find_one(
+        {"displayName": {"$regex": f"^{re.escape(display_name)}$", "$options": "i"}},
+        {"_id": 1}
+    )
+    return existing_account is not None
+
+
+async def get_account_data_owner(database: motor.core.AgnosticDatabase, account_id: str) -> Optional[dict]:
+    """
+    Gets account data from an account id
+    :param database: The database to get the data from
+    :param account_id: The account id to get the data for
+    :return: The account data
+    """
+    account_data = await database["accounts"].find_one({"_id": account_id}, {
+        "displayName": 1,
+        "minorVerified": 1,
+        "minorStatus": 1,
+        "cabinedMode": 1,
+        "name": 1,
+        "email": 1,
+        "failedLoginAttempts": 1,
+        "lastLogin": 1,
+        "numberOfDisplayNameChanges": 1,
+        "dateOfBirth": 1,
+        "ageGroup": 1,
+        "headless": 1,
+        "country": 1,
+        "lastName": 1,
+        "phoneNumber": 1,
+        "preferredLanguage": 1,
+        "lastDisplayNameChange": 1,
+        "canUpdateDisplayName": 1,
+        "tfaEnabled": 1,
+        "emailVerified": 1,
+        "minorExpected": 1,
+        "hasHashedEmail": 1,
+        "externalAuths": 1
+    })
+    if not account_data:
+        return None
+    return {
+        "id": account_data["_id"],
+        "displayName": account_data["displayName"],
+        "minorVerified": account_data["minorVerified"],
+        "minorStatus": account_data["minorStatus"],
+        "cabinedMode": account_data["cabinedMode"],
+        "name": account_data["name"],
+        "email": account_data["email"],
+        "failedLoginAttempts": account_data["failedLoginAttempts"],
+        "lastLogin": account_data["lastLogin"],
+        "numberOfDisplayNameChanges": account_data["numberOfDisplayNameChanges"],
+        "dateOfBirth": account_data["dateOfBirth"],
+        "ageGroup": account_data["ageGroup"],
+        "headless": account_data["headless"],
+        "country": account_data["country"],
+        "lastName": account_data["lastName"],
+        "phoneNumber": account_data["phoneNumber"],
+        "preferredLanguage": account_data["preferredLanguage"],
+        "lastDisplayNameChange": account_data["lastDisplayNameChange"],
+        "canUpdateDisplayName": account_data["canUpdateDisplayName"],
+        "tfaEnabled": account_data["tfaEnabled"],
+        "emailVerified": account_data["emailVerified"],
+        "minorExpected": account_data["minorExpected"],
+        "hasHashedEmail": account_data["hasHashedEmail"],
+        "externalAuths": account_data["externalAuths"]
+    }
+
+
+async def get_account_data(database: motor.core.AgnosticDatabase, account_id: str) -> Optional[dict]:
+    """
+    Gets account data from an account id
+    :param database: The database to get the data from
+    :param account_id: The account id to get the data for
+    :return: The account data
+    """
+    account_data = await database["accounts"].find_one({"_id": account_id}, {
+        "displayName": 1,
+        "minorVerified": 1,
+        "minorStatus": 1,
+        "cabinedMode": 1,
+        "externalAuths": 1
+    })
+    return {
+        "id": account_data["_id"],
+        "displayName": account_data["displayName"],
+        "minorVerified": account_data["minorVerified"],
+        "minorStatus": account_data["minorStatus"],
+        "cabinedMode": account_data["cabinedMode"],
+        "externalAuths": account_data["externalAuths"]
+    }
 
 
 async def oauth_response(client_id: str = "3cf78cd3b00b439a8755a878b160c7ad", dn: Optional[str] = None,
@@ -750,9 +831,9 @@ async def find_best_match(input_str: str, item_list: list, split_for_path: bool 
     best_match_score = 0
     for item in item_list:
         if split_for_path:
-            score = SequenceMatcher(None, input_str, item.split("\\")[-1].split(".")[0]).ratio()
+            score = difflib.SequenceMatcher(None, input_str, item.split("\\")[-1].split(".")[0]).ratio()
         else:
-            score = SequenceMatcher(None, input_str, item).ratio()
+            score = difflib.SequenceMatcher(None, input_str, item).ratio()
         if score > best_match_score:
             best_match_score = score
             best_match = item
