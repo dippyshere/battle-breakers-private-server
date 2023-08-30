@@ -34,6 +34,12 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
     account_ids = []
     results = []
     display_name = urllib.parse.unquote(request.args.get("name", ""))
+    # we treat this as not found instead of bad request, so that the client will show "0 results" instead of
+    # popping up an error
+    if not display_name:
+        raise errors.com.epicgames.world_explorers.not_found(errorMessage="Missing required query parameter: name")
+    if display_name == "":
+        raise errors.com.epicgames.world_explorers.not_found(errorMessage="Missing required query parameter: name")
     search_results = await search_for_display_name(request.app.ctx.database, display_name)
     if search_results:
         account_ids.extend(search_results)

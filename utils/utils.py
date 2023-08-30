@@ -480,8 +480,10 @@ async def search_for_display_name(database: motor.core.AgnosticDatabase, display
     """
     ranked_accounts = []
     async for entry in database["accounts"].find({}, {"_id": 1, "displayName": 1}):
+        if not entry["displayName"]:
+            continue
         similarity_ratio = difflib.SequenceMatcher(None, entry["displayName"], display_name).ratio()
-        if similarity_ratio >= 0.6:
+        if similarity_ratio >= 0.4:
             ranked_accounts.append({"_id": entry["_id"], "similarity": similarity_ratio})
     ranked_accounts.sort(key=lambda x: x["similarity"], reverse=True)
     return [entry["_id"] for entry in ranked_accounts]
