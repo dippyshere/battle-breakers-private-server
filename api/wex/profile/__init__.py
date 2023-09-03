@@ -19,19 +19,26 @@ from .bulk_improve_heroes import wex_profile_bulk_improve_heroes
 from .buy_back_from_monster_pit import wex_profile_buy_back_from_monster_pit
 from .cash_out_workshop import wex_profile_cash_out_workshop
 from .claim_account_reward import wex_profile_claim_account_reward
+from .claim_come_back_reward import wex_profile_claim_comeback
 from .claim_event_rewards import wex_profile_claim_event_rewards
 from .claim_gift_points import wex_profile_claim_gift_points
 from .claim_login_reward import wex_profile_claim_login
 from .claim_notification_optin_reward import wex_profile_claim_notification_opt_in_reward
+from .claim_personal_event import wex_profile_claim_personal_event
 from .claim_quest_reward import wex_profile_claim_quest_reward
 from .claim_territory import wex_profile_claim_territory
+from .client_added_external_account import wex_profile_client_ext_acc
 from .client_tracked_retention_analytics import wex_profile_client_tracked_retention_analytics
+from .collect_hammer_quest_energy import wex_profile_collect_hammer_quest_energy
+from .collect_hammer_quest_realtime import wex_profile_collect_hammer_quest_realtime
+from .craft_recipe import wex_profile_craft_recipe
 from .delete_friend import wex_profile_delete_friend
 from .evolve_hero import wex_profile_evolve_hero
 from .finalize_level import wex_profile_finalize_level
 from .foil_hero import wex_profile_foil_hero
 from .generate_daily_quests import wex_profile_generate_daily_quests
 from .generate_match_with_friend import wex_profile_generate_match_with_friend
+from .generate_matches import wex_profile_generate_matches
 from .initialize_level import wex_profile_initialize_level
 from .join_matchmaking import wex_profile_join_matchmaking
 from .level_up_hero import wex_profile_level_up_hero
@@ -48,7 +55,11 @@ from .purchase_catalog_entry import wex_profile_purchase_catalog_entry
 from .query_profile import wex_profile_query
 from .reconcile import wex_profile_reconcile
 from .redeem_token import wex_profile_redeem_token
+from .refresh_run_count import wex_profile_refresh_run_count
+from .remove_friend import wex_profile_remove_friend
 from .remove_from_monster_pit import wex_profile_remove_from_monster_pit
+from .remove_hero_from_all_parties import wex_profile_remove_hero_from_all_parties
+from .request_preregistration_reward import wex_profile_request_prereg
 from .roll_hammer_chests import wex_profile_roll_hammer_chests
 from .select_hammer_chest import wex_profile_select_hammer_chest
 from .select_start_options import wex_profile_select_start_options
@@ -57,6 +68,7 @@ from .sell_hero import wex_profile_sell_hero
 from .sell_multiple_gear import wex_profile_sell_multiple_gear
 from .sell_treasure import wex_profile_sell_treasure
 from .send_gift_points import wex_profile_send_gift
+from .set_affiliate import wex_profile_set_sac
 from .set_default_party import wex_profile_set_default_party
 from .set_rep_hero import wex_profile_set_rep_hero
 from .suggest_friends import wex_profile_suggest_friends
@@ -104,7 +116,12 @@ wex_profile = sanic.Blueprint.group(wex_profile_abandon_level, wex_profile_add_e
                                     wex_profile_claim_gift_points, wex_profile_sell_gear,
                                     wex_profile_sell_multiple_gear, wex_profile_sell_treasure,
                                     wex_profile_delete_friend, wex_profile_redeem_token, wex_profile_add_friend,
-                                    url_prefix="/api/game/v2/profile")
+                                    wex_profile_claim_comeback, wex_profile_claim_personal_event,
+                                    wex_profile_client_ext_acc, wex_profile_collect_hammer_quest_energy,
+                                    wex_profile_collect_hammer_quest_realtime, wex_profile_craft_recipe,
+                                    wex_profile_generate_matches, wex_profile_refresh_run_count,
+                                    wex_profile_remove_friend, wex_profile_remove_hero_from_all_parties,
+                                    wex_profile_request_prereg, wex_profile_set_sac, url_prefix="/api/game/v2/profile")
 
 
 @wex_profile.on_request
