@@ -7,8 +7,14 @@ This code is licensed under the [TBD] license.
 Class based systems for each of the channels in the calendar service
 """
 from typing import Any
+import datetime
+
+import aiofiles
+import icalendar
+import recurring_ical_events
 
 from utils.profile_system import MCPTypes
+from utils.utils import load_datatable, format_time
 
 
 class State:
@@ -21,8 +27,8 @@ class State:
         Initialise the states class.
         This will setup the variables for the state
         """
-        self.validFrom: str = ""
-        self.activeEvents: list[str] = []
+        self.valid_from: str = ""
+        self.active_events: list[str] = []
         self.state: dict[str, MCPTypes] = {}
 
     def __repr__(self) -> str:
@@ -45,8 +51,8 @@ class State:
         :return: The dictionary of the state class
         """
         return {
-            "validFrom": self.validFrom,
-            "activeEvents": self.activeEvents,
+            "validFrom": self.valid_from,
+            "activeEvents": self.active_events,
             "state": self.state
         }
 
@@ -93,8 +99,8 @@ class Channel:
         Initialise the channel class.
         This will setup the variables for the channel
         """
-        self.states: dict[str, State] = {}
-        self.cacheExpire: str = ""
+        self.states: list[State] = [State()]
+        self.cache_expire: str = ""
 
     def __repr__(self) -> str:
         """
@@ -117,7 +123,7 @@ class Channel:
         """
         return {
             "states": self.states,
-            "cacheExpire": self.cacheExpire
+            "cacheExpire": self.cache_expire
         }
 
     def __getitem__(self, key: str) -> Any:
@@ -165,7 +171,7 @@ class News(Channel):
         """
         super().__init__()
 
-    def update_events(self) -> None:
+    async def update_events(self) -> None:
         """
         Update the events for the news channel
         :return: None
@@ -185,7 +191,7 @@ class LimitedTimeMode(Channel):
         """
         super().__init__()
 
-    def update_events(self) -> None:
+    async def update_events(self) -> None:
         """
         Update the events for the limited time mode channel
         :return:
@@ -205,7 +211,7 @@ class Marketing(Channel):
         """
         super().__init__()
 
-    def update_events(self) -> None:
+    async def update_events(self) -> None:
         """
         Update the events for the marketing channel
         :return:
@@ -225,7 +231,7 @@ class RotationalContent(Channel):
         """
         super().__init__()
 
-    def update_events(self) -> None:
+    async def update_events(self) -> None:
         """
         Update the events for the rotational content channel
         :return:
@@ -245,7 +251,7 @@ class FeaturedStoresMcp(Channel):
         """
         super().__init__()
 
-    def update_events(self) -> None:
+    async def update_events(self) -> None:
         """
         Update the events for the featured stores mcp channel
         :return:
@@ -265,7 +271,7 @@ class WeeklyChallenge(Channel):
         """
         super().__init__()
 
-    def update_events(self) -> None:
+    async def update_events(self) -> None:
         """
         Update the events for the weekly challenge channel
         :return:
@@ -285,9 +291,20 @@ class BattlePass(Channel):
         """
         super().__init__()
 
-    def update_events(self) -> None:
+    async def update_events(self) -> None:
         """
         Update the events for the battle pass channel
         :return:
         """
-        pass
+        async with aiofiles.open("battlepass.ics", "rb") as f:
+            events = recurring_ical_events.of(icalendar.Calendar.from_ical(await f.read())).at(
+                datetime.datetime.utcnow()
+            )
+        end_date = events[-1].get("DTEND").dt
+        event_data = await load_datatable(events[-1].get("DESCRIPTION")[1:])
+        self.states[0].valid_from = await format_time()
+        self.states[0].state = {
+            "seasonId": event_data[0].get("Properties", {}).get("EventId", "None"),
+            "seasonEndDate": await format_time(end_date),
+        }
+        self.cache_expire = await format_time(min(datetime.datetime.utcnow() + datetime.timedelta(hours=2), end_date))

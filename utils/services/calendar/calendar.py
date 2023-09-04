@@ -7,7 +7,7 @@ This code is licensed under the [TBD] license.
 Class based system to handle the calendar services
 """
 import datetime
-from typing import Any
+from typing import Any, Optional, Self
 
 import utils.services.calendar.channels as channels
 
@@ -23,13 +23,13 @@ class ScheduledEvents:
         This will setup the variables for the calendar
         """
         self.updated: datetime = datetime.datetime.utcnow()
-        self.news: channels.News = channels.News()
-        self.limited_time_mode: channels.LimitedTimeMode = channels.LimitedTimeMode()
-        self.marketing: channels.Marketing = channels.Marketing()
-        self.rotational_content: channels.RotationalContent = channels.RotationalContent()
-        self.featured_stores_mcp: channels.FeaturedStoresMcp = channels.FeaturedStoresMcp()
-        self.weekly_challenge: channels.WeeklyChallenge = channels.WeeklyChallenge()
-        self.battlepass: channels.BattlePass = channels.BattlePass()
+        self.news: Optional[channels.News] = None
+        self.limited_time_mode: Optional[channels.LimitedTimeMode] = None
+        self.marketing: Optional[channels.Marketing] = None
+        self.rotational_content: Optional[channels.RotationalContent] = None
+        self.featured_stores_mcp: Optional[channels.FeaturedStoresMcp] = None
+        self.weekly_challenge: Optional[channels.WeeklyChallenge] = None
+        self.battlepass: Optional[channels.BattlePass] = None
 
     def __repr__(self) -> str:
         """
@@ -92,16 +92,40 @@ class ScheduledEvents:
         """
         return len(self.__dict__())
 
-    def update_events(self) -> None:
+    @classmethod
+    async def init_calendar(cls) -> Self:
+        """
+        Initialise the calendar
+        :return: The initialised calendar class
+        """
+        self: ScheduledEvents = cls()
+        await self.setup_calendar()
+        return self
+
+    async def setup_calendar(self) -> None:
+        """
+        Setup the calendar
+        :return: None
+        """
+        self.news: channels.News = channels.News()
+        self.limited_time_mode: channels.LimitedTimeMode = channels.LimitedTimeMode()
+        self.marketing: channels.Marketing = channels.Marketing()
+        self.rotational_content: channels.RotationalContent = channels.RotationalContent()
+        self.featured_stores_mcp: channels.FeaturedStoresMcp = channels.FeaturedStoresMcp()
+        self.weekly_challenge: channels.WeeklyChallenge = channels.WeeklyChallenge()
+        self.battlepass: channels.BattlePass = channels.BattlePass()
+        await self.update_all_events()
+
+    async def update_all_events(self) -> None:
         """
         Update the events in the ScheduledEvents class
         :return: None
         """
         self.updated = datetime.datetime.utcnow()
-        self.news.update_events()
-        self.limited_time_mode.update_events()
-        self.marketing.update_events()
-        self.rotational_content.update_events()
-        self.featured_stores_mcp.update_events()
-        self.weekly_challenge.update_events()
-        self.battlepass.update_events()
+        await self.news.update_events()
+        await self.limited_time_mode.update_events()
+        await self.marketing.update_events()
+        await self.rotational_content.update_events()
+        await self.featured_stores_mcp.update_events()
+        await self.weekly_challenge.update_events()
+        await self.battlepass.update_events()
