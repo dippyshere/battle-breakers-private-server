@@ -29,7 +29,7 @@ async def quickstart(request: sanic.request.Request) -> sanic.response.HTTPRespo
     :return: The response object
     """
     # TODO: better signup system
-    new_account_id = await create_account()
+    new_account_id = await create_account(request.app.ctx.database, calendar=request.app.ctx.calendar)
     device_id = await uuid_generator()
     device_authorisation = {
         "deviceId": device_id,
@@ -49,11 +49,6 @@ async def quickstart(request: sanic.request.Request) -> sanic.response.HTTPRespo
             "$push": {"extra.deviceAuths": device_authorisation}
         }
     )
-    profile = await read_file(
-        f"res/wex/api/game/v2/profile/{new_account_id}/QueryProfile/profile0.json")
-    profile["stats"]["attributes"]["is_headless"] = True
-    await write_file(
-        f"res/wex/api/game/v2/profile/{new_account_id}/QueryProfile/profile0.json", profile)
     return sanic.response.json({
         "accountInfo": {
             "id": new_account_id,

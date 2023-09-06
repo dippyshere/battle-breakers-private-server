@@ -10,46 +10,42 @@ import datetime
 import os
 import uuid
 
-from utils.utils import normalise_string, write_file
+import motor.core
+import motor.motor_asyncio
+
+from utils.services.calendar.calendar import ScheduledEvents
+from utils.utils import normalise_string, format_time, uuid_generator
 
 
-async def initialise_account(account_id: str = None, display_name: str = None, password: bytes = None,
-                             **kwargs) -> str:
+async def initialise_account(database: motor.core.AgnosticDatabase, account_id: str = None, display_name: str = None,
+                             password: bytes = None, email: str = None, calendar: ScheduledEvents = None) -> str:
     """
-    Initialises an account with the given account ID.
+    Initialises an account with the given account ID. If no account ID is given, one will be generated.
+    :param database: The database to use
     :param account_id: The account ID to initialise
     :param display_name: The display name to use
     :param password: The password to use
-    :param kwargs: Any other arguments to use
+    :param email: The email to use
+    :param calendar: The calendar class to fetch events from
     :return: account_id
     """
-    from utils.utils import uuid_generator
-    from utils.utils import format_time
     if account_id is None:
         account_id = await uuid_generator()
-    # create the directories
-    os.makedirs(f"res/account/api/public/account", exist_ok=True)
-    os.makedirs(f"res/friends/api/v1", exist_ok=True)
-    os.makedirs(f"res/wex/api/game/v2/item_ratings", exist_ok=True)
-    os.makedirs(f"res/wex/api/game/v2/profile/{account_id}/QueryProfile", exist_ok=True)
-    os.makedirs(f"res/wex/api/receipts/v1/account", exist_ok=True)
     # initialise the account services
-    # we don't use headless because the display name is what we ask for during sign up (to avoid asking for an email)
-    # headless is used in quickstart to allow the user to set a display name
-    await write_file(f"res/account/api/public/account/{account_id}.json", {
+    await database["accounts"].insert_one({
         "id": account_id,
         "displayName": display_name,
         "minorVerified": False,
         "minorStatus": "NOT_MINOR",
         "cabinedMode": False,
         "name": None,
-        "email": f"{display_name}@dippy.com",
+        "email": email,
         "failedLoginAttempts": 0,
         "lastLogin": None,
         "numberOfDisplayNameChanges": 0,
         "dateOfBirth": None,
         "ageGroup": "ADULT",
-        "headless": False,
+        "headless": True if display_name is None else False,
         "country": None,
         "lastName": None,
         "phoneNumber": None,
@@ -62,19 +58,21 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
         "hasHashedEmail": False,
         "externalAuths": {},
         "extra": {
-            "pwhash": password.decode() if password is not None else "",
+            "pwhash": password.decode() if password is not None else None,
             "deviceAuths": []
         },
         "metadata": {
             "FGOnboarded": "true"
         }
     })
-    # catalog service is shared
     # initialise entitlement service
-    # TODO: This could be hardcoded in the response if storage is an issue
-    await write_file(f"res/entitlement/api/account/{account_id}.json", [])
+    await database["entitlements"].insert_one({
+        "_id": account_id,
+        "entitlements": {}
+    })
     # initialise friends service
-    await write_file(f"res/friends/api/v1/{account_id}.json", {
+    await database["friends"].insert_one({
+        "_id": account_id,
         "friends": [],
         "incoming": [],
         "outgoing": [],
@@ -90,16 +88,13 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
             "accepted": False
         }
     })
-    # price engine is shared
     # initialise wex services
-    await write_file(f"res/wex/api/game/v2/item_ratings/{account_id}.json", {})
-    await write_file(f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/friends.json", {
-        "_id": await uuid_generator(),
+    await database["profile_friends"].insert_one({
+        "_id": account_id,
         "created": await format_time(),
         "updated": await format_time(),
         "rvn": 1,
         "wipeNumber": 4,
-        "accountId": account_id,
         "profileId": "friends",
         "version": "force_max_friends_to_100",
         "items": {},
@@ -112,13 +107,12 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
         },
         "commandRevision": 0
     })
-    await write_file(f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/levels.json", {
-        "_id": await uuid_generator(),
+    await database["profile_levels"].insert_one({
+        "_id": account_id,
         "created": await format_time(),
         "updated": await format_time(),
         "rvn": 1,
         "wipeNumber": 4,
-        "accountId": account_id,
         "profileId": "levels",
         "version": "grant_pvp_item",
         "items": {},
@@ -129,7 +123,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
                 "portal_level": "",
                 "personal_events": [
                     {
-                        "expiresAt": "2099-01-04T00:00:00.000Z",
+                        "expiresAt": "2999-12-31T23:59:59.999Z",
                         "sortPriority": 5,
                         "zoneId": "Zone.Event.PE.MidgamePet.First.Map1",
                         "maxRuns": 1,
@@ -141,7 +135,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
                         "dynamicWorldLevel": -1
                     },
                     {
-                        "expiresAt": "2099-01-04T00:00:00.000Z",
+                        "expiresAt": "2999-12-31T23:59:59.999Z",
                         "sortPriority": 4,
                         "zoneId": "Zone.Event.PE.MidgamePet.Second.Map1",
                         "maxRuns": 1,
@@ -153,7 +147,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
                         "dynamicWorldLevel": -1
                     },
                     {
-                        "expiresAt": "2099-01-04T00:00:00.000Z",
+                        "expiresAt": "2999-12-31T23:59:59.999Z",
                         "sortPriority": 3,
                         "zoneId": "Zone.Event.PE.MidgamePet.Third.Map1",
                         "maxRuns": 1,
@@ -165,7 +159,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
                         "dynamicWorldLevel": -1
                     },
                     {
-                        "expiresAt": "2099-01-04T00:00:00.000Z",
+                        "expiresAt": "2999-12-31T23:59:59.999Z",
                         "sortPriority": 2,
                         "zoneId": "Zone.Event.PE.MidgamePet.Fourth.Map1",
                         "maxRuns": 1,
@@ -177,7 +171,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
                         "dynamicWorldLevel": -1
                     },
                     {
-                        "expiresAt": "2099-01-04T00:00:00.000Z",
+                        "expiresAt": "2999-12-31T23:59:59.999Z",
                         "sortPriority": 1,
                         "zoneId": "Zone.Event.PE.MidgamePet.Fifth.Map1",
                         "maxRuns": 1,
@@ -189,7 +183,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
                         "dynamicWorldLevel": -1
                     },
                     {
-                        "expiresAt": "2099-01-04T00:00:00.000Z",
+                        "expiresAt": "2999-12-31T23:59:59.999Z",
                         "sortPriority": 5,
                         "zoneId": "Zone.Event.PE.MidgameChallenge.First.Map1",
                         "maxRuns": 1,
@@ -201,7 +195,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
                         "dynamicWorldLevel": -1
                     },
                     {
-                        "expiresAt": "2099-01-04T00:00:00.000Z",
+                        "expiresAt": "2999-12-31T23:59:59.999Z",
                         "sortPriority": 4,
                         "zoneId": "Zone.Event.PE.MidgameChallenge.Second.Map1",
                         "maxRuns": 1,
@@ -213,7 +207,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
                         "dynamicWorldLevel": -1
                     },
                     {
-                        "expiresAt": "2099-01-04T00:00:00.000Z",
+                        "expiresAt": "2999-12-31T23:59:59.999Z",
                         "sortPriority": 3,
                         "zoneId": "Zone.Event.PE.MidgameChallenge.Third.Map1",
                         "maxRuns": 1,
@@ -225,7 +219,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
                         "dynamicWorldLevel": -1
                     },
                     {
-                        "expiresAt": "2099-01-04T00:00:00.000Z",
+                        "expiresAt": "2999-12-31T23:59:59.999Z",
                         "sortPriority": 2,
                         "zoneId": "Zone.Event.PE.MidgameChallenge.Fourth.Map1",
                         "maxRuns": 1,
@@ -237,7 +231,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
                         "dynamicWorldLevel": -1
                     },
                     {
-                        "expiresAt": "2099-01-04T00:00:00.000Z",
+                        "expiresAt": "2999-12-31T23:59:59.999Z",
                         "sortPriority": 1,
                         "zoneId": "Zone.Event.PE.MidgameChallenge.Fifth.Map1",
                         "maxRuns": 1,
@@ -255,13 +249,12 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
         },
         "commandRevision": 0
     })
-    await write_file(f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/monsterpit.json", {
-        "_id": await uuid_generator(),
+    await database["profile_monsterpit"].insert_one({
+        "_id": account_id,
         "created": await format_time(),
         "updated": await format_time(),
         "rvn": 1,
         "wipeNumber": 4,
-        "accountId": account_id,
         "profileId": "monsterpit",
         "version": "remove_pet_upgrades",
         "items": {},
@@ -275,13 +268,12 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
         },
         "commandRevision": 0
     })
-    await write_file(f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/multiplayer.json", {
-        "_id": await uuid_generator(),
+    await database["profile_multiplayer"].insert_one({
+        "_id": account_id,
         "created": await format_time(),
         "updated": await format_time(),
         "rvn": 1,
         "wipeNumber": 5,
-        "accountId": account_id,
         "profileId": "multiplayer",
         "version": "initial",
         "items": {
@@ -318,13 +310,17 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
         },
         "commandRevision": 0
     })
-    await write_file(f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/profile0.json", {
-        "_id": await uuid_generator(),
+    if calendar is not None:
+        await calendar.update_required_events()
+        current_event = calendar.battlepass.states[0].state.get("seasonId", "2018_1")
+    else:
+        current_event = "2018_1"
+    await database["profile_profile0"].insert_one({
+        "_id": account_id,
         "created": await format_time(),
         "updated": await format_time(),
         "rvn": 1,
         "wipeNumber": 4,
-        "accountId": account_id,
         "profileId": "profile0",
         "version": "initialize_season_end_date",
         "items": {
@@ -483,7 +479,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
             str(uuid.uuid4()): {
                 "templateId": "MajorEventTracker:BattlepassSeason",
                 "attributes": {
-                    "seasonId": "Evergreen5",  # TODO: fetch current bp
+                    "seasonId": current_event,
                     "level": 0,
                     "totalLevels": 0,
                     "xp": 0,
@@ -557,7 +553,7 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
                     "receipts": [],
                     "packages": []
                 },
-                "current_battlepass": "Battlepass4",
+                "current_battlepass": current_event,
                 "hero_limit": 15,
                 "is_pvp_unlocked": False,
                 "days_since_started": 0,
@@ -613,13 +609,13 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
                 "num_territories_claimed": 0,
                 "daily_quest_last_refresh": "0021-12-01T21:12:00.000Z",
                 "debug_ltm": "",
-                "recovery_code": "discord.gg/Mt7SgUu",
+                "recovery_code": str(int(os.urandom(3).hex(), 16)),
                 "has_external_account": False,
                 "hammer_quest_realtime": {
                     "next_claim": None,
                     "claim_count": 0
                 },
-                "is_headless": False,
+                "is_headless": True if display_name is None else False,
                 "current_season_end_date": "2022-12-28T00:00:00.000Z",
                 "max_rep_heroes": 1,
                 "armor_limit": 500,
@@ -647,5 +643,5 @@ async def initialise_account(account_id: str = None, display_name: str = None, p
         },
         "commandRevision": 2
     })
-    await write_file(f"res/wex/api/receipts/v1/account/{account_id}.json", [])
+    await database["receipts"].insert_one({"_id": account_id, "receipts": []})
     return account_id

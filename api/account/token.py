@@ -12,6 +12,7 @@ import re
 import sanic
 
 from utils.exceptions import errors
+from utils.profile_system import PlayerProfile
 from utils.utils import (authorized as auth, oauth_response, parse_eg1, create_account, verify_google_token,
                          oauth_client_response, read_file, write_file, bcrypt_check)
 
@@ -69,7 +70,8 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                                 dvid = request.headers.get('X-Epic-Device-ID')
                                 return sanic.response.json(await oauth_response(client_id, dn, dvid, account['id']))
                             # Create an account
-                            account_id = await create_account()
+                            account_id = await create_account(request.app.ctx.database,
+                                                              calendar=request.app.ctx.calendar)
                             await request.app.ctx.database["accounts"].update_one(
                                 {"_id": account_id},
                                 {
@@ -93,11 +95,9 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                                     }
                                 }
                             )
-                            profile = await read_file(
-                                f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/profile0.json")
-                            profile["stats"]["attributes"]["is_headless"] = True
-                            await write_file(
-                                f"res/wex/api/game/v2/profile/{account_id}/QueryProfile/profile0.json", profile)
+                            if account_id not in request.app.ctx.profiles:
+                                request.app.ctx.profiles[account_id] = await PlayerProfile.init_profile(account_id)
+                            await request.app.ctx.profiles[account_id].modify_stat("is_headless", False)
                             return sanic.response.json(
                                 (await oauth_response(sub=account_id)))
                         else:

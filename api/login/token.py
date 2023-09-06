@@ -113,7 +113,8 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
                     "extra.pwhash": 1
                 })
             if account_data is None:
-                account_id = await create_account(username, await bcrypt_hash(password))
+                account_id = await create_account(request.app.ctx.database, username, await bcrypt_hash(password),
+                                                  calendar=request.app.ctx.calendar)
                 return sanic.response.json(
                     {"username": username,
                      "authorisationCode": await generate_authorisation_eg1(account_id,

@@ -63,10 +63,9 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
             result.pop(friend_instance["attributes"]["accountId"])
         if datetime.datetime.strptime(friend_instance["attributes"]["snapshot_expires"],
                                       "%Y-%m-%dT%H:%M:%S.%fZ") <= datetime.datetime.utcnow():
-            try:
-                account_data = await read_file(
-                    f"res/account/api/public/account/{friend_instance['attributes']['accountId']}.json")
-            except FileNotFoundError:
+            account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                {"_id": friend_instance["attributes"]["accountId"]}, {"displayName": 1, "_id": 0})
+            if account_data is None:
                 # This friend isn't on the private server / was deleted
                 # In this case, we preserve their snapshot and entry by marking them as a legacy friend
                 # SuggestedLegacy was originally intended for friends on the old (1.0-1.71) friends system,
