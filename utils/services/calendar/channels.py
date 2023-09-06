@@ -158,6 +158,13 @@ class Channel:
         """
         return len(self.__dict__())
 
+    def cache_expired(self) -> bool:
+        """
+        Determines if the cache is expired
+        :return: True if the cache is expired
+        """
+        return datetime.datetime.utcnow() > datetime.datetime.strptime(self.cache_expire, "%Y-%m-%dT%H:%M:%SZ")
+
 
 class News(Channel):
     """
@@ -194,7 +201,7 @@ class LimitedTimeMode(Channel):
     async def update_events(self) -> None:
         """
         Update the events for the limited time mode channel
-        :return:
+        :return: None
         """
         pass
 
@@ -214,7 +221,7 @@ class Marketing(Channel):
     async def update_events(self) -> None:
         """
         Update the events for the marketing channel
-        :return:
+        :return: None
         """
         pass
 
@@ -234,7 +241,7 @@ class RotationalContent(Channel):
     async def update_events(self) -> None:
         """
         Update the events for the rotational content channel
-        :return:
+        :return: None
         """
         pass
 
@@ -254,9 +261,14 @@ class FeaturedStoresMcp(Channel):
     async def update_events(self) -> None:
         """
         Update the events for the featured stores mcp channel
-        :return:
+        :return: None
         """
-        pass
+        self.states[0].valid_from = await format_time()
+        self.states[0].state = {
+            "activePurchaseLimitingEventIds": [],
+            "storefront": {}
+        }
+        self.cache_expire = await format_time(datetime.datetime.utcnow() + datetime.timedelta(hours=2))
 
 
 class WeeklyChallenge(Channel):
@@ -274,7 +286,7 @@ class WeeklyChallenge(Channel):
     async def update_events(self) -> None:
         """
         Update the events for the weekly challenge channel
-        :return:
+        :return: None
         """
         pass
 
@@ -294,9 +306,9 @@ class BattlePass(Channel):
     async def update_events(self) -> None:
         """
         Update the events for the battle pass channel
-        :return:
+        :return: None
         """
-        async with aiofiles.open("battlepass.ics", "rb") as f:
+        async with aiofiles.open("res/wex/api/calendar/battlepass.ics", "rb") as f:
             events = recurring_ical_events.of(icalendar.Calendar.from_ical(await f.read())).at(
                 datetime.datetime.utcnow()
             )
@@ -307,4 +319,6 @@ class BattlePass(Channel):
             "seasonId": event_data[0].get("Properties", {}).get("EventId", "None"),
             "seasonEndDate": await format_time(end_date),
         }
-        self.cache_expire = await format_time(min(datetime.datetime.utcnow() + datetime.timedelta(hours=2), end_date))
+        self.cache_expire = await format_time(
+            min(datetime.datetime.utcnow() + datetime.timedelta(hours=2), end_date.replace(tzinfo=None))
+        )

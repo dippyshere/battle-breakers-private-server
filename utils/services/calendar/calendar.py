@@ -129,3 +129,30 @@ class ScheduledEvents:
         await self.featured_stores_mcp.update_events()
         await self.weekly_challenge.update_events()
         await self.battlepass.update_events()
+
+    async def update_required_events(self) -> None:
+        """
+        Updates any events that have their cache expired
+        :return: None
+        """
+        if self.news.cache_expired():
+            await self.news.update_events()
+            self.updated = datetime.datetime.utcnow()
+        if self.limited_time_mode.cache_expired():
+            await self.limited_time_mode.update_events()
+            self.updated = datetime.datetime.utcnow()
+        if self.marketing.cache_expired():
+            await self.marketing.update_events()
+            self.updated = datetime.datetime.utcnow()
+        if self.rotational_content.cache_expired():
+            await self.rotational_content.update_events()
+            self.updated = datetime.datetime.utcnow()
+        if self.featured_stores_mcp.cache_expired():
+            await self.featured_stores_mcp.update_events()
+            self.updated = datetime.datetime.utcnow()
+        if self.weekly_challenge.cache_expired():
+            await self.weekly_challenge.update_events()
+            self.updated = datetime.datetime.utcnow()
+        if self.battlepass.cache_expired():
+            await self.battlepass.update_events()
+            self.updated = datetime.datetime.utcnow()

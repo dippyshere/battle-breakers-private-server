@@ -4,6 +4,7 @@ Please do not skid my hard work.
 https://github.com/dippyshere/battle-breakers-private-server
 This code is licensed under the [TBD] license.
 """
+import asyncio
 from typing import Any
 
 from api import api
@@ -16,6 +17,8 @@ import sanic
 import sanic_ext
 import colorama
 import motor.motor_asyncio
+
+from utils.services.calendar.calendar import ScheduledEvents
 
 try:
     import tomllib as toml
@@ -60,6 +63,14 @@ app.ctx.profiles = {}
 app.ctx.invalid_tokens = []
 
 
+async def setup() -> None:
+    """
+    Setup async functions
+    :return: None
+    """
+    app.ctx.calendar = await ScheduledEvents.init_calendar()
+
+
 @app.main_process_stop
 async def main_stop(*_: Any) -> None:
     """
@@ -75,4 +86,5 @@ async def main_stop(*_: Any) -> None:
 
 # fast=true
 if __name__ == "__main__":
+    asyncio.run(setup())
     app.run(host="127.0.0.1", port=80, auto_reload=True, access_log=False)
