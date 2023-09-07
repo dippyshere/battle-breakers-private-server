@@ -6,11 +6,10 @@ This code is licensed under the [TBD] license.
 
 Handles suggestion responses.
 """
-import os
-
 import sanic
 
 from utils.exceptions import errors
+from utils.friend_system import PlayerFriends
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -30,17 +29,16 @@ async def suggestion_response(request: sanic.request.Request, accountId: str) ->
     :param accountId: The account id
     :return: The modified profile
     """
-    accounts_list = os.listdir("res/account/api/public/account")
-    accounts_list = [account.split(".")[0] for account in accounts_list]
     for friend_id in request.json.get("invitedFriendInstanceIds"):
         friend_instance = await request.ctx.profile.get_item_by_guid(friend_id, request.ctx.profile_id)
-        if friend_instance["attributes"].get("status") == "SuggestedLegacy" and friend_instance["attributes"].get(
-                "accountId") not in accounts_list:
+        if friend_instance["attributes"].get("status") == "SuggestedLegacy" and await request.app.ctx.database["accounts"].find_one({"_id": friend_instance["attributes"].get("accountId")}, {"_id": 1}) is None:
             raise errors.com.epicgames.world_explorers.not_found(
                 errorMessage="Unfortunately, this friend has not imported their saved account to the private server. "
                              "Mew should ask them to do so :)")
         else:
-            await request.ctx.profile.remove_item(friend_id, request.ctx.profile_id)
+            if accountId not in request.app.ctx.friends:
+                request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
+            await request.app.ctx.friends[accountId].send_friend_request(request, request.json.get("friendAccountId"))
     for friend_id in request.json.get("rejectedFriendInstanceIds"):
         # TODO: add ignored suggestion list
         await request.ctx.profile.remove_item(friend_id, request.ctx.profile_id)

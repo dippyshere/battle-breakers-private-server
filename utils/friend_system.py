@@ -6,7 +6,6 @@ This code is licensed under the [TBD] license.
 
 Class based system to handle the friends service management
 """
-import os
 import random
 from typing import Optional, Self
 
@@ -65,9 +64,7 @@ class PlayerFriends:
         Load the profile based on the account ID and setup the variables
         :return: None
         """
-        collection = database[f"friends"]
-        friends = await collection.find_one({"_id": self.account_id})
-        self.friends = friends
+        self.friends = await database["friends"].find_one({"_id": self.account_id})
 
     async def get_friends(self) -> dict:
         """
@@ -293,37 +290,16 @@ class PlayerFriends:
         :param request: The request object
         :return: The response of the request
         """
-        suggested_accounts: list[str] = []
-        accounts_list: list[str] = os.listdir("res/account/api/public/account")
-        accounts_list: list[str] = [account.split(".")[0] for account in accounts_list]
-        # This just forces this account to be the first suggestion :)
-        if "ec0ebb7e56f6454e86c62299a7b32e20" in accounts_list:
-            accounts_list.remove("ec0ebb7e56f6454e86c62299a7b32e20")
-        accounts_list.insert(0, "ec0ebb7e56f6454e86c62299a7b32e20")
-        if self.account_id in accounts_list:
-            accounts_list.remove(self.account_id)
-        for account in accounts_list:
-            if account not in request.app.ctx.friends:
-                request.app.ctx.friends[account]: PlayerFriends = await PlayerFriends.init_friends(account)
-            if request.app.ctx.friends[account].friends["settings"]["acceptInvites"] != "public":
-                accounts_list.remove(account)
-            for friend in self.friends["friends"]:
-                if friend["accountId"] == account:
-                    accounts_list.remove(account)
-                    break
-            for friend in self.friends["incoming"]:
-                if friend["accountId"] == account:
-                    accounts_list.remove(account)
-                    break
-            for friend in self.friends["outgoing"]:
-                if friend["accountId"] == account:
-                    accounts_list.remove(account)
-                    break
-        for _ in range(10):
-            if len(accounts_list) == 0:
-                break
-            suggested_accounts.append(random.choice(accounts_list))
-            accounts_list.remove(suggested_accounts[-1])
+        # TODO: calculate mutual friends and rank suggestions by mutuals
+        matching_account_ids = [doc["_id"] async for doc in request.app.ctx.database["friends"].find({
+            "_id": {"$ne": self.account_id},
+            "friends.friends": {"$ne": {"accountId": self.account_id}},
+            "friends.incoming": {"$not": {"$elemMatch": {"accountId": self.account_id}}},
+            "friends.outgoing": {"$not": {"$elemMatch": {"accountId": self.account_id}}},
+            "friends.settings.acceptInvites": "public"
+        }, projection=["_id"])]
+        random.shuffle(matching_account_ids)
+        suggested_accounts = matching_account_ids[:10]
         self.friends["suggested"] = []
         for suggestion in suggested_accounts:
             self.friends["suggested"].append({
