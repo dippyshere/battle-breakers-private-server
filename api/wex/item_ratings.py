@@ -41,7 +41,7 @@ async def item_ratings(request: sanic.request.Request, accountId: str, templateI
         (await load_character_data(template_id))[0]["Properties"]["CharacterStatsHandle"]["RowName"],
         {}).get("RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")).replace(".", "_")
     data = await request.app.ctx.database["item_ratings"].find_one({"_id": accountId}, {rating_key: 1, "_id": 0})
-    if rating_key in data:
+    if data and rating_key in data:
         my_rating = data[rating_key]
     base_ratings = await read_file("res/wex/api/game/v2/item_ratings/base_ratings.json")
     user_ratings = request.app.ctx.database["item_ratings"].find({rating_key: {'$ne': None}},
