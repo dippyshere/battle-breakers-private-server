@@ -7,14 +7,13 @@ This code is licensed under the [TBD] license.
 Handles updating friends
 """
 import datetime
-import os
 
 import sanic
 
 from utils.friend_system import PlayerFriends
 from utils.profile_system import PlayerProfile
 from utils.enums import ProfileType, FriendStatus
-from utils.utils import authorized as auth, read_file, format_time
+from utils.utils import authorized as auth, format_time
 
 from utils.sanic_gzip import Compress
 
@@ -34,7 +33,6 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
     :return: The modified profile
     """
     friend_instances = await request.ctx.profile.find_item_by_template_id("Friend:Instance", request.ctx.profile_id)
-    accounts_list = [acc.split(".")[0] for acc in os.listdir("res/account/api/public/account/")]
     pending_changes = request.ctx.profile.friends_changes
     if accountId not in request.app.ctx.friends:
         request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
@@ -42,20 +40,16 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
     incoming_list = (await request.app.ctx.friends[accountId].get_summary())["incoming"]
     outgoing_list = (await request.app.ctx.friends[accountId].get_summary())["outgoing"]
     result = {}
-    for friend in friends_list:
-        if friend["accountId"] in accounts_list:
-            result[friend["accountId"]] = FriendStatus.FRIEND
-    for friend in incoming_list:
-        if friend["accountId"] in accounts_list:
-            result[friend["accountId"]] = FriendStatus.INVITED
-    for friend in outgoing_list:
-        if friend["accountId"] in accounts_list:
-            result[friend["accountId"]] = FriendStatus.REQUESTED
+    async for account in request.app.ctx.database["accounts"].find({"_id": {"$in": friends_list}}, {"_id": 1}):
+        result[account["_id"]] = FriendStatus.FRIEND
+    async for account in request.app.ctx.database["accounts"].find({"_id": {"$in": incoming_list}}, {"_id": 1}):
+        result[account["_id"]] = FriendStatus.INVITED
+    async for account in request.app.ctx.database["accounts"].find({"_id": {"$in": outgoing_list}}, {"_id": 1}):
+        result[account["_id"]] = FriendStatus.REQUESTED
     for pending_change in pending_changes:
-        # noinspection IncorrectFormatting
         if pending_change.get("changeType") == "itemAdded" and pending_change.get("item", {}).get(
-                "templateId") == "Friend:Instance" and pending_change.get("item", {}).get("attributes", {}).get(
-                "accountId") in accounts_list:
+                "templateId") == "Friend:Instance" and await request.app.ctx.database["accounts"].find_one(
+                {"_id": pending_change.get("item", {}).get("attributes", {}).get("accountId")}, {"_id": 1}) is not None:
             result.pop(pending_change.get("item", {}).get("attributes", {}).get("accountId"))
     for itemId in friend_instances:
         friend_instance = await request.ctx.profile.get_item_by_guid(itemId, request.ctx.profile_id)
@@ -70,6 +64,8 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
                 # In this case, we preserve their snapshot and entry by marking them as a legacy friend
                 # SuggestedLegacy was originally intended for friends on the old (1.0-1.71) friends system,
                 # suggesting players to add them back using the Epic friends system
+                # Note: Doing this means that clients older than 1.80 cannot parse the friend instance, and will
+                # not show the friend in the friends list
                 await request.ctx.profile.change_item_attribute(itemId, "status", "SuggestedLegacy",
                                                                 request.ctx.profile_id)
                 await request.ctx.profile.change_item_attribute(itemId, "snapshot_expires",

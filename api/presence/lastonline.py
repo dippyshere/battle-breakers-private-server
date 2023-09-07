@@ -6,12 +6,10 @@ This code is licensed under the [TBD] license.
 
 Handles the last online presence request
 """
-import os
 
 import sanic
 
 from utils.friend_system import PlayerFriends
-from utils.profile_system import PlayerProfile
 from utils.enums import ProfileType
 from utils.utils import authorized as auth
 
@@ -35,16 +33,24 @@ async def last_online(request: sanic.request.Request, accountId: str) -> sanic.r
     """
     if accountId not in request.app.ctx.friends:
         request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
-    request.ctx.friends = request.app.ctx.friends[accountId]
-    accounts_list = os.listdir("res/account/api/public/account")
-    accounts_list = [account.split(".")[0] for account in accounts_list]
     response = {}
-    for friend in (await request.ctx.friends.get_friends())["friends"]:
-        if friend["accountId"] in accounts_list:
-            if friend["accountId"] not in request.app.ctx.profiles:
-                request.app.ctx.profiles[friend["accountId"]] = await PlayerProfile.init_profile(friend["accountId"])
+    pending_presence = []
+    for friend in (await request.app.ctx.friends[accountId].get_friends())["friends"]:
+        if friend["accountId"] in request.app.ctx.profiles:
             wex_data = await request.app.ctx.profiles[friend["accountId"]].get_profile(ProfileType.PROFILE0)
             response[friend["accountId"]] = [
+                {
+                    "last_online": wex_data["updated"]
+                }
+            ]
+        else:
+            pending_presence.append(friend)
+    if len(pending_presence) > 0:
+        async for wex_data in request.app.ctx.database["profile_profile0"].find({"_id": {"$in": pending_presence}}, {
+            "_id": 1,
+            "updated": 1
+        }):
+            response[wex_data["_id"]] = [
                 {
                     "last_online": wex_data["updated"]
                 }

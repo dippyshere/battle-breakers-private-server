@@ -39,16 +39,16 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
                 raise sanic.exceptions.InvalidUsage("Invalid username",
                                                     context={"errorMessage": "This account ID is invalid"})
             else:
-                if not os.path.exists(f"res/account/api/public/account/{username}.json"):
+                account_data: dict = await request.app.ctx.database["accounts"].find_one({"_id": username}, {
+                    "_id": 0,
+                    "displayName": 1,
+                    "extra.pwhash": 1
+                })
+                if account_data is None:
                     raise sanic.exceptions.InvalidUsage("Invalid username", context={
                         "errorMessage": "Your account ID doesn't exist...\nAlready have an account to import? Contact "
                                         "us on Discord.\nTrying to create an account? Sign up instead."})
                 else:
-                    account_data: dict = await request.app.ctx.database["accounts"].find_one({"_id": username}, {
-                        "_id": 0,
-                        "displayName": 1,
-                        "extra.pwhash": 1
-                    })
                     if account_data["extra"]["pwhash"] != password:
                         raise sanic.exceptions.Unauthorized("Invalid password", context={
                             "errorMessage": "The password you entered is incorrect"})

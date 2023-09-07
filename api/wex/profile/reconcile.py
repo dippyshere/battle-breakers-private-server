@@ -38,12 +38,11 @@ async def reconcile(request: sanic.request.Request, accountId: str) -> sanic.res
     friends_list = request.json["friendIdList"]
     friends_list.extend(request.json["outgoingIdList"])
     friends_list.extend(request.json["incomingIdList"])
-    accounts_list = [acc.split(".")[0] for acc in os.listdir("res/account/api/public/account/")]
-    for friend in friends_list:
-        if friend in accounts_list:
-            results[friend] = True
-        else:
-            results[friend] = False
+    async for account in request.app.ctx.database["accounts"].find({"_id": {"$in": friends_list}}, {"_id": 1}):
+        results[account["_id"]] = True
+    for account in results:
+        if account not in results:
+            results[account] = False
     await request.ctx.profile.add_notifications({
         "type": "WExpReconcileNotification",
         "primary": True,
