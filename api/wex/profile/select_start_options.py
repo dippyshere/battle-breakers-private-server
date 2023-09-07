@@ -198,7 +198,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
         }, profile_id=ProfileType.FRIENDS)
     await request.ctx.profile.modify_stat("personal_events", [
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 5,
             "zoneId": "Zone.Event.PE.MidgamePet.First.Map1",
             "maxRuns": 1,
@@ -210,7 +210,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 4,
             "zoneId": "Zone.Event.PE.MidgamePet.Second.Map1",
             "maxRuns": 1,
@@ -222,7 +222,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 3,
             "zoneId": "Zone.Event.PE.MidgamePet.Third.Map1",
             "maxRuns": 1,
@@ -234,7 +234,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 2,
             "zoneId": "Zone.Event.PE.MidgamePet.Fourth.Map1",
             "maxRuns": 1,
@@ -246,7 +246,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 1,
             "zoneId": "Zone.Event.PE.MidgamePet.Fifth.Map1",
             "maxRuns": 1,
@@ -258,7 +258,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 5,
             "zoneId": "Zone.Event.PE.MidgameChallenge.First.Map1",
             "maxRuns": 1,
@@ -270,7 +270,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 4,
             "zoneId": "Zone.Event.PE.MidgameChallenge.Second.Map1",
             "maxRuns": 1,
@@ -282,7 +282,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 3,
             "zoneId": "Zone.Event.PE.MidgameChallenge.Third.Map1",
             "maxRuns": 1,
@@ -294,7 +294,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 2,
             "zoneId": "Zone.Event.PE.MidgameChallenge.Fourth.Map1",
             "maxRuns": 1,
@@ -306,7 +306,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 1,
             "zoneId": "Zone.Event.PE.MidgameChallenge.Fifth.Map1",
             "maxRuns": 1,
@@ -318,7 +318,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 8,
             "zoneId": "Zone.Event.NewPlayer.Map1",
             "maxRuns": 1,
@@ -330,7 +330,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 7,
             "zoneId": "Zone.Event.NewPlayer.Map2",
             "maxRuns": 1,
@@ -342,7 +342,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 6,
             "zoneId": "Zone.Event.NewPlayer.Map3",
             "maxRuns": 1,
@@ -354,7 +354,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 5,
             "zoneId": "Zone.Event.NewPlayer.Map4",
             "maxRuns": 1,
@@ -366,7 +366,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 4,
             "zoneId": "Zone.Event.NewPlayer.Map5",
             "maxRuns": 1,
@@ -378,7 +378,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 3,
             "zoneId": "Zone.Event.NewPlayer.Map6",
             "maxRuns": 1,
@@ -390,7 +390,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 2,
             "zoneId": "Zone.Event.NewPlayer.Map7",
             "maxRuns": 1,
@@ -402,7 +402,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "dynamicWorldLevel": -1
         },
         {
-            "expiresAt": "2099-01-04T00:00:00.000Z",
+            "expiresAt": "2999-12-31T23:59:59.999Z",
             "sortPriority": 1,
             "zoneId": "Zone.Event.NewPlayer.Map8",
             "maxRuns": 1,
