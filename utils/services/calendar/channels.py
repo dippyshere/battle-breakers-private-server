@@ -13,7 +13,6 @@ import aiofiles
 import icalendar
 import recurring_ical_events
 
-from utils.profile_system import MCPTypes
 from utils.utils import load_datatable, format_time
 
 
@@ -29,7 +28,7 @@ class State:
         """
         self.valid_from: str = ""
         self.active_events: list[str] = []
-        self.state: dict[str, MCPTypes] = {}
+        self.state: dict[str, str | int | float | list | dict | bool] = {}
 
     def __repr__(self) -> str:
         """
@@ -100,7 +99,7 @@ class Channel:
         This will setup the variables for the channel
         """
         self.states: list[State] = [State()]
-        self.cache_expire: str = ""
+        self.cache_expire: str = "0021-01-01T00:00:000Z"
 
     def __repr__(self) -> str:
         """

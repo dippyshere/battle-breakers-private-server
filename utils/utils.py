@@ -34,7 +34,6 @@ from cryptography.hazmat.primitives.serialization import load_pem_private_key, l
 from cryptography.hazmat.backends import default_backend
 
 from utils.exceptions import errors
-from utils.services.calendar.calendar import ScheduledEvents
 
 # Load the private key
 with open('utils/crypto/bb_private_key.pem', 'rb') as f:
@@ -641,7 +640,7 @@ async def oauth_client_response(client_id: str) -> dict:
 
 async def create_account(database: motor.core.AgnosticDatabase, displayName: Optional[str] = None,
                          password: Optional[bytes] = None, email: Optional[str] = None,
-                         calendar: ScheduledEvents = None) -> str:
+                         calendar=None) -> str:
     """
     Creates an account and prepares all the files
     :param database: The database to create the account in
