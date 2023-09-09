@@ -1,7 +1,7 @@
 # Required Python Dependencies
 # ----------------------------
 # JSON handling
-orjson>=3.9.2
+orjson>=3.9.7
 # Web server
 sanic[ext]>=23.6.0
 # Colourful logging
@@ -15,22 +15,22 @@ py-cpuinfo>=9.0.0
 # GZIP + Deflate compression (here for credit, implementation is replaced)
 sanic-gzip>=0.4.1
 # Brotli compression
-Brotli>=1.0.9
+Brotli>=1.1.0
 # Async file handling
-aiofiles>=23.1.0
+aiofiles>=23.2.1
 # Password hashing
 bcrypt>=4.0.1
 # Input validation
-pydantic>=2.1.1
+pydantic>=2.3.0
 # Crypto
 cryptography>=41.0.3
 # Characterset detection speedup
-faust-cchardet>=2.1.18
+faust-cchardet>=2.1.19
 # Async HTTP client
 aiohttp[speedups]>=3.8.5
 urllib3>=2.0.4
 # MongoDB driver
-motor>=3.3.0
+motor>=3.3.1
 # Calendar system
 icalendar>=5.0.7
 recurring-ical-events>=2.0.2
