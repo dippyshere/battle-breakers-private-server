@@ -36,10 +36,14 @@ def custom_serialise(obj: Any) -> dict[str, Any]:
     """
     if isinstance(obj, MCPProfile):
         return obj.profile
-    if isinstance(obj, MCPItem):
+    elif isinstance(obj, MCPItem):
         return obj.item
-    # Handle other custom serialization logic here
-    raise TypeError(f"Object of type '{obj.__class__.__name__}' is not JSON serializable")
+    else:
+        try:
+            return obj.__dict__
+        except AttributeError:
+            pass
+    raise TypeError(f"Object of type '{obj.__class__.__name__}' is not JSON serialisable")
 
 
 app: sanic.app.Sanic = sanic.app.Sanic("dippy_breakers", dumps=lambda obj: orjson.dumps(obj, default=custom_serialise),
@@ -57,18 +61,11 @@ app.ctx.public_key = utils.public_key
 app.error_handler = error_handler.CustomErrorHandler()
 app.register_middleware(middleware.mcp_middleware.add_mcp_headers, "response")
 app.ctx.database = motor.motor_asyncio.AsyncIOMotorClient(config["database"]["uri"])[config["database"]["database"]]
+app.ctx.calendar = asyncio.run(ScheduledEvents.init_calendar())
 app.ctx.accounts = {}
 app.ctx.friends = {}
 app.ctx.profiles = {}
 app.ctx.invalid_tokens = []
-
-
-async def setup() -> None:
-    """
-    Setup async functions
-    :return: None
-    """
-    app.ctx.calendar = await ScheduledEvents.init_calendar()
 
 
 @app.main_process_stop
@@ -86,5 +83,4 @@ async def main_stop(*_: Any) -> None:
 
 # fast=true
 if __name__ == "__main__":
-    asyncio.run(setup())
     app.run(host="127.0.0.1", port=80, auto_reload=True, access_log=False)

@@ -130,7 +130,7 @@ class ScheduledEvents:
         await self.weekly_challenge.update_events()
         await self.battlepass.update_events()
 
-    async def update_required_events(self) -> None:
+    async def update_required_events(self) -> dict[str, Any]:
         """
         Updates any events that have their cache expired
         :return: None
@@ -156,3 +156,4 @@ class ScheduledEvents:
         if self.battlepass.cache_expired():
             await self.battlepass.update_events()
             self.updated = datetime.datetime.utcnow()
+        return self.__dict__()

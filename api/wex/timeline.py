@@ -28,95 +28,20 @@ async def calendar(request: sanic.request.Request) -> sanic.response.JSONRespons
     :param request: The request object
     :return: The response object
     """
-    # with open("res/wex/api/calendar/v1/timeline.json", "r", encoding='utf-8') as file:
-    #     return sanic.response.json(orjson.loads(file.read()))
-    # return await sanic.response.file_stream("res/wex/api/calendar/v1/timeline.json", mime_type="application/json")
-    valid_from = await format_time(
-        (datetime.datetime.utcnow() - datetime.timedelta(hours=1)))
-    cache_expire = await format_time(
-        (datetime.datetime.utcnow() + datetime.timedelta(hours=2)))
-    calendar_channels = {
-        "news": {
-            "states": [
-                {
-                    "validFrom": valid_from,
-                    "activeEvents": [],
-                    "state": {}
-                }
-            ],
-            "cacheExpire": cache_expire
-        },
-        "limited-time-mode": {
-            "states": [
-                {
-                    "validFrom": valid_from,
-                    "activeEvents": [],
-                    "state": {}
-                }
-            ],
-            "cacheExpire": cache_expire
-        },
-        "marketing": {
-            "states": [
-                {
-                    "validFrom": valid_from,
-                    "activeEvents": [],
-                    "state": {}
-                }
-            ],
-            "cacheExpire": cache_expire
-        },
-        "rotational-content": {
-            "states": [
-                {
-                    "validFrom": valid_from,
-                    "activeEvents": [],
-                    "state": {}
-                }
-            ],
-            "cacheExpire": cache_expire
-        },
-        "featured-stores-mcp": {
-            "states": [
-                {
-                    "validFrom": valid_from,
-                    "activeEvents": [],
-                    "state": {}
-                }
-            ],
-            "cacheExpire": cache_expire
-        },
-        "weekly-challenge": {
-            "states": [
-                {
-                    "validFrom": valid_from,
-                    "activeEvents": [],
-                    "state": {}
-                }
-            ],
-            "cacheExpire": cache_expire
-        },
-        "battlepass": {
-            "states": [
-                {
-                    "validFrom": valid_from,
-                    "activeEvents": [],
-                    "state": {}
-                }
-            ],
-            "cacheExpire": cache_expire
-        }
-    }
-    timeline = await read_file("res/wex/api/calendar/v1/timeline.json")
-    for channel in timeline["channels"]:
-        for state in timeline["channels"][channel]["states"]:
-            state["validFrom"] = await format_time((datetime.datetime.utcnow() - datetime.timedelta(hours=1)))
-        timeline["channels"][channel]["cacheExpire"] = await format_time(
-            (datetime.datetime.utcnow() + datetime.timedelta(hours=2)))
-    # return sanic.response.json({
-    #     "channels": calendar_channels,
-    #     "eventsTimeOffsetHrs": 0.0,
-    #     "cacheIntervalMins": 15.0,
-    #     "currentTime": await format_time()
-    # })
-    return sanic.response.json(timeline)
+    # valid_from = await format_time(
+    #     (datetime.datetime.utcnow() - datetime.timedelta(hours=1)))
+    # cache_expire = await format_time(
+    #     (datetime.datetime.utcnow() + datetime.timedelta(hours=2)))
+    # timeline = await read_file("res/wex/api/calendar/v1/timeline.json")
+    # for channel in timeline["channels"]:
+    #     for state in timeline["channels"][channel]["states"]:
+    #         state["validFrom"] = await format_time((datetime.datetime.utcnow() - datetime.timedelta(hours=1)))
+    #     timeline["channels"][channel]["cacheExpire"] = await format_time(
+    #         (datetime.datetime.utcnow() + datetime.timedelta(hours=2)))
+    # return sanic.response.json(timeline)
+    return sanic.response.json({
+        "channels": await request.app.ctx.calendar.update_required_events(),
+        "eventsTimeOffsetHrs": 0.0,
+        "cacheIntervalMins": 15.0,
+        "currentTime": await format_time()
+    })
