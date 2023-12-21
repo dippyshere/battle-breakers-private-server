@@ -208,3 +208,40 @@ class AuthClient(enum.Enum):
         :return: The authentication client
         """
         return cls[s]
+
+
+class AccountPerk(enum.Enum):
+    """
+    Enum for the different account perks
+
+    Attributes:
+        MaxMana: The max mana perk
+        MaxHitPoints: The max hit points perk
+        Attack: The attack perk
+        DamageReduction: The damage reduction perk
+        RegenStat: The regen stat perk
+        PetStrength: The pet strength perk
+        BasicAttack: The basic attack perk
+        SpecialAttack: The special attack perk
+
+    Methods:
+        from_string(cls, s: str) -> "AccountPerk":
+            Get the account perk from a string
+    """
+    MaxMana = "MaxMana"
+    MaxHitPoints = "MaxHitPoints"
+    Attack = "Attack"
+    DamageReduction = "DamageReduction"
+    RegenStat = "RegenStat"
+    PetStrength = "PetStrength"
+    BasicAttack = "BasicAttack"
+    SpecialAttack = "SpecialAttack"
+
+    @classmethod
+    def from_string(cls, s: str) -> "AccountPerk":
+        """
+        Get the account perk from a string
+        :param s: The string to get the account perk from
+        :return: The account perk
+        """
+        return cls[s]
