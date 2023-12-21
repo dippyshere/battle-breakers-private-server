@@ -9,8 +9,9 @@ Handles evolving heroes
 
 import sanic
 
+from utils.enums import ProfileType
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, load_datatable, get_path_from_template_id, get_template_id_from_path
 
 from utils.sanic_gzip import Compress
 
@@ -29,4 +30,45 @@ async def evolve_hero(request: sanic.request.Request, accountId: str) -> sanic.r
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_implemented()
+    # TODO: validation
+    if request.ctx.json.get("bIsInPit"):
+        old_hero = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"), ProfileType.MONSTERPIT)
+    else:
+        old_hero = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"))
+    if not old_hero:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid hero item id")
+    evolution_recipe = (await load_datatable(
+        (await get_path_from_template_id(request.ctx.json.get("evoPathName"))).replace(
+            "res/Game/WorldExplorers/", "").replace(".json", "").replace("\\", "/")))[0]["Properties"]
+    if old_hero["attributes"]["level"] < evolution_recipe["RequiredLevel"]:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Hero level is too low")
+    cost_recipe = (await load_datatable(
+        evolution_recipe["Recipe"]["ObjectPath"].replace("WorldExplorers/", "").replace(".0", "")))[0]["Properties"]
+    pending_items = []
+    for consumed_item in cost_recipe["ConsumedItems"]:
+        consumed_item_id = (await request.ctx.profile.find_item_by_template_id(
+            await get_template_id_from_path(consumed_item["ItemDefinition"]["ObjectPath"])))[0]
+        consumed_item_quantity = (await request.ctx.profile.get_item_by_guid(consumed_item_id))["quantity"]
+        if consumed_item_quantity < consumed_item["Count"]:
+            raise errors.com.epicgames.world_explorers.bad_request(
+                errorMessage=f"Not enough {consumed_item['ItemDefinition']['ObjectName']}")
+        pending_items.append({
+            "itemId": consumed_item_id,
+            "quantity": consumed_item_quantity - consumed_item["Count"]
+        })
+    new_hero_id = (
+        await get_template_id_from_path(evolution_recipe["EvolutionDestination"]["ObjectPath"]))
+    if not new_hero_id:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid hero item id")
+    for pending_item in pending_items:
+        await request.ctx.profile.change_item_quantity(pending_item["itemId"], pending_item["quantity"])
+    old_hero["templateId"] = new_hero_id
+    if request.ctx.json.get("bIsInPit"):
+        await request.ctx.profile.add_item(old_hero, request.ctx.json.get("heroItemId"), ProfileType.MONSTERPIT)
+    else:
+        await request.ctx.profile.add_item(old_hero, request.ctx.json.get("heroItemId"))
+    # TODO: chest activity
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions, True)
+    )
