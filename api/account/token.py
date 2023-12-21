@@ -68,7 +68,7 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                             if account:
                                 dn = account['displayName']
                                 dvid = request.headers.get('X-Epic-Device-ID')
-                                return sanic.response.json(await oauth_response(client_id, dn, dvid, account['id']))
+                                return sanic.response.json(await oauth_response(client_id, dn, dvid, account['_id']))
                             # Create an account
                             account_id = await create_account(request.app.ctx.database,
                                                               calendar=request.app.ctx.calendar)
@@ -169,7 +169,7 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                     if account:
                         return sanic.response.json(
                             await oauth_response(client_id, account['displayName'], request.form.get('device_id'),
-                                                 account["id"]))
+                                                 account["_id"]))
                     else:
                         raise errors.com.epicgames.common.authentication.authentication_failed(
                             request.form.get('account_id'))
