@@ -36,6 +36,8 @@ async def foil_hero(request: sanic.request.Request, accountId: str) -> sanic.res
         character_data = await load_character_data(
             (await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"), ProfileType.MONSTERPIT))[
                 "templateId"])
+        if not character_data[0]["Properties"].get("FoilTable"):
+            raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Hero cannot be foiled")
         foil_table = character_data[0]["Properties"]["FoilTable"]["AssetPathName"].replace("/Game/", "Content/").split(
             ".")[0]
         foil_cost = (await load_datatable((await load_datatable(foil_table))[0]["Properties"]["RankRecipes"][0][
@@ -49,6 +51,8 @@ async def foil_hero(request: sanic.request.Request, accountId: str) -> sanic.res
     else:
         character_data = await load_character_data(
             (await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId")))["templateId"])
+        if not character_data[0]["Properties"].get("FoilTable"):
+            raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Hero cannot be foiled")
         foil_table = character_data[0]["Properties"]["FoilTable"]["AssetPathName"].replace("/Game/", "Content/").split(
             ".")[0]
         foil_cost = (await load_datatable((await load_datatable(foil_table))[0]["Properties"]["RankRecipes"][0][
