@@ -19,6 +19,7 @@ import colorama
 import motor.motor_asyncio
 
 from utils.services.calendar.calendar import ScheduledEvents
+from utils.services.storefront.catalog import StoreCatalogue
 
 try:
     import tomllib as toml
@@ -62,6 +63,7 @@ app.error_handler = error_handler.CustomErrorHandler()
 app.register_middleware(middleware.mcp_middleware.add_mcp_headers, "response")
 app.ctx.database = motor.motor_asyncio.AsyncIOMotorClient(config["database"]["uri"])[config["database"]["database"]]
 app.ctx.calendar = asyncio.run(ScheduledEvents.init_calendar())
+app.ctx.storefronts = asyncio.run(StoreCatalogue.init_storefront())
 app.ctx.accounts = {}
 app.ctx.friends = {}
 app.ctx.profiles = {}
