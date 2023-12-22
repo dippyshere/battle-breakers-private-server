@@ -38,7 +38,12 @@ async def sell_treasure(request: sanic.request.Request, accountId: str) -> sanic
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="This item cannot be sold.")
     gold_id = (await request.ctx.profile.find_item_by_template_id("Currency:Gold"))[0]
     current_gold = (await request.ctx.profile.get_item_by_guid(gold_id))["quantity"]
-    item_guid = (await request.ctx.profile.find_item_by_template_id(request.json.get("itemTemplateId")))[0]
+    item_guid = (await request.ctx.profile.find_item_by_template_id(request.json.get("itemTemplateId")))
+    if not item_guid:
+        raise errors.com.epicgames.world_explorers.not_found(
+            errorMessage="We're sorry, but we were unable to sell your item as it was not found in your inventory.")
+    else:
+        item_guid = item_guid[0]
     item_quantity = (await request.ctx.profile.get_item_by_guid(item_guid))["quantity"]
     sell_quantity = request.json.get("quantity")
     if sell_quantity > item_quantity:

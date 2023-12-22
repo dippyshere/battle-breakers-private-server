@@ -36,6 +36,9 @@ async def sell_hero(request: sanic.request.Request, accountId: str) -> sanic.res
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="How did you do this?")
     else:
         hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"))
+    if not hero_item:
+        raise errors.com.epicgames.world_explorers.not_found(
+            errorMessage="We're sorry, but we were unable to sell your item as it was not found in your inventory.")
     if not hero_item.get("templateId").startswith("Character:"):
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
     hero_data = await load_character_data(hero_item["templateId"])
@@ -104,4 +107,3 @@ async def sell_hero(request: sanic.request.Request, accountId: str) -> sanic.res
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
                                                      request.ctx.profile_revisions)
     )
-

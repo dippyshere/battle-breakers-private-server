@@ -36,7 +36,11 @@ async def sell_gear(request: sanic.request.Request, accountId: str) -> sanic.res
     # EWExpRarity::SuperRare    - 20
     gear_guid = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_Shard_Gear")
     # TODO: validate the item to sell
-    match (await request.ctx.profile.get_item_by_guid(request.json.get("itemId")))["attributes"]["rarity"]:
+    item_to_sell = await request.ctx.profile.get_item_by_guid(request.json.get("itemId"))
+    if not item_to_sell:
+        raise errors.com.epicgames.world_explorers.not_found(
+            errorMessage="We're sorry, but we were unable to sell your item as it was not found in your inventory.")
+    match item_to_sell["attributes"]["rarity"]:
         case "Common":
             value = 1
         case "Uncommon":

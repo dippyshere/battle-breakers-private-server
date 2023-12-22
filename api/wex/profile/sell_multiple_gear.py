@@ -38,6 +38,12 @@ async def sell_multiple_gear(request: sanic.request.Request, accountId: str) -> 
     gear_quantity = 0
     if gear_guid:
         gear_quantity = (await request.ctx.profile.get_item_by_guid(gear_guid[0]))["quantity"]
+    if not request.json.get("itemIds"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="No items to sell")
+    if len(request.json.get("itemIds")) == 1:
+        if not await request.ctx.profile.get_item_by_guid(request.json.get("itemIds")[0]):
+            raise errors.com.epicgames.world_explorers.not_found(
+                errorMessage="We're sorry, but we were unable to sell your item as it was not found in your inventory.")
     for item_guid in request.json.get("itemIds"):
         # TODO: validate the item to sell
         match (await request.ctx.profile.get_item_by_guid(item_guid))["attributes"]["rarity"]:
@@ -52,7 +58,9 @@ async def sell_multiple_gear(request: sanic.request.Request, accountId: str) -> 
             case "SuperRare":
                 value = 20
             case _:
-                raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid rarity")
+                # raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid rarity")
+                # silently fail so that other items can be sold still
+                continue
         if gear_guid:
             gear_quantity += value
             await request.ctx.profile.change_item_quantity(gear_guid[0], gear_quantity)
