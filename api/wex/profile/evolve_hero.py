@@ -31,16 +31,16 @@ async def evolve_hero(request: sanic.request.Request, accountId: str) -> sanic.r
     :return: The modified profile
     """
     # TODO: validation
-    if request.ctx.json.get("bIsInPit"):
+    if request.json.get("bIsInPit"):
         old_hero = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"), ProfileType.MONSTERPIT)
     else:
         old_hero = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"))
     if not old_hero:
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid hero item id")
     evolution_recipe = (await load_datatable(
-        (await get_path_from_template_id(request.ctx.json.get("evoPathName"))).replace(
+        (await get_path_from_template_id(request.json.get("evoPathName"))).replace(
             "res/Game/WorldExplorers/", "").replace(".json", "").replace("\\", "/")))[0]["Properties"]
-    if old_hero["attributes"]["level"] < evolution_recipe["RequiredLevel"]:
+    if old_hero["attributes"]["level"] < evolution_recipe.get("RequiredCharacterLevel", 0):
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Hero level is too low")
     cost_recipe = (await load_datatable(
         evolution_recipe["Recipe"]["ObjectPath"].replace("WorldExplorers/", "").replace(".0", "")))[0]["Properties"]
@@ -63,10 +63,10 @@ async def evolve_hero(request: sanic.request.Request, accountId: str) -> sanic.r
     for pending_item in pending_items:
         await request.ctx.profile.change_item_quantity(pending_item["itemId"], pending_item["quantity"])
     old_hero["templateId"] = new_hero_id
-    if request.ctx.json.get("bIsInPit"):
-        await request.ctx.profile.add_item(old_hero, request.ctx.json.get("heroItemId"), ProfileType.MONSTERPIT)
+    if request.json.get("bIsInPit"):
+        await request.ctx.profile.add_item(old_hero, request.json.get("heroItemId"), ProfileType.MONSTERPIT)
     else:
-        await request.ctx.profile.add_item(old_hero, request.ctx.json.get("heroItemId"))
+        await request.ctx.profile.add_item(old_hero, request.json.get("heroItemId"))
     # TODO: chest activity
     return sanic.response.json(
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
