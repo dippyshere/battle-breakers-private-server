@@ -62,6 +62,13 @@ async def evolve_hero(request: sanic.request.Request, accountId: str) -> sanic.r
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid hero item id")
     for pending_item in pending_items:
         await request.ctx.profile.change_item_quantity(pending_item["itemId"], pending_item["quantity"])
+    await request.ctx.profile.add_notifications({
+        "type": "WExpCharacterEvolution",
+        "primary": True,
+        "oldItemId": request.json.get("heroItemId"),
+        "oldTemplateId": old_hero["templateId"],
+        "newItemId": request.json.get("heroItemId")  # TODO: determine compatibility with old clients
+    }, request.ctx.profile_id)
     old_hero["templateId"] = new_hero_id
     if request.json.get("bIsInPit"):
         await request.ctx.profile.add_item(old_hero, request.json.get("heroItemId"), ProfileType.MONSTERPIT)
