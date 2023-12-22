@@ -8,9 +8,8 @@ Handles the events timeline
 """
 
 import sanic
-import datetime
 
-from utils.utils import authorized as auth, format_time, read_file
+from utils.utils import authorized as auth, format_time
 
 from utils.sanic_gzip import Compress
 
