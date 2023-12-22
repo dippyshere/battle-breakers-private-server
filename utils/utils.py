@@ -844,8 +844,9 @@ async def find_best_match(input_str: str, item_list: list, split_for_path: bool 
         if score > best_match_score:
             best_match_score = score
             best_match = item
-        if score >= 0.95:
-            break
+        # if score >= 0.95:
+        #     break
+    # print(f"Found best match for {input_str} as {best_match} with score {best_match_score}")
     return best_match
 
 
