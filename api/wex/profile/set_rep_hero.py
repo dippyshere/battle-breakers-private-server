@@ -9,6 +9,7 @@ Handles setting friend hero
 
 import sanic
 
+from utils.exceptions import errors
 from utils.sanic_gzip import Compress
 from utils.utils import authorized as auth
 
@@ -27,17 +28,26 @@ async def set_rep_hero(request: sanic.request.Request, accountId: str) -> sanic.
     :param accountId: The account id
     :return: The modified profile
     """
-    # if not request.json.get("heroId").startswith("Character:"):
-    #     raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
-    # should probably verify the player's treasure hunter ownership here
     hero_id = request.json.get("heroId")
     slot_index = request.json.get("slotIdx")
-    rep_heros = await request.ctx.profile.get_stat("rep_hero_ids")
-    if len(rep_heros) <= slot_index:
-        rep_heros.append(hero_id)
-    else:
-        rep_heros[slot_index] = hero_id
-    await request.ctx.profile.modify_stat("rep_hero_ids", rep_heros)
+    hero = await request.ctx.profile.get_item_by_guid(hero_id)
+    if hero is None:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage=f"Hero with id {hero_id} not found")
+    if not hero.get("templateId").startswith("Character:"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage=f"Invalid character item id {hero_id}")
+    rep_heroes = await request.ctx.profile.get_stat("rep_hero_ids")
+    max_rep_heroes = await request.ctx.profile.get_stat("max_rep_heroes")
+    if slot_index >= max_rep_heroes:
+        raise errors.com.epicgames.world_explorers.bad_request(
+            errorMessage=f"Slot index {slot_index} is greater than max rep heroes {max_rep_heroes}")
+    if hero_id in rep_heroes:
+        raise errors.com.epicgames.world_explorers.bad_request(
+            errorMessage=f"Hero with id {hero_id} already set on another slot")
+    if len(rep_heroes) < slot_index + 1:
+        for i in range(slot_index + 1 - len(rep_heroes)):
+            rep_heroes.append("")
+    rep_heroes[slot_index] = hero_id
+    await request.ctx.profile.modify_stat("rep_hero_ids", rep_heroes)
     return sanic.response.json(
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
                                                      request.ctx.profile_revisions)
