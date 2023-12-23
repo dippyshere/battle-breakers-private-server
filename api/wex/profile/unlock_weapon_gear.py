@@ -58,7 +58,7 @@ async def unlock_weapon_gear(request: sanic.request.Request, accountId: str) -> 
         current_quantity = (await request.ctx.profile.get_item_by_guid(consumed_item_guid))["quantity"]
         if current_quantity < consumed_item["Count"]:
             raise errors.com.epicgames.world_explorers.bad_request(
-                errorMessage=f"Not enough {consumed_item['ItemDefinition']['ObjectName']}")
+                errorMessage=f"Not enough {consumed_item.get('ItemDefinition', '').get('ObjectName')}")
         pending_items.append({
             "itemId": consumed_item_guid,
             "quantity": current_quantity - consumed_item["Count"]

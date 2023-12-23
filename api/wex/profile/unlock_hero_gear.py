@@ -56,7 +56,8 @@ async def unlock_hero_gear(request: sanic.request.Request, accountId: str) -> sa
                 raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid consumed item")
         current_quantity = (await request.ctx.profile.get_item_by_guid(consumed_item_guid))["quantity"]
         if current_quantity < consumed_item["Count"]:
-            raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough consumed item")
+            raise errors.com.epicgames.world_explorers.bad_request(
+                errorMessage=f"Not enough {consumed_item.get('ItemDefinition', '').get('ObjectName')}")
         pending_items.append({
             "itemGuid": consumed_item_guid,
             "quantity": current_quantity - consumed_item["Count"]
