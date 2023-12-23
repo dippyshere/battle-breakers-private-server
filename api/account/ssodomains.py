@@ -24,4 +24,7 @@ async def epic_domains_sso_domains(request: sanic.request.Request) -> sanic.resp
     :param request: The request object
     :return: The response object
     """
-    return sanic.response.json(["unrealengine.com", "unrealtournament.com", "fortnite.com", "epicgames.com"])
+    return sanic.response.json(
+        ["unrealengine.com", "unrealtournament.com", "fortnite.com", "epicgames.com", "twinmotion.com", "paragon.com",
+         "battlebreakers.com", "epicgames.dev"]
+    )
