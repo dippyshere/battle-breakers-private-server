@@ -38,9 +38,10 @@ async def unlock_weapon_gear(request: sanic.request.Request, accountId: str) -> 
     hero_data = await load_character_data(hero_item["templateId"])
     consumed_items = (await load_datatable((await load_datatable(
         hero_data[0]["Properties"]["HeroGearInfo"]["AssetPathName"].replace("/Game/", "Content/").split(".")[0]))[0][
-                                                               "Properties"]["HeroGearSlotRecipe"][
-                                                               "ObjectPath"].replace("WorldExplorers/", "").split(".")[
-                                                               0]))[0]["Properties"]["ConsumedItems"]
+                                               "Properties"]["HeroGearSlotRecipe"][
+                                               "ObjectPath"].replace("WorldExplorers/", "").split(".")[
+                                               0]))[0]["Properties"]["ConsumedItems"]
+    pending_items = []
     for consumed_item in consumed_items:
         match consumed_item.get("ItemDefinition", "").get("ObjectName"):
             case "WExpGenericAccountItemDefinition'Reagent_Misc_CeremonialSword'":
@@ -56,8 +57,14 @@ async def unlock_weapon_gear(request: sanic.request.Request, accountId: str) -> 
                 raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid consumed item")
         current_quantity = (await request.ctx.profile.get_item_by_guid(consumed_item_guid))["quantity"]
         if current_quantity < consumed_item["Count"]:
-            raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough consumed item")
-        await request.ctx.profile.change_item_quantity(consumed_item_guid, current_quantity - consumed_item["Count"])
+            raise errors.com.epicgames.world_explorers.bad_request(
+                errorMessage=f"Not enough {consumed_item['ItemDefinition']['ObjectName']}")
+        pending_items.append({
+            "itemId": consumed_item_guid,
+            "quantity": current_quantity - consumed_item["Count"]
+        })
+    for pending_item in pending_items:
+        await request.ctx.profile.change_item_quantity(pending_item["itemId"], pending_item["quantity"])
     await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "weapon_unlocked", True)
     return sanic.response.json(
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
