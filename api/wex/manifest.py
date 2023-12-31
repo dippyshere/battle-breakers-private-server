@@ -6,6 +6,8 @@ This code is licensed under the [TBD] license.
 
 Handles the manifest
 """
+import hashlib
+
 import aiofiles
 import sanic
 
@@ -51,7 +53,12 @@ async def wex_cloudv3_manifests(request: sanic.request.Request, manifest: str) -
 
     # ~ 1.5ms
     try:
-        async with aiofiles.open(f"res/wex/api/game/v2/manifests/CL_{changelist}/{manifest}", "rb") as file:
-            return sanic.response.raw(await file.read(), content_type="text/text")
+        manifest_file: bytes = await (
+            await aiofiles.open(f"res/wex/api/game/v2/manifests/CL_{changelist}/{manifest}", "rb")).read()
+        md5_hash: str = hashlib.md5(manifest_file).hexdigest().upper()
+        if request.headers.get("If-None-Match") == f'"{md5_hash}"':
+            return sanic.response.text("", status=304, headers={"ETag": f'"{md5_hash}"'})
+        return sanic.response.text(manifest_file.decode(), content_type="text/text",
+                                   headers={"ETag": f'"{md5_hash}"'})
     except:
         raise errors.com.epicgames.common.not_found()
