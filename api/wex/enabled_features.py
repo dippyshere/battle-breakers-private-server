@@ -25,4 +25,4 @@ async def enabled_features(request: sanic.request.Request) -> sanic.response.JSO
     :return: The response object
     """
     # Unsure what could/should be here, this feature was disabled via config files after 1.80 on pc
-    return sanic.response.json(["store", "pvp"])
+    return sanic.response.json([])
