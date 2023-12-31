@@ -29,4 +29,5 @@ async def promote_hero(request: sanic.request.Request, accountId: str) -> sanic.
     :param accountId: The account id
     :return: The modified profile
     """
+    # errors.com.epicgames.modules.gameplayutils.recipe_failed - Unable to promote
     raise errors.com.epicgames.not_implemented()

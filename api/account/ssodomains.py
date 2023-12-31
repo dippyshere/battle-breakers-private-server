@@ -26,5 +26,5 @@ async def epic_domains_sso_domains(request: sanic.request.Request) -> sanic.resp
     """
     return sanic.response.json(
         ["unrealengine.com", "unrealtournament.com", "fortnite.com", "epicgames.com", "twinmotion.com", "paragon.com",
-         "battlebreakers.com", "epicgames.dev"]
+         "battlebreakers.com", "epicgames.dev", "epicgames.net"]
     )
