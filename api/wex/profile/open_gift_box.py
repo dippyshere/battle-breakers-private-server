@@ -9,7 +9,6 @@ Handles opening a gift box.
 
 import sanic
 
-from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress

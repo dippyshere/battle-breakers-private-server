@@ -12,7 +12,7 @@ import sanic
 
 from utils.exceptions import errors
 from utils.enums import ProfileType
-from utils.utils import authorized as auth, load_datatable, format_time
+from utils.utils import authorized as auth, load_datatable, format_time, room_generator
 
 from utils.sanic_gzip import Compress
 

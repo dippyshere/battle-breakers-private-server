@@ -8,8 +8,8 @@ Handles the quick start account creation
 """
 import sanic
 
-from utils.utils import authorized as auth, oauth_response, generate_eg1, uuid_generator, create_account, read_file, \
-    token_generator, format_time, write_file
+from utils.utils import authorized as auth, oauth_response, generate_eg1, uuid_generator, create_account, \
+    token_generator, format_time
 
 from utils.sanic_gzip import Compress
 

@@ -6,7 +6,6 @@ This code is licensed under the [TBD] license.
 
 Handles all the item ratings requests
 """
-import os
 import urllib.parse
 
 import sanic

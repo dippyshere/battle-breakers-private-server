@@ -9,5 +9,4 @@ Handles the purchase page with the epic games purchase flow
 import sanic
 from .purchaseflow import purchase_flow
 
-
 purchase = sanic.Blueprint.group(purchase_flow)

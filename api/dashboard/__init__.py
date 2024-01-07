@@ -9,5 +9,4 @@ Handles the account page
 import sanic
 from .personal import personal
 
-
 dasboard = sanic.Blueprint.group(personal, url_prefix="/account")

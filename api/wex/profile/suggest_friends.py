@@ -13,7 +13,7 @@ import sanic
 from utils.enums import ProfileType
 from utils.friend_system import PlayerFriends
 from utils.profile_system import PlayerProfile
-from utils.utils import authorized as auth, read_file, format_time
+from utils.utils import authorized as auth, format_time
 
 from utils.sanic_gzip import Compress
 

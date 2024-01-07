@@ -4,12 +4,12 @@ Please do not skid my hard work.
 https://github.com/dippyshere/battle-breakers-private-server
 This code is licensed under the [TBD] license.
 
-Handles the store catalog
+Handles the IAP receipts
 """
 
 import sanic
 
-from utils.utils import authorized as auth, read_file
+from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
 

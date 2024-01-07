@@ -14,7 +14,7 @@ import sanic
 from utils.exceptions import errors
 from utils.profile_system import PlayerProfile
 from utils.utils import (authorized as auth, oauth_response, parse_eg1, create_account, verify_google_token,
-                         oauth_client_response, read_file, write_file, bcrypt_check)
+                         oauth_client_response, bcrypt_check)
 
 from utils.sanic_gzip import Compress
 

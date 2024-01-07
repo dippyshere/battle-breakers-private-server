@@ -1,3 +1,3 @@
 <component name="DependencyValidationManager">
-  <scope name="Python Only" pattern="file:*.py" />
+  <scope name="Python Only" pattern="file:*.py&amp;&amp;!file[battle-breakers-private-server]:res/wex/api/game/v2/manifests//*&amp;&amp;!file[battle-breakers-private-server]:res//*&amp;&amp;!file[battle-breakers-private-server]:docs//*&amp;&amp;!ext:*/||file[battle-breakers-private-server]:api//*||file[battle-breakers-private-server]:middleware//*||file[battle-breakers-private-server]:utils//*" />
 </component>

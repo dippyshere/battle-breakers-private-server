@@ -14,7 +14,7 @@ from utils.exceptions import errors
 from utils.friend_system import PlayerFriends
 from utils.profile_system import PlayerProfile
 from utils.enums import ProfileType
-from utils.utils import authorized as auth, normalise_string, format_time, read_file
+from utils.utils import authorized as auth, normalise_string, format_time
 
 from utils.sanic_gzip import Compress
 

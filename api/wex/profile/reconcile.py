@@ -6,8 +6,6 @@ This code is licensed under the [TBD] license.
 
 Handles friends reconciliation.
 """
-import os
-
 import sanic
 
 from utils.friend_system import PlayerFriends

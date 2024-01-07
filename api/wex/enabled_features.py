@@ -4,7 +4,7 @@ Please do not skid my hard work.
 https://github.com/dippyshere/battle-breakers-private-server
 This code is licensed under the [TBD] license.
 
-Handles the enabled features request
+Handles the enabled features stub
 """
 
 import sanic

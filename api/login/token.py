@@ -6,7 +6,6 @@ This code is licensed under the [TBD] license.
 
 Handles the login flow
 """
-import os
 import re
 
 import sanic
