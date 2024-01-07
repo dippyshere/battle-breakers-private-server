@@ -592,7 +592,7 @@ async def initialise_account(database: motor.core.AgnosticDatabase, account_id: 
                 },
                 "activity": {
                     "a": {
-                        "date": datetime.datetime.utcnow().strftime("%Y-%m-%dT00:00:00.000Z"),
+                        "date": datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT00:00:00.000Z"),
                         "claimed": False,
                         "props": {
                             "BaseBonus": 10

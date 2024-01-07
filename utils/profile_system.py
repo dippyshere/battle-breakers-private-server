@@ -813,7 +813,7 @@ class PlayerProfile:
                                                  ProfileType.FRIENDS)
                 await self.change_item_attribute(friend_instance_guid, "snapshot_expires",
                                                  await format_time(
-                                                     datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
+                                                     datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=3)),
                                                  ProfileType.FRIENDS)
                 await self.change_item_attribute(friend_instance_guid, "canBeSparred",
                                                  wex_data["stats"]["attributes"].get("is_pvp_unlocked",
@@ -837,7 +837,7 @@ class PlayerProfile:
                 "accountId": account_data["_id"],
                 "canBeSparred": False,
                 "snapshot_expires": await format_time(
-                    datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
+                    datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=3)),
                 "best_gift": 0,  # These stats are unique to the friend instance on the profile, not the friend
                 "lifetime_gifted": 0,
                 "snapshot": {

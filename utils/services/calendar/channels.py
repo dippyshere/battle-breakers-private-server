@@ -163,7 +163,9 @@ class Channel:
         Determines if the cache is expired
         :return: True if the cache is expired
         """
-        return datetime.datetime.utcnow() > datetime.datetime.strptime(self.cache_expire, "%Y-%m-%dT%H:%M:%S.%fZ")
+        return datetime.datetime.now(datetime.UTC) > datetime.datetime.strptime(self.cache_expire,
+                                                                                "%Y-%m-%dT%H:%M:%S.%fZ").replace(
+            tzinfo=datetime.UTC)
 
 
 class News(Channel):
@@ -185,7 +187,7 @@ class News(Channel):
         """
         async with aiofiles.open("res/wex/api/calendar/news.ics", "rb") as f:
             events = recurring_ical_events.of(icalendar.Calendar.from_ical(await f.read())).at(
-                datetime.datetime.utcnow()
+                datetime.datetime.now(datetime.UTC)
             )
         self.states[0].state["activeNews"] = []
         for event in events:
@@ -204,7 +206,7 @@ class News(Channel):
                 }
             })
         self.states[0].valid_from = await format_time()
-        self.cache_expire = await format_time(datetime.datetime.utcnow() + datetime.timedelta(hours=2))
+        self.cache_expire = await format_time(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=2))
 
 
 class LimitedTimeMode(Channel):
@@ -224,10 +226,11 @@ class LimitedTimeMode(Channel):
         Update the events for the limited time mode channel
         :return: None
         """
-        begin = await format_time(datetime.datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0) +
-                                  datetime.timedelta(days=-datetime.datetime.utcnow().weekday() + 2))
-        end = await format_time(datetime.datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0) +
-                                datetime.timedelta(days=7 - datetime.datetime.utcnow().weekday() + 2))
+        begin = await format_time(
+            datetime.datetime.now(datetime.UTC).replace(hour=0, minute=0, second=0, microsecond=0) +
+            datetime.timedelta(days=-datetime.datetime.now(datetime.UTC).weekday() + 2))
+        end = await format_time(datetime.datetime.now(datetime.UTC).replace(hour=0, minute=0, second=0, microsecond=0) +
+                                datetime.timedelta(days=7 - datetime.datetime.now(datetime.UTC).weekday() + 2))
         self.states[0].valid_from = await format_time()
         self.states[0].state = {
             "activeLTMs": [{
@@ -889,7 +892,7 @@ class LimitedTimeMode(Channel):
             }],
             "eventInstanceId": "$EVENT_INSTANCE_ID"
         }
-        self.cache_expire = await format_time(datetime.datetime.utcnow() + datetime.timedelta(hours=2))
+        self.cache_expire = await format_time(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=2))
 
 
 class Marketing(Channel):
@@ -913,7 +916,7 @@ class Marketing(Channel):
         self.states[0].state = {
             "affiliateSelectionEndDate": "2999-12-31T23:59:59.999Z"
         }
-        self.cache_expire = await format_time(datetime.datetime.utcnow() + datetime.timedelta(hours=2))
+        self.cache_expire = await format_time(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=2))
 
 
 class RotationalContent(Channel):
@@ -939,8 +942,8 @@ class RotationalContent(Channel):
             "activeEvents": [],
             "preregRewardZones": [],
             "heroStoreEnd": await format_time(
-                datetime.datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(
-                    days=-datetime.datetime.utcnow().weekday(), weeks=1)),
+                datetime.datetime.now(datetime.UTC).replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(
+                    days=-datetime.datetime.now(datetime.UTC).weekday(), weeks=1)),
             "purchasingEventId": ""
         }
         self.states[0].state["activeZones"] = [{
@@ -1003,7 +1006,7 @@ class RotationalContent(Channel):
         }]
         async with aiofiles.open("res/wex/api/calendar/battlepass.ics", "rb") as f:
             events = recurring_ical_events.of(icalendar.Calendar.from_ical(await f.read())).at(
-                datetime.datetime.utcnow()
+                datetime.datetime.now(datetime.UTC)
             )
         end_date = events[-1].get("DTEND").dt
         event_data = await load_datatable(events[-1].get("DESCRIPTION")[1:])
@@ -1015,7 +1018,7 @@ class RotationalContent(Channel):
             "expiresAt": await format_time(end_date)
         }]
         self.states[0].state["purchaseEventId"] = event_data[0].get("Properties").get("EventCurrency")[0].get("AssetPathName").split(".Reagent_")[-1].split("Event_")[-1].split("_")[0]
-        self.cache_expire = await format_time(datetime.datetime.utcnow() + datetime.timedelta(hours=2))
+        self.cache_expire = await format_time(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=2))
 
 
 class FeaturedStoresMcp(Channel):
@@ -1041,7 +1044,7 @@ class FeaturedStoresMcp(Channel):
             "activePurchaseLimitingEventIds": [],
             "storefront": {}
         }
-        self.cache_expire = await format_time(datetime.datetime.utcnow() + datetime.timedelta(hours=2))
+        self.cache_expire = await format_time(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=2))
 
 
 class WeeklyChallenge(Channel):
@@ -1203,10 +1206,10 @@ class WeeklyChallenge(Channel):
                                                                 "%Y-%m-%dT%H:%M:%S.%fZ"))
         self.states[0].state["namedWeights"] = "Blackguard=1"
         if end_date is None:
-            self.cache_expire = await format_time(datetime.datetime.utcnow() + datetime.timedelta(hours=2))
+            self.cache_expire = await format_time(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=2))
         else:
             self.cache_expire = await format_time(
-                min(datetime.datetime.utcnow() + datetime.timedelta(hours=2), end_date.replace(tzinfo=None))
+                min(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=2), end_date.replace(tzinfo=None))
             )
 
 
@@ -1229,7 +1232,7 @@ class BattlePass(Channel):
         """
         async with aiofiles.open("res/wex/api/calendar/battlepass.ics", "rb") as f:
             events = recurring_ical_events.of(icalendar.Calendar.from_ical(await f.read())).at(
-                datetime.datetime.utcnow()
+                datetime.datetime.now(datetime.UTC)
             )
         end_date = events[-1].get("DTEND").dt
         event_data = await load_datatable(events[-1].get("DESCRIPTION")[1:])
@@ -1239,5 +1242,5 @@ class BattlePass(Channel):
             "seasonEndDate": await format_time(end_date),
         }
         self.cache_expire = await format_time(
-            min(datetime.datetime.utcnow() + datetime.timedelta(hours=2), end_date.replace(tzinfo=None))
+            min(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=2), end_date.replace(tzinfo=None))
         )

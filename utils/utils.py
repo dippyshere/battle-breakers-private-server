@@ -102,7 +102,7 @@ async def format_time(time: Optional[datetime.datetime | float | int | str] = No
     :return: The formatted time string in the format of YYYY-MM-DDTHH:MM:SS.mmmZ (ISO8601)
     """
     if time is None:
-        return datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+        return datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
     else:
         if isinstance(time, datetime.datetime):
             return time.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
@@ -119,7 +119,8 @@ async def get_nearest_12_hour_interval() -> datetime.datetime:
     Gets the nearest 12 hour interval from the current time
     :return:
     """
-    next_12hr = datetime.datetime.utcnow() + datetime.timedelta(hours=12 - (datetime.datetime.utcnow().hour % 12))
+    next_12hr = datetime.datetime.now(datetime.UTC) + datetime.timedelta(
+        hours=12 - (datetime.datetime.now(datetime.UTC).hour % 12))
     return datetime.datetime(next_12hr.year, next_12hr.month, next_12hr.day, next_12hr.hour,
                              tzinfo=datetime.timezone.utc)
 
@@ -129,7 +130,8 @@ async def get_current_12_hour_interval() -> datetime.datetime:
     Gets the current 12 hour interval
     :return:
     """
-    current_12hr = datetime.datetime.utcnow() - datetime.timedelta(hours=datetime.datetime.utcnow().hour % 12)
+    current_12hr = datetime.datetime.now(datetime.UTC) - datetime.timedelta(
+        hours=datetime.datetime.now(datetime.UTC).hour % 12)
     return datetime.datetime(current_12hr.year, current_12hr.month, current_12hr.day, current_12hr.hour,
                              tzinfo=datetime.timezone.utc)
 
@@ -187,8 +189,8 @@ async def generate_eg1(sub: Optional[str] = None, dn: Optional[str] = None, clid
         "clsvc": "wex",
         "t": "s",
         "ic": True,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=8),
-        "iat": datetime.datetime.utcnow(),
+        "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=8),
+        "iat": datetime.datetime.now(datetime.UTC),
         "jti": await token_generator()
     }, private_key, "RS256", headers)
 
@@ -211,8 +213,8 @@ async def generate_client_eg1(clid: Optional[str] = None) -> str:
         "clid": clid,
         "ic": True,
         "am": "client_credentials",
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=4),
-        "iat": datetime.datetime.utcnow(),
+        "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=4),
+        "iat": datetime.datetime.now(datetime.UTC),
         "jti": await token_generator()
     }, private_key, "RS256", headers)
 
@@ -240,7 +242,7 @@ async def generate_refresh_eg1(sub: Optional[str] = None, dn: Optional[str] = No
         "t": "r",
         "clid": clid,
         "dn": dn,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=672),
+        "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=672),
         "am": "exchange_code",
         "jti": await token_generator()
     }, private_key, "RS256", headers)
@@ -265,7 +267,7 @@ async def generate_authorisation_eg1(sub: Optional[str] = None, dn: Optional[str
         "t": "r",
         "clid": clid,
         "dn": dn,
-        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=8),
+        "exp": datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=8),
         "am": "exchange_code",
         "jti": await token_generator()
     }, private_key, "RS256", headers)
@@ -602,12 +604,12 @@ async def oauth_response(client_id: str = "3cf78cd3b00b439a8755a878b160c7ad", dn
     return {
         "access_token": f"eg1~{await generate_eg1(sub, dn, client_id, dvid)}",
         "expires_in": 28800,
-        "expires_at": (datetime.datetime.utcnow() + datetime.timedelta(hours=8)).strftime("%Y-%m-%dT%H:%M"
-                                                                                          ":%S.000Z"),
+        "expires_at": (datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=8)).strftime("%Y-%m-%dT%H:%M"
+                                                                                                   ":%S.000Z"),
         "token_type": "bearer",
         "refresh_token": f"eg1~{await generate_refresh_eg1(sub, dn, client_id, dvid)}",
         "refresh_expires": 2419200,
-        "refresh_expires_at": await format_time(datetime.datetime.utcnow() + datetime.timedelta(hours=672)),
+        "refresh_expires_at": await format_time(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=672)),
         "account_id": sub,
         "client_id": client_id,
         "internal_client": True,
@@ -628,7 +630,7 @@ async def oauth_client_response(client_id: str) -> dict:
     return {
         "access_token": f"eg1~{await generate_client_eg1(client_id)}",
         "expires_in": 14400,
-        "expires_at": await format_time(datetime.datetime.utcnow() + datetime.timedelta(hours=4)),
+        "expires_at": await format_time(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=4)),
         "token_type": "bearer",
         "client_id": client_id,
         "internal_client": True,

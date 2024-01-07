@@ -56,7 +56,8 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
         if friend_instance["attributes"]["accountId"] in result:
             result.pop(friend_instance["attributes"]["accountId"])
         if datetime.datetime.strptime(friend_instance["attributes"]["snapshot_expires"],
-                                      "%Y-%m-%dT%H:%M:%S.%fZ") <= datetime.datetime.utcnow():
+                                      "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=datetime.UTC) <= datetime.datetime.now(
+                datetime.UTC):
             account_data: dict = await request.app.ctx.database["accounts"].find_one(
                 {"_id": friend_instance["attributes"]["accountId"]}, {"displayName": 1, "_id": 0})
             if account_data is None:
@@ -70,8 +71,9 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
                                                                 request.ctx.profile_id)
                 await request.ctx.profile.change_item_attribute(itemId, "snapshot_expires",
                                                                 await format_time(
-                                                                    datetime.datetime.utcnow() + datetime.timedelta(
-                                                                        hours=3)), request.ctx.profile_id)
+                                                                    datetime.datetime.now(
+                                                                        datetime.UTC) + datetime.timedelta(hours=3)),
+                                                                request.ctx.profile_id)
                 continue
             if friend_instance["attributes"]["accountId"] not in request.app.ctx.profiles:
                 request.app.ctx.profiles[friend_instance["attributes"]["accountId"]] = await PlayerProfile.init_profile(
@@ -118,8 +120,9 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
             await request.ctx.profile.change_item_attribute(itemId, "status", "Friend", request.ctx.profile_id)
             await request.ctx.profile.change_item_attribute(itemId, "snapshot_expires",
                                                             await format_time(
-                                                                datetime.datetime.utcnow() + datetime.timedelta(
-                                                                    hours=3)), request.ctx.profile_id)
+                                                                datetime.datetime.now(
+                                                                    datetime.UTC) + datetime.timedelta(hours=3)),
+                                                            request.ctx.profile_id)
     for friend in result:
         await request.ctx.profile.add_friend_instance(request, friend, result[friend])
     return sanic.response.json(

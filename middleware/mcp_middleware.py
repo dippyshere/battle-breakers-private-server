@@ -36,7 +36,7 @@ async def add_mcp_headers(request: sanic.request.Request, response: sanic.respon
             response.headers["X-Epic-Device-ID"] = request.ctx.dvid
     except:
         pass
-    response.headers["Date"] = datetime.datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S GMT")
+    response.headers["Date"] = datetime.datetime.now(datetime.UTC).strftime("%a, %d %b %Y %H:%M:%S GMT")
     response.headers["X-EpicGames-McpVersion"] = "prod Release-1.88-1.88 build 107 cl 19310354"
     response.headers["X-EpicGames-ContentVersion"] = content_version
     response.headers["X-EpicGames-MinBuild"] = "-1"

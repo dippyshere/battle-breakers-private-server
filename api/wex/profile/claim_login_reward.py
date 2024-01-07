@@ -31,14 +31,15 @@ async def claim_login_reward(request: sanic.request.Request, accountId: str) -> 
     """
     current_day = (await request.ctx.profile.get_stat("login_reward"))["next_level"]
     if datetime.datetime.strptime((await request.ctx.profile.get_stat("login_reward")).get("last_claim_time"),
-                                  "%Y-%m-%dT%H:%M:%S.%fZ") > datetime.datetime.utcnow().replace(hour=0, minute=0,
-                                                                                                second=0,
-                                                                                                microsecond=0):
+                                  "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=datetime.UTC) > datetime.datetime.now(
+            datetime.UTC).replace(hour=0, minute=0, second=0, microsecond=0):
         raise errors.com.epicgames.world_explorers.login_reward_not_available(current_day,
                                                                               await format_time(
-                                                                                  datetime.datetime.utcnow().replace(
-                                                                                      hour=0, minute=0, second=0,
-                                                                                      microsecond=0)))
+                                                                                  datetime.datetime.now(
+                                                                                      datetime.UTC).replace(hour=0,
+                                                                                                            minute=0,
+                                                                                                            second=0,
+                                                                                                            microsecond=0)))
     if current_day >= 1800:
         await request.ctx.profile.modify_stat("login_reward", {
             # Effectively disable future login rewards as beyond this, the game crashes

@@ -22,7 +22,7 @@ class ScheduledEvents:
         Initialise the scheduled events class.
         This will setup the variables for the calendar
         """
-        self.updated: datetime = datetime.datetime.utcnow()
+        self.updated: datetime = datetime.datetime.now(datetime.UTC)
         self.news: Optional[channels.News] = None
         self.limited_time_mode: Optional[channels.LimitedTimeMode] = None
         self.marketing: Optional[channels.Marketing] = None
@@ -121,7 +121,7 @@ class ScheduledEvents:
         Update the events in the ScheduledEvents class
         :return: None
         """
-        self.updated = datetime.datetime.utcnow()
+        self.updated = datetime.datetime.now(datetime.UTC)
         await self.news.update_events()
         await self.limited_time_mode.update_events()
         await self.marketing.update_events()
@@ -137,23 +137,23 @@ class ScheduledEvents:
         """
         if self.news.cache_expired():
             await self.news.update_events()
-            self.updated = datetime.datetime.utcnow()
+            self.updated = datetime.datetime.now(datetime.UTC)
         if self.limited_time_mode.cache_expired():
             await self.limited_time_mode.update_events()
-            self.updated = datetime.datetime.utcnow()
+            self.updated = datetime.datetime.now(datetime.UTC)
         if self.marketing.cache_expired():
             await self.marketing.update_events()
-            self.updated = datetime.datetime.utcnow()
+            self.updated = datetime.datetime.now(datetime.UTC)
         if self.rotational_content.cache_expired():
             await self.rotational_content.update_events()
-            self.updated = datetime.datetime.utcnow()
+            self.updated = datetime.datetime.now(datetime.UTC)
         if self.featured_stores_mcp.cache_expired():
             await self.featured_stores_mcp.update_events()
-            self.updated = datetime.datetime.utcnow()
+            self.updated = datetime.datetime.now(datetime.UTC)
         if self.weekly_challenge.cache_expired():
             await self.weekly_challenge.update_events()
-            self.updated = datetime.datetime.utcnow()
+            self.updated = datetime.datetime.now(datetime.UTC)
         if self.battlepass.cache_expired():
             await self.battlepass.update_events()
-            self.updated = datetime.datetime.utcnow()
+            self.updated = datetime.datetime.now(datetime.UTC)
         return self.__dict__()

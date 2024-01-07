@@ -136,7 +136,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
     )
     await request.ctx.profile.modify_stat("suggestion_timeout",
                                           await format_time(
-                                              datetime.datetime.utcnow() + datetime.timedelta(hours=1)),
+                                              datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1)),
                                           ProfileType.FRIENDS)
     if accountId not in request.app.ctx.friends:
         request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
@@ -176,7 +176,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
                 "accountId": account_data["_id"],
                 "canBeSparred": False,
                 "snapshot_expires": await format_time(
-                    datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
+                    datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=3)),
                 "best_gift": 0,  # These stats are unique to the friend instance on the profile, not the friend
                 "lifetime_gifted": 0,
                 "snapshot": {

@@ -70,7 +70,7 @@ async def suggest_friends(request: sanic.request.Request, accountId: str) -> san
                 "accountId": account_data["_id"],
                 "canBeSparred": False,
                 "snapshot_expires": await format_time(
-                    datetime.datetime.utcnow() + datetime.timedelta(hours=3)),
+                    datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=3)),
                 "best_gift": 0,  # These stats are unique to the friend instance on the profile, not the friend
                 "lifetime_gifted": 0,
                 "snapshot": {
