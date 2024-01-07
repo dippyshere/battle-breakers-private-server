@@ -25,6 +25,7 @@ import jwt
 import motor.core
 import motor.motor_asyncio
 import orjson
+import rapidfuzz.process
 import sanic
 import aiofiles
 
@@ -480,15 +481,24 @@ async def search_for_display_name(database: motor.core.AgnosticDatabase, display
     :param display_name: The display name to search for
     :return: A list of account ids
     """
-    ranked_accounts = []
+    # ranked_accounts = []
+    # async for entry in database["accounts"].find({}, {"_id": 1, "displayName": 1}):
+    #     if not entry["displayName"]:
+    #         continue
+    #     similarity_ratio = difflib.SequenceMatcher(None, entry["displayName"], display_name).ratio()
+    #     if similarity_ratio >= 0.4:
+    #         ranked_accounts.append({"_id": entry["_id"], "similarity": similarity_ratio})
+    # ranked_accounts.sort(key=lambda x: x["similarity"], reverse=True)
+    # return [entry["_id"] for entry in ranked_accounts]
+    display_names = []
+    account_ids = []
     async for entry in database["accounts"].find({}, {"_id": 1, "displayName": 1}):
         if not entry["displayName"]:
             continue
-        similarity_ratio = difflib.SequenceMatcher(None, entry["displayName"], display_name).ratio()
-        if similarity_ratio >= 0.4:
-            ranked_accounts.append({"_id": entry["_id"], "similarity": similarity_ratio})
-    ranked_accounts.sort(key=lambda x: x["similarity"], reverse=True)
-    return [entry["_id"] for entry in ranked_accounts]
+        display_names.append(entry["displayName"])
+        account_ids.append(entry["_id"])
+    ranked_accounts = rapidfuzz.process.extract(display_name, display_names, limit=10)
+    return [account_ids[display_names.index(entry[0])] for entry in ranked_accounts]
 
 
 async def check_if_display_name_exists(database: motor.core.AgnosticDatabase, display_name: str) -> bool:
@@ -836,20 +846,24 @@ async def find_best_match(input_str: str, item_list: list, split_for_path: bool 
     :param split_for_path: Whether to split the string for the path
     :return: The best match
     """
-    best_match = ""
-    best_match_score = 0
-    for item in item_list:
-        if split_for_path:
-            score = difflib.SequenceMatcher(None, input_str, item.split("\\")[-1].split(".")[0]).ratio()
-        else:
-            score = difflib.SequenceMatcher(None, input_str, item).ratio()
-        if score > best_match_score:
-            best_match_score = score
-            best_match = item
-        # if score >= 0.95:
-        #     break
+    # best_match = ""
+    # best_match_score = 0
+    # for item in item_list:
+    #     if split_for_path:
+    #         score = difflib.SequenceMatcher(None, input_str, item.split("\\")[-1].split(".")[0]).ratio()
+    #     else:
+    #         score = difflib.SequenceMatcher(None, input_str, item).ratio()
+    #     if score > best_match_score:
+    #         best_match_score = score
+    #         best_match = item
+    #     # if score >= 0.95:
+    #     #     break
     # print(f"Found best match for {input_str} as {best_match} with score {best_match_score}")
-    return best_match
+    # return best_match
+    if split_for_path:
+        return rapidfuzz.process.extractOne(input_str, item_list, processor=lambda x: x.split("\\")[-1].split(".")[0])[0]
+    else:
+        return rapidfuzz.process.extractOne(input_str, item_list)[0]
 
 
 @alru_cache(maxsize=256)
