@@ -22,7 +22,8 @@ from .version import wex_version
 from .profile import wex_profile
 from .enabled_features import wex_enabled_features
 from .friends import wex_friend
+from .push import wex_push
 
 wex = sanic.Blueprint.group(wex_log, wex_entitlement, wex_catalog, wex_timeline, wex_version_check, wex_version_probe,
                             wex_cloud, wex_item_ratings, wex_receipts, wex_manifest, wex_motd, wex_version, wex_profile,
-                            wex_enabled_features, wex_friend, url_prefix="/wex")
+                            wex_enabled_features, wex_friend, wex_push, url_prefix="/wex")
