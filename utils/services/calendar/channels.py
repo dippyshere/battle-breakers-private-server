@@ -1200,16 +1200,16 @@ class WeeklyChallenge(Channel):
         }
         if end_date is None:
             end_date = datetime.datetime.strptime(self.states[0].state["bossZone"]["availabilityEnd"],
-                                                  "%Y-%m-%dT%H:%M:%S.%fZ")
+                                                  "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=datetime.UTC)
         else:
             end_date = min(end_date, datetime.datetime.strptime(self.states[0].state["bossZone"]["availabilityEnd"],
-                                                                "%Y-%m-%dT%H:%M:%S.%fZ"))
+                                                                "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=datetime.UTC))
         self.states[0].state["namedWeights"] = "Blackguard=1"
         if end_date is None:
             self.cache_expire = await format_time(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=2))
         else:
             self.cache_expire = await format_time(
-                min(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=2), end_date.replace(tzinfo=None))
+                min(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=2), end_date)
             )
 
 
@@ -1234,7 +1234,7 @@ class BattlePass(Channel):
             events = recurring_ical_events.of(icalendar.Calendar.from_ical(await f.read())).at(
                 datetime.datetime.now(datetime.UTC)
             )
-        end_date = events[-1].get("DTEND").dt
+        end_date = events[-1].get("DTEND").dt.replace(tzinfo=datetime.UTC)
         event_data = await load_datatable(events[-1].get("DESCRIPTION")[1:])
         self.states[0].valid_from = await format_time()
         self.states[0].state = {
@@ -1242,5 +1242,5 @@ class BattlePass(Channel):
             "seasonEndDate": await format_time(end_date),
         }
         self.cache_expire = await format_time(
-            min(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=2), end_date.replace(tzinfo=None))
+            min(datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=2), end_date)
         )
