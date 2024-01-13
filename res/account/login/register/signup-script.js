@@ -89,8 +89,8 @@ signupForm.addEventListener('submit', (event) => {
             signupPassword.disabled = false;
             signupConfirmPassword.disabled = false;
             addListeners();
-        } else if (signupPassword.value.length > 32) {
-            alert('Password must be less than 32 characters long!');
+        } else if (signupPassword.value.length > 64) {
+            alert('Password must be less than 64 characters long!');
             signupSpinner.classList.remove('show');
             signupButton.disabled = false;
             signupUsername.disabled = false;
@@ -173,7 +173,7 @@ signupForm.addEventListener('submit', (event) => {
                     });
                 } else {
                     response.json().then(data => {
-                        alert('An error occurred when logging in!\n\nError Info:\n' + data.errorCode + '\n' + data.errorMessage);
+                        alert('An error occurred when logging in!\n\n' + data.errorMessage);
                         signupSpinner.classList.remove('show');
                         signupButton.disabled = false;
                         signupUsername.disabled = false;
@@ -227,8 +227,8 @@ loginForm.addEventListener('submit', (event) => {
             loginUsername.disabled = false;
             loginPassword.disabled = false;
             addListeners();
-        } else if (loginPassword.value.length > 32) {
-            alert('Password must be less than 32 characters long!');
+        } else if (loginPassword.value.length > 64) {
+            alert('Password must be less than 64 characters long!');
             loginSpinner.classList.remove('show');
             loginButton.disabled = false;
             loginUsername.disabled = false;
@@ -305,7 +305,7 @@ loginForm.addEventListener('submit', (event) => {
                     });
                 } else {
                     response.json().then(data => {
-                        alert('An error occurred when logging in!\n\nError Info:\n' + data.errorCode + '\n' + data.errorMessage);
+                        alert('An error occurred when logging in!\n\n' + data.errorMessage);
                         loginSpinner.classList.remove('show');
                         loginButton.disabled = false;
                         loginUsername.disabled = false;

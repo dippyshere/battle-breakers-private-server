@@ -33,16 +33,16 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
         username = request.json.get("username")[:32]
         password = request.json.get("password")
         if len(username) > 24:
-            username = username.lower()
-            if not re.match(r"^[a-f0-9]{32}$", username):
+            if not re.match(r"[0-9a-f]{12}4[0-9a-f]{3}[89ab][0-9a-f]{15}", username, re.IGNORECASE):
                 raise sanic.exceptions.InvalidUsage("Invalid username",
                                                     context={"errorMessage": "This account ID is invalid"})
             else:
-                account_data: dict = await request.app.ctx.database["accounts"].find_one({"_id": username}, {
-                    "_id": 0,
-                    "displayName": 1,
-                    "extra.pwhash": 1
-                })
+                account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                    {"_id": {"$regex": re.escape(username.strip()), "$options": "i"}}, {
+                        "_id": 1,
+                        "displayName": 1,
+                        "extra.pwhash": 1
+                    })
                 if account_data is None:
                     raise sanic.exceptions.InvalidUsage("Invalid username", context={
                         "errorMessage": "Your account ID doesn't exist...\nAlready have an account to import? Contact "
@@ -54,10 +54,10 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
                     else:
                         return sanic.response.json(
                             {"username": account_data["displayName"],
-                             "authorisationCode": await generate_authorisation_eg1(username,
+                             "authorisationCode": await generate_authorisation_eg1(account_data["_id"],
                                                                                    account_data[
                                                                                        "displayName"]),
-                             "id": username, "heading": "Complete Login"
+                             "id": account_data["_id"], "heading": "Complete Login"
                              }
                         )
         elif len(username) < 3:
@@ -67,12 +67,20 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
             raise sanic.exceptions.InvalidUsage("Invalid username", context={
                 "errorMessage": "Username/Account ID too long"})
         else:
-            # TODO: support email and displayname login
-            account_data: dict = await request.app.ctx.database["accounts"].find_one(
-                {"_id": username.split("@")[0].strip()}, {
-                    "displayName": 1,
-                    "extra.pwhash": 1
-                })
+            if re.match(r"[^@]+@[^@]*\.[^@]*", username):
+                account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                    {"email": {"$regex": re.escape(username.strip()), "$options": "i"}}, {
+                        "_id": 1,
+                        "displayName": 1,
+                        "extra.pwhash": 1
+                    })
+            else:
+                account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                    {"displayName": {"$regex": re.escape(username.strip()), "$options": "i"}}, {
+                        "_id": 1,
+                        "displayName": 1,
+                        "extra.pwhash": 1
+                    })
             if account_data is None:
                 raise sanic.exceptions.InvalidUsage("Invalid username", context={
                     "errorMessage": "Your username doesn't exist...\nAlready have an account to import? Contact us on "
@@ -101,16 +109,25 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
         elif len(str(password)) < 4:
             raise sanic.exceptions.InvalidUsage("Invalid password", context={
                 "errorMessage": "Your password is too short"})
-        elif len(str(password)) > 32:
+        elif len(str(password)) > 64:
             raise sanic.exceptions.InvalidUsage("Invalid password", context={
                 "errorMessage": "Your password is too long"})
         else:
             # TODO: implement better signup system
-            account_data: dict = await request.app.ctx.database["accounts"].find_one(
-                {"_id": username.split("@")[0].strip()}, {
-                    "displayName": 1,
-                    "extra.pwhash": 1
-                })
+            if re.match(r"[^@]+@[^@]*\.[^@]*", username):
+                account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                    {"email": {"$regex": re.escape(username.strip()), "$options": "i"}}, {
+                        "_id": 1,
+                        "displayName": 1,
+                        "extra.pwhash": 1
+                    })
+            else:
+                account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                    {"displayName": {"$regex": re.escape(username.strip()), "$options": "i"}}, {
+                        "_id": 1,
+                        "displayName": 1,
+                        "extra.pwhash": 1
+                    })
             if account_data is None:
                 account_id = await create_account(request.app.ctx.database, username, await bcrypt_hash(password),
                                                   calendar=request.app.ctx.calendar)
