@@ -39,11 +39,11 @@ async def item_ratings(request: sanic.request.Request, accountId: str, templateI
     rating_key = (character_datatable[0]["Rows"].get(
         (await load_character_data(template_id))[0]["Properties"]["CharacterStatsHandle"]["RowName"],
         {}).get("RatingsKey", f"CD.{template_id.split(':')[1].replace('_', '.')}")).replace(".", "_")
-    data = await request.app.ctx.database["item_ratings"].find_one({"_id": accountId}, {rating_key: 1, "_id": 0})
+    data = await request.app.ctx.db["item_ratings"].find_one({"_id": accountId}, {rating_key: 1, "_id": 0})
     if data and rating_key in data:
         my_rating = data[rating_key]
     base_ratings = await read_file("res/wex/api/game/v2/item_ratings/base_ratings.json")
-    user_ratings = request.app.ctx.database["item_ratings"].find({rating_key: {'$ne': None}},
+    user_ratings = request.app.ctx.db["item_ratings"].find({rating_key: {'$ne': None}},
                                                                  {rating_key: 1, "_id": 0})
     ratings = [{
         "gameplayRating": 0,
@@ -116,10 +116,10 @@ async def set_item_rating(request: sanic.request.Request, accountId: str,
         rating_data["appearanceRating"] = 5
     elif rating_data["appearanceRating"] < 0:
         rating_data["appearanceRating"] = 0
-    await request.app.ctx.database["item_ratings"].update_one({"_id": accountId}, {"$set": {rating_key: rating_data}},
+    await request.app.ctx.db["item_ratings"].update_one({"_id": accountId}, {"$set": {rating_key: rating_data}},
                                                               upsert=True)
     base_ratings = await read_file("res/wex/api/game/v2/item_ratings/base_ratings.json")
-    user_ratings = request.app.ctx.database["item_ratings"].find({rating_key: {'$ne': None}},
+    user_ratings = request.app.ctx.db["item_ratings"].find({rating_key: {'$ne': None}},
                                                                  {rating_key: 1, "_id": 0})
     ratings = [{
         "gameplayRating": 0,

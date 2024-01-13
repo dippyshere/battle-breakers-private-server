@@ -31,7 +31,7 @@ async def suggestion_response(request: sanic.request.Request, accountId: str) ->
     """
     for friend_id in request.json.get("invitedFriendInstanceIds"):
         friend_instance = await request.ctx.profile.get_item_by_guid(friend_id, request.ctx.profile_id)
-        if friend_instance["attributes"].get("status") == "SuggestedLegacy" and await request.app.ctx.database["accounts"].find_one({"_id": friend_instance["attributes"].get("accountId")}, {"_id": 1}) is None:
+        if friend_instance["attributes"].get("status") == "SuggestedLegacy" and await request.app.ctx.db["accounts"].find_one({"_id": friend_instance["attributes"].get("accountId")}, {"_id": 1}) is None:
             raise errors.com.epicgames.world_explorers.not_found(
                 errorMessage="Unfortunately, this friend has not imported their saved account to the private server. "
                              "Mew should ask them to do so :)")

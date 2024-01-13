@@ -556,7 +556,7 @@ class PlayerProfile:
         """
         sanic_app = sanic.Sanic.get_app()
         for profile_type in ProfileType:
-            mcp_profile: MCPProfile = await MCPProfile.init_profile(account_id, profile_type, sanic_app.ctx.database)
+            mcp_profile: MCPProfile = await MCPProfile.init_profile(account_id, profile_type, sanic_app.ctx.db)
             setattr(self, f"_{profile_type.value}", mcp_profile)
             setattr(self, f"{profile_type.value}_changes", [])
             setattr(self, f"{profile_type.value}_notifications", [])
@@ -779,7 +779,7 @@ class PlayerProfile:
         rep_heroes: list = []
         account_perks: list = []
         # TODO: Move to database
-        account_data: dict = await request.app.ctx.database["accounts"].find_one({"_id": friendId}, {
+        account_data: dict = await request.app.ctx.db["accounts"].find_one({"_id": friendId}, {
             "displayName": 1,
         })
         for account_perk in ["MaxHitPoints", "RegenStat", "PetStrength", "BasicAttack", "Attack", "SpecialAttack",
@@ -1001,4 +1001,4 @@ class PlayerProfile:
         if save_profile:
             for profile_type in ProfileType:
                 profile = await self.get_profile(profile_type)
-                await profile.save_profile(sanic.Sanic.get_app().ctx.database)
+                await profile.save_profile(sanic.Sanic.get_app().ctx.db)

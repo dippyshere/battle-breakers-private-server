@@ -36,7 +36,7 @@ async def suggest_friends(request: sanic.request.Request, accountId: str) -> san
         request.app.ctx.friends[accountId] = await PlayerFriends.init_friends(accountId)
     suggested_accounts = await request.app.ctx.friends[accountId].suggest_friends(request)
     for account in suggested_accounts:
-        account_data: dict = await request.app.ctx.database["accounts"].find_one({"_id": account}, {
+        account_data: dict = await request.app.ctx.db["accounts"].find_one({"_id": account}, {
             "displayName": 1,
         })
         if account not in request.app.ctx.profiles:

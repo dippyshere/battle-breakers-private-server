@@ -40,15 +40,15 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
     incoming_list = (await request.app.ctx.friends[accountId].get_summary())["incoming"]
     outgoing_list = (await request.app.ctx.friends[accountId].get_summary())["outgoing"]
     result = {}
-    async for account in request.app.ctx.database["accounts"].find({"_id": {"$in": friends_list}}, {"_id": 1}):
+    async for account in request.app.ctx.db["accounts"].find({"_id": {"$in": friends_list}}, {"_id": 1}):
         result[account["_id"]] = FriendStatus.FRIEND
-    async for account in request.app.ctx.database["accounts"].find({"_id": {"$in": incoming_list}}, {"_id": 1}):
+    async for account in request.app.ctx.db["accounts"].find({"_id": {"$in": incoming_list}}, {"_id": 1}):
         result[account["_id"]] = FriendStatus.INVITED
-    async for account in request.app.ctx.database["accounts"].find({"_id": {"$in": outgoing_list}}, {"_id": 1}):
+    async for account in request.app.ctx.db["accounts"].find({"_id": {"$in": outgoing_list}}, {"_id": 1}):
         result[account["_id"]] = FriendStatus.REQUESTED
     for pending_change in pending_changes:
         if pending_change.get("changeType") == "itemAdded" and pending_change.get("item", {}).get(
-                "templateId") == "Friend:Instance" and await request.app.ctx.database["accounts"].find_one(
+                "templateId") == "Friend:Instance" and await request.app.ctx.db["accounts"].find_one(
                 {"_id": pending_change.get("item", {}).get("attributes", {}).get("accountId")}, {"_id": 1}) is not None:
             result.pop(pending_change.get("item", {}).get("attributes", {}).get("accountId"))
     for itemId in friend_instances:
@@ -58,7 +58,7 @@ async def update_friends(request: sanic.request.Request, accountId: str) -> sani
         if datetime.datetime.strptime(friend_instance["attributes"]["snapshot_expires"],
                                       "%Y-%m-%dT%H:%M:%S.%fZ").replace(tzinfo=datetime.UTC) <= datetime.datetime.now(
                 datetime.UTC):
-            account_data: dict = await request.app.ctx.database["accounts"].find_one(
+            account_data: dict = await request.app.ctx.db["accounts"].find_one(
                 {"_id": friend_instance["attributes"]["accountId"]}, {"displayName": 1, "_id": 0})
             if account_data is None:
                 # This friend isn't on the private server / was deleted

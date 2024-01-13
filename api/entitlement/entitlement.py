@@ -29,5 +29,5 @@ async def entitlements_route(request: sanic.request.Request, accountId: str) -> 
     :return: The response object (204)
     """
     return sanic.response.json(
-        (await request.app.ctx.database["entitlements"].find_one({"_id": accountId}, {"_id": 0}))["entitlements"]
+        (await request.app.ctx.db["entitlements"].find_one({"_id": accountId}, {"_id": 0}))["entitlements"]
     )

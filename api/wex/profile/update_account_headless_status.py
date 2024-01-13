@@ -28,7 +28,7 @@ async def update_headless(request: sanic.request.Request, accountId: str) -> san
     """
     # TODO: Determine what the request provides us with
     await request.ctx.profile.modify_stat("is_headless", False, request.ctx.profile_id)
-    await request.app.ctx.database["accounts"].update_one(
+    await request.app.ctx.db["accounts"].update_one(
         {"_id": accountId},
         {"$set": {"headless": False}}
     )

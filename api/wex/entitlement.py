@@ -24,7 +24,7 @@ async def entitlement_check(request: sanic.request.Request) -> sanic.response.HT
     :param request: The request object
     :return: The response object (204)
     """
-    if await request.app.ctx.database["entitlements"].count_documents({"_id": request.ctx.owner, "entitlements": {
+    if await request.app.ctx.db["entitlements"].count_documents({"_id": request.ctx.owner, "entitlements": {
         "$elemMatch": {"catalogItemId": "e458e71024404176addca212860f9ef2"}}}) == 0:
         raise errors.com.epicgames.common.missing_action("PLAY")
     return sanic.response.empty()
@@ -39,10 +39,10 @@ async def request_access(request: sanic.request.Request, accountId: str) -> sani
     :param accountId: The account id
     :return: The response object (204)
     """
-    if await request.app.ctx.database["entitlements"].count_documents({"_id": request.ctx.owner, "entitlements": {
+    if await request.app.ctx.db["entitlements"].count_documents({"_id": request.ctx.owner, "entitlements": {
             "$elemMatch": {"catalogItemId": "e458e71024404176addca212860f9ef2"}}}):
         raise errors.com.epicgames.bad_request(errorMessage="Already have access to this game.")
-    await request.app.ctx.database["entitlements"].update_one({"_id": accountId}, {
+    await request.app.ctx.db["entitlements"].update_one({"_id": accountId}, {
         "$push": {
             "entitlements": {
                 "id": await uuid_generator(),
@@ -84,7 +84,7 @@ async def redeem_access(request: sanic.request.Request, accountId: str) -> sanic
     :param accountId: The account id
     :return: The response object (204)
     """
-    entitlements = await request.app.ctx.database["entitlements"].find_one({"_id": accountId})
+    entitlements = await request.app.ctx.db["entitlements"].find_one({"_id": accountId})
     for entitlement in entitlements["entitlements"]:
         if entitlement.get("catalogItemId") == "e458e71024404176addca212860f9ef2":
             raise errors.com.epicgames.bad_request(errorMessage="Already have access to this game.")
@@ -108,7 +108,7 @@ async def redeem_access(request: sanic.request.Request, accountId: str) -> sanic
         "groupEntitlement": False,
         "country": None
     })
-    await request.app.ctx.database["entitlements"].update_one({"_id": accountId}, {"$set": entitlements})
+    await request.app.ctx.db["entitlements"].update_one({"_id": accountId}, {"$set": entitlements})
     return sanic.response.empty()
     # TODO Check for bans
     # raise errors.com.epicgames.world_explorers.banned_access_found_when_granting()
@@ -124,7 +124,7 @@ async def real_game_access(request: sanic.request.Request, accountId: str) -> sa
     :return: The response object
     """
     # TODO: Check for bans
-    if await request.app.ctx.database["entitlements"].count_documents({"_id": request.ctx.owner, "entitlements": {
+    if await request.app.ctx.db["entitlements"].count_documents({"_id": request.ctx.owner, "entitlements": {
             "$elemMatch": {"catalogItemId": "e458e71024404176addca212860f9ef2"}}}) == 0:
         return sanic.response.json({
             "play": False,

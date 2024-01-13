@@ -9,7 +9,6 @@ This file contains utility functions for the server
 
 import base64
 import datetime
-import difflib
 import functools
 import os
 import random

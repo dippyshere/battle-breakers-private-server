@@ -46,7 +46,7 @@ async def last_online(request: sanic.request.Request, accountId: str) -> sanic.r
         else:
             pending_presence.append(friend)
     if len(pending_presence) > 0:
-        async for wex_data in request.app.ctx.database["profile_profile0"].find({"_id": {"$in": pending_presence}}, {
+        async for wex_data in request.app.ctx.db["profile_profile0"].find({"_id": {"$in": pending_presence}}, {
             "_id": 1,
             "updated": 1
         }):

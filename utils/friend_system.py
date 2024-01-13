@@ -56,7 +56,7 @@ class PlayerFriends:
         :return: The friends class
         """
         self: PlayerFriends = cls(account_id)
-        await self.load_friends(sanic.Sanic.get_app().ctx.database)
+        await self.load_friends(sanic.Sanic.get_app().ctx.db)
         return self
 
     async def load_friends(self, database: motor.core.AgnosticDatabase) -> None:
@@ -281,7 +281,7 @@ class PlayerFriends:
         """
         save_friends: bool = False
         if save_friends:
-            collection = sanic.Sanic.get_app().ctx.database["friends"]
+            collection = sanic.Sanic.get_app().ctx.db["friends"]
             await collection.replace_one({"_id": self.account_id}, self.friends, upsert=True)
 
     async def suggest_friends(self, request: sanic.request.Request) -> list[str]:
@@ -291,7 +291,7 @@ class PlayerFriends:
         :return: The response of the request
         """
         # TODO: calculate mutual friends and rank suggestions by mutuals
-        matching_account_ids = [doc["_id"] async for doc in request.app.ctx.database["friends"].find({
+        matching_account_ids = [doc["_id"] async for doc in request.app.ctx.db["friends"].find({
             "_id": {"$ne": self.account_id},
             "friends.friends": {"$ne": {"accountId": self.account_id}},
             "friends.incoming": {"$not": {"$elemMatch": {"accountId": self.account_id}}},

@@ -37,7 +37,7 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
                 raise sanic.exceptions.InvalidUsage("Invalid username",
                                                     context={"errorMessage": "This account ID is invalid"})
             else:
-                account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                account_data: dict = await request.app.ctx.db["accounts"].find_one(
                     {"_id": {"$regex": re.escape(username.strip()), "$options": "i"}}, {
                         "_id": 1,
                         "displayName": 1,
@@ -68,14 +68,14 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
                 "errorMessage": "Username/Account ID too long"})
         else:
             if re.match(r"[^@]+@[^@]*\.[^@]*", username):
-                account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                account_data: dict = await request.app.ctx.db["accounts"].find_one(
                     {"email": {"$regex": re.escape(username.strip()), "$options": "i"}}, {
                         "_id": 1,
                         "displayName": 1,
                         "extra.pwhash": 1
                     })
             else:
-                account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                account_data: dict = await request.app.ctx.db["accounts"].find_one(
                     {"displayName": {"$regex": re.escape(username.strip()), "$options": "i"}}, {
                         "_id": 1,
                         "displayName": 1,
@@ -115,21 +115,21 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
         else:
             # TODO: implement better signup system
             if re.match(r"^[^@]+@[^@]*\.[^@]*$", username):
-                account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                account_data: dict = await request.app.ctx.db["accounts"].find_one(
                     {"email": {"$regex": f"^{re.escape(username.strip())}$", "$options": "i"}}, {
                         "_id": 1,
                         "displayName": 1,
                         "extra.pwhash": 1
                     })
             else:
-                account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                account_data: dict = await request.app.ctx.db["accounts"].find_one(
                     {"displayName": {"$regex": f"^{re.escape(username.strip())}$", "$options": "i"}}, {
                         "_id": 1,
                         "displayName": 1,
                         "extra.pwhash": 1
                     })
             if account_data is None:
-                account_id = await create_account(request.app.ctx.database, username, await bcrypt_hash(password),
+                account_id = await create_account(request.app.ctx.db, username, await bcrypt_hash(password),
                                                   calendar=request.app.ctx.calendar)
                 return sanic.response.json(
                     {"username": username,

@@ -36,7 +36,7 @@ async def reconcile(request: sanic.request.Request, accountId: str) -> sanic.res
     friends_list = request.json["friendIdList"]
     friends_list.extend(request.json["outgoingIdList"])
     friends_list.extend(request.json["incomingIdList"])
-    async for account in request.app.ctx.database["accounts"].find({"_id": {"$in": friends_list}}, {"_id": 1}):
+    async for account in request.app.ctx.db["accounts"].find({"_id": {"$in": friends_list}}, {"_id": 1}):
         results[account["_id"]] = True
     for account in results:
         if account not in results:

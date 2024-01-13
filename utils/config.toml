@@ -1,6 +1,15 @@
 # Dippy Breakers private server config file
 # You shouldn't need to touch anything in this file
 
+# Sanic config
+CORS_ORIGINS = "*"
+CORS_ALWAYS_SEND = "True"
+KEEP_ALIVE_TIMEOUT = 300
+
+[server]
+host = "127.0.0.1"
+port = 80
+
 [database]
 uri = "mongodb://localhost:27017"
 database = "dippy_battle_breakers"

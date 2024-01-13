@@ -4,12 +4,10 @@ Please do not skid my hard work.
 https://github.com/dippyshere/battle-breakers-private-server
 This code is licensed under the [TBD] license.
 """
-import asyncio
 from typing import Any
 
 from api import api
 from utils import utils, error_handler
-from utils.profile_system import MCPProfile, MCPItem
 import middleware.mcp_middleware
 
 import orjson
@@ -20,54 +18,34 @@ import motor.motor_asyncio
 
 from utils.services.calendar.calendar import ScheduledEvents
 from utils.services.storefront.catalog import StoreCatalogue
-
-try:
-    import tomllib as toml
-except ModuleNotFoundError:
-    import tomli as toml
+from utils.toml_config import TomlConfig
+from utils.custom_serialiser import custom_serialise
 
 colorama.init()
-
-
-def custom_serialise(obj: Any) -> dict[str, Any]:
-    """
-    Custom serialiser for orjson to handle the custom objects
-    :param obj: The object to serialize
-    :return: The serialisable object
-    """
-    if isinstance(obj, MCPProfile):
-        return obj.profile
-    elif isinstance(obj, MCPItem):
-        return obj.item
-    else:
-        try:
-            return obj.__dict__
-        except AttributeError:
-            pass
-    raise TypeError(f"Object of type '{obj.__class__.__name__}' is not JSON serialisable")
-
-
+toml_config = TomlConfig(path="utils/config.toml")
 app: sanic.app.Sanic = sanic.app.Sanic("dippy_breakers", dumps=lambda obj: orjson.dumps(obj, default=custom_serialise),
-                                       loads=orjson.loads)
-app.config.CORS_ORIGINS = "*"
-app.config.CORS_ALWAYS_SEND = True
+                                       loads=orjson.loads, config=toml_config)
+
 app.blueprint(api)
 sanic_ext.Extend(app)
-
-with open("utils/config.toml", "rb") as config_file:
-    config: dict[str, Any] = toml.load(config_file)
-    config_file.close()
-
 app.ctx.public_key = utils.public_key
 app.error_handler = error_handler.CustomErrorHandler()
 app.register_middleware(middleware.mcp_middleware.add_mcp_headers, "response")
-app.ctx.database = motor.motor_asyncio.AsyncIOMotorClient(config["database"]["uri"])[config["database"]["database"]]
-app.ctx.calendar = asyncio.run(ScheduledEvents.init_calendar())
-app.ctx.storefronts = asyncio.run(StoreCatalogue.init_storefront())
 app.ctx.accounts = {}
 app.ctx.friends = {}
 app.ctx.profiles = {}
 app.ctx.invalid_tokens = []
+
+
+@app.before_server_start
+async def attach_db(*_: Any) -> None:
+    """
+    Called when the server is started
+    :param _: The loop
+    """
+    app.ctx.db = motor.motor_asyncio.AsyncIOMotorClient(app.config.DATABASE["URI"])[app.config.DATABASE["DATABASE"]]
+    app.ctx.calendar = await ScheduledEvents.init_calendar()
+    app.ctx.storefronts = await StoreCatalogue.init_storefront()
 
 
 @app.main_process_stop
@@ -83,6 +61,5 @@ async def main_stop(*_: Any) -> None:
         await profile.save_friends()
 
 
-# fast=true
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=80, auto_reload=True, access_log=False)
+    app.run(host=app.config.SERVER["HOST"], port=app.config.SERVER["PORT"], auto_reload=True, access_log=False)

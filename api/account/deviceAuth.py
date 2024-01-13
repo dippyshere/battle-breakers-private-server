@@ -49,7 +49,7 @@ async def device_auth_create(request: sanic.request.Request, accountId: str) -> 
             "os": ""
         }
     }
-    await request.app.ctx.database["accounts"].update_one({"_id": accountId}, {
+    await request.app.ctx.db["accounts"].update_one({"_id": accountId}, {
         "$push": {
             "extra.deviceAuths": device_authorisation
         }
@@ -68,7 +68,7 @@ async def device_auth_get(request: sanic.request.Request, accountId: str) -> san
     :param accountId: The account id
     :return: The response object
     """
-    device_auths = await request.app.ctx.database["accounts"].find_one({"_id": accountId}, {"extra.deviceAuths": 1})
+    device_auths = await request.app.ctx.db["accounts"].find_one({"_id": accountId}, {"extra.deviceAuths": 1})
     for device in device_auths["extra"]["deviceAuths"]:
         device.pop("secret")
     return sanic.response.json(device_auths["extra"]["deviceAuths"])
@@ -87,7 +87,7 @@ async def device_auth_info(request: sanic.request.Request, accountId: str,
     :param deviceId: The device id
     :return: The response object
     """
-    device_info = await request.app.ctx.database["accounts"].find_one({"_id": accountId}, {
+    device_info = await request.app.ctx.db["accounts"].find_one({"_id": accountId}, {
         "extra.deviceAuths": {
             "$elemMatch": {
                 "deviceId": deviceId
@@ -114,14 +114,14 @@ async def device_auth_deletion(request: sanic.request.Request, accountId: str,
     :param deviceId: The device id
     :return: The response object
     """
-    device_auths = await request.app.ctx.database["accounts"].find_one({"_id": accountId}, {"extra.deviceAuths": 1})
+    device_auths = await request.app.ctx.db["accounts"].find_one({"_id": accountId}, {"extra.deviceAuths": 1})
     for device in device_auths["extra"]["deviceAuths"]:
         if device["deviceId"] == deviceId:
             device_auths["extra"]["deviceAuths"].remove(device)
             break
     else:
         raise errors.com.epicgames.account.device_auth.invalid_device_info()
-    await request.app.ctx.database["accounts"].update_one({"_id": accountId}, {
+    await request.app.ctx.db["accounts"].update_one({"_id": accountId}, {
         "$set": {
             "extra.deviceAuths": device_auths["extra"]["deviceAuths"]
         }

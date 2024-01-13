@@ -29,7 +29,7 @@ async def quickstart(request: sanic.request.Request) -> sanic.response.HTTPRespo
     :return: The response object
     """
     # TODO: better signup system
-    new_account_id = await create_account(request.app.ctx.database, calendar=request.app.ctx.calendar)
+    new_account_id = await create_account(request.app.ctx.db, calendar=request.app.ctx.calendar)
     device_id = await uuid_generator()
     device_authorisation = {
         "deviceId": device_id,
@@ -42,7 +42,7 @@ async def quickstart(request: sanic.request.Request) -> sanic.response.HTTPRespo
             "dateTime": await format_time()
         }
     }
-    await request.app.ctx.database["accounts"].update_one(
+    await request.app.ctx.db["accounts"].update_one(
         {"_id": new_account_id},
         {
             "$set": {"headless": True},

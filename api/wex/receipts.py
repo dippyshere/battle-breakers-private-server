@@ -29,5 +29,5 @@ async def receipts(request: sanic.request.Request, accountId: str) -> sanic.resp
     :return: The response object
     """
     return sanic.response.json(
-        (await request.app.ctx.database["receipts"].find_one({"_id": accountId})).get("receipts", [])
+        (await request.app.ctx.db["receipts"].find_one({"_id": accountId})).get("receipts", [])
     )

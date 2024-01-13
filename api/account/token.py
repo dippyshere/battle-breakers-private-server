@@ -51,7 +51,7 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                     case 'google':
                         # TODO: Reinvestigate what this case is
                         sub = request.form.get('external_auth_token').split(':')[0]
-                        account: dict = await request.app.ctx.database["accounts"].find_one({"_id": sub}, {
+                        account: dict = await request.app.ctx.db["accounts"].find_one({"_id": sub}, {
                             "_id": 0,
                             "displayName": 1,
                         })
@@ -63,16 +63,16 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                             request.form.get('external_auth_token'))
                         if google_token is not None:
                             sub = google_token['sub']
-                            account = await request.app.ctx.database["accounts"].find_one(
+                            account = await request.app.ctx.db["accounts"].find_one(
                                 {"externalAuths.google.externalAuthId": sub}, {"displayName": 1})
                             if account:
                                 dn = account['displayName']
                                 dvid = request.headers.get('X-Epic-Device-ID')
                                 return sanic.response.json(await oauth_response(client_id, dn, dvid, account['_id']))
                             # Create an account
-                            account_id = await create_account(request.app.ctx.database,
+                            account_id = await create_account(request.app.ctx.db,
                                                               calendar=request.app.ctx.calendar)
-                            await request.app.ctx.database["accounts"].update_one(
+                            await request.app.ctx.db["accounts"].update_one(
                                 {"_id": account_id},
                                 {
                                     "$set": {
@@ -143,7 +143,7 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                 # TODO: implement better signup system
                 # allows email@. to be used as a username login
                 if re.match(r"^[^@]+@[^@]+\.[^@]+$", request.form.get('username')):
-                    account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                    account_data: dict = await request.app.ctx.db["accounts"].find_one(
                         {"email": {"$regex": f"^{re.escape(request.form.get('username').split('@')[0].strip())}$",
                                    "$options": "i"}}, {
                             "_id": 1,
@@ -151,7 +151,7 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                             "extra.pwhash": 1
                         })
                 else:
-                    account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                    account_data: dict = await request.app.ctx.db["accounts"].find_one(
                         {"displayName": {"$regex": f"^{re.escape(request.form.get('username').split('@')[0].strip())}$",
                                          "$options": "i"}}, {
                             "_id": 1,
@@ -180,7 +180,7 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                     raise errors.com.epicgames.account.oauth.expired_exchange_code()
             case 'device_auth':
                 if request.form.get('account_id'):
-                    account = await request.app.ctx.database["accounts"].find_one({
+                    account = await request.app.ctx.db["accounts"].find_one({
                         "_id": request.form.get('account_id'),
                         "extra.deviceAuths": {
                             "$elemMatch": {

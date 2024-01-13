@@ -28,7 +28,7 @@ async def get_metadata(request: sanic.request.Request, accountId: str) -> sanic.
     :param accountId: The account id
     :return: The response object
     """
-    account = await request.app.ctx.database["accounts"].find_one({"_id": accountId})
+    account = await request.app.ctx.db["accounts"].find_one({"_id": accountId})
     if not account:
         raise errors.com.epicgames.account.account_not_found()
     return sanic.response.json(account.get("metadata", {}))
@@ -47,7 +47,7 @@ async def get_delete_metadata(request: sanic.request.Request, accountId: str, ke
     :return: The response object
     """
     if request.method == "GET":
-        account = await request.app.ctx.database["accounts"].find_one({"_id": accountId}, {"metadata": 1})
+        account = await request.app.ctx.db["accounts"].find_one({"_id": accountId}, {"metadata": 1})
         if account and "metadata" in account:
             metadata = account["metadata"]
             try:
@@ -57,7 +57,7 @@ async def get_delete_metadata(request: sanic.request.Request, accountId: str, ke
         else:
             raise errors.com.epicgames.account.metadata_key_not_found()
     else:
-        update_result = await request.app.ctx.database["accounts"].update_one(
+        update_result = await request.app.ctx.db["accounts"].update_one(
             {"_id": accountId, f"metadata.{key}": {"$exists": True}},
             {"$unset": {f"metadata.{key}": 1}}
         )
@@ -77,7 +77,7 @@ async def set_metadata(request: sanic.request.Request, accountId: str) -> sanic.
     :param accountId: The account id
     :return: The response object
     """
-    account = await request.app.ctx.database["accounts"].find_one({"_id": accountId})
+    account = await request.app.ctx.db["accounts"].find_one({"_id": accountId})
     if not account:
         raise errors.com.epicgames.account.account_not_found()
     if "metadata" not in account:
@@ -85,7 +85,7 @@ async def set_metadata(request: sanic.request.Request, accountId: str) -> sanic.
     if len(account["metadata"]) > 1000:
         raise errors.com.epicgames.account.metadata.too_many_keys()
     account["metadata"][request.json.get("key")] = request.json.get("value")
-    await request.app.ctx.database["accounts"].update_one(
+    await request.app.ctx.db["accounts"].update_one(
         {"_id": accountId},
         {"$set": {"metadata": account["metadata"]}}
     )

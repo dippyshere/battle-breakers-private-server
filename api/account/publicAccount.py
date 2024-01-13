@@ -33,7 +33,7 @@ async def public_account_info(request: sanic.request.Request) -> sanic.response.
     account_ids = request.args.getlist("accountId")
     if len(account_ids) > 100:
         raise errors.com.epicgames.account.invalid_account_id_count(100)
-    account_cursor = request.app.ctx.database["accounts"].find(
+    account_cursor = request.app.ctx.db["accounts"].find(
         {"_id": {"$in": account_ids}},
         {
             "displayName": 1,
@@ -61,15 +61,15 @@ async def account_displayname(request: sanic.request.Request, displayName: str) 
     :return: The response object
     """
     displayName = urllib.parse.unquote(displayName)
-    requested_id = await get_account_id_from_display_name(request.app.ctx.database, displayName)
+    requested_id = await get_account_id_from_display_name(request.app.ctx.db, displayName)
     if requested_id is None:
         raise errors.com.epicgames.account.account_not_found(displayName)
     if requested_id == request.ctx.owner:
-        account_data = await get_account_data_owner(request.app.ctx.database, requested_id)
+        account_data = await get_account_data_owner(request.app.ctx.db, requested_id)
         if not account_data:
             raise errors.com.epicgames.account.account_not_found(displayName)
         return sanic.response.json(account_data)
-    account_data = await get_account_data(request.app.ctx.database, requested_id)
+    account_data = await get_account_data(request.app.ctx.db, requested_id)
     if not account_data:
         raise errors.com.epicgames.account.account_not_found(displayName)
     return sanic.response.json(account_data)
@@ -85,15 +85,15 @@ async def account_email(request: sanic.request.Request, email: str) -> sanic.res
     :param email: The email
     :return: The response object
     """
-    requested_id = await get_account_id_from_email(request.app.ctx.database, email)
+    requested_id = await get_account_id_from_email(request.app.ctx.db, email)
     if requested_id is None:
         raise errors.com.epicgames.account.account_not_found(email)
     if requested_id == request.ctx.owner:
-        account_data = await get_account_data_owner(request.app.ctx.database, requested_id)
+        account_data = await get_account_data_owner(request.app.ctx.db, requested_id)
         if not account_data:
             raise errors.com.epicgames.account.account_not_found(email)
         return sanic.response.json(account_data)
-    account_data = await get_account_data(request.app.ctx.database, requested_id)
+    account_data = await get_account_data(request.app.ctx.db, requested_id)
     if not account_data:
         raise errors.com.epicgames.account.account_not_found(email)
     return sanic.response.json(account_data)

@@ -37,7 +37,7 @@ async def push(request: sanic.request.Request, accountId: str) -> HTTPResponse:
     :param accountId: The account id
     :return: The response object
     """
-    await request.app.ctx.database["push"].update_one({"_id": accountId}, {"$push": {
+    await request.app.ctx.db["push"].update_one({"_id": accountId}, {"$push": {
         "devices": {
             "deviceToken": request.args.get("deviceToken"),
             "platform": request.args.get("platform"),

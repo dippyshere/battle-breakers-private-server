@@ -40,7 +40,7 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
         raise errors.com.epicgames.world_explorers.not_found(errorMessage="Missing required query parameter: name")
     if display_name == "":
         raise errors.com.epicgames.world_explorers.not_found(errorMessage="Missing required query parameter: name")
-    search_results = await search_for_display_name(request.app.ctx.database, display_name)
+    search_results = await search_for_display_name(request.app.ctx.db, display_name)
     if search_results:
         account_ids.extend(search_results)
     if accountId in account_ids:
@@ -52,7 +52,7 @@ async def wex_friends_search(request: sanic.request.Request, accountId: str) -> 
         if friend["accountId"] in account_ids:
             account_ids.remove(friend["accountId"])
     for account_id in account_ids:
-        account_data: dict = await request.app.ctx.database["accounts"].find_one({"_id": account_id}, {
+        account_data: dict = await request.app.ctx.db["accounts"].find_one({"_id": account_id}, {
             "displayName": 1,
         })
         if account_id not in request.app.ctx.profiles:

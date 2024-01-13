@@ -29,10 +29,10 @@ async def account_route(request: sanic.request.Request, accountId: str) -> sanic
     :return: The response object
     """
     if request.ctx.is_owner:
-        account_data = await get_account_data_owner(request.app.ctx.database, accountId)
+        account_data = await get_account_data_owner(request.app.ctx.db, accountId)
         if not account_data:
             raise errors.com.epicgames.account.account_not_found(accountId)
         return sanic.response.json(account_data)
-    account_data = await get_account_data(request.app.ctx.database, accountId)
+    account_data = await get_account_data(request.app.ctx.db, accountId)
     if not account_data:
         raise errors.com.epicgames.account.account_not_found(accountId)
