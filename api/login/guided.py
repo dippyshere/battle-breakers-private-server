@@ -20,7 +20,8 @@ guided_login = sanic.Blueprint("guided_login")
 
 
 # undocumented
-@guided_login.route("/id/login/guided", methods=["GET"], strict_slashes=False)
+@guided_login.route("/id/login/guided", methods=["GET"], strict_slashes=False, name="login-guided")
+@guided_login.route("/id/register", methods=["GET"], strict_slashes=False, name="register")
 @compress.compress()
 async def login_page(request: sanic.request.Request) -> sanic.response.HTTPResponse:
     """
@@ -32,7 +33,8 @@ async def login_page(request: sanic.request.Request) -> sanic.response.HTTPRespo
         return sanic.response.raw(await file.read(), content_type="text/html")
 
 
-@guided_login.route("/id/login/guided/<file>", methods=["GET"])
+@guided_login.route("/id/login/guided/<file>", methods=["GET"], name="login-guided-files")
+@guided_login.route("/id/register/<file>", methods=["GET"], name="register-files")
 @compress.compress()
 async def login_page_files(request: sanic.request.Request, file: str) -> sanic.response.HTTPResponse:
     """
@@ -41,23 +43,29 @@ async def login_page_files(request: sanic.request.Request, file: str) -> sanic.r
     :param file: The file to get
     :return: The response object
     """
-    if file == "main.css":
-        async with aiofiles.open("res/account/login/guided/main.css", "rb") as file:
-            return sanic.response.raw(await file.read(), content_type="text/css")
-    elif file == "login-script.js":
-        if "register" in request.headers.get("Referer"):
-            async with aiofiles.open("res/account/login/register/signup-script.js", "rb") as file:
-                return sanic.response.raw(await file.read(), content_type="text/javascript")
-        else:
-            async with aiofiles.open("res/account/login/guided/login-script.js", "rb") as file:
-                return sanic.response.raw(await file.read(), content_type="text/javascript")
-    else:
-        if urllib.parse.unquote(file).split(".")[-1] == "woff2":
-            content_type = "font/woff2"
-        else:
-            content_type = mimetypes.guess_type(f"res/site-meta/{urllib.parse.unquote(file)}", False)[0] or "text/plain"
-        async with aiofiles.open(f"res/site-meta/{urllib.parse.unquote(file)}", "rb") as file:
-            return sanic.response.raw(await file.read(), content_type=content_type)
+    match file:
+        case "main.css":
+            async with aiofiles.open("res/account/login/guided/main.css", "rb") as file:
+                return sanic.response.raw(await file.read(), content_type="text/css")
+        case "login-script.js":
+            if "register" in request.headers.get("Referer") or request.route.name == "register-files":
+                async with aiofiles.open("res/account/login/register/signup-script.js", "rb") as file:
+                    return sanic.response.raw(await file.read(), content_type="text/javascript")
+            else:
+                async with aiofiles.open("res/account/login/guided/login-script.js", "rb") as file:
+                    return sanic.response.raw(await file.read(), content_type="text/javascript")
+        case "index.html":
+            if request.route.name == "register-files":
+                return sanic.response.redirect("/id/register")
+            else:
+                return sanic.response.redirect("/id/login/guided")
+        case _:
+            if urllib.parse.unquote(file).split(".")[-1] == "woff2":
+                content_type = "font/woff2"
+            else:
+                content_type = mimetypes.guess_type(f"res/site-meta/{urllib.parse.unquote(file)}", False)[0] or "text/plain"
+            async with aiofiles.open(f"res/site-meta/{urllib.parse.unquote(file)}", "rb") as file:
+                return sanic.response.raw(await file.read(), content_type=content_type)
 
 
 @guided_login.route("/id/login", methods=["GET"])
