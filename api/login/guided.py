@@ -80,3 +80,17 @@ async def login_redirect2(request: sanic.request.Request) -> sanic.response.HTTP
     :return: The response object
     """
     return sanic.response.redirect("/id/login/guided/")
+
+
+@guided_login.route("/apple-touch-icon.png", methods=["GET"], name="apple-touch-icon")
+@guided_login.route("/apple-touch-icon-precomposed.png", methods=["GET"], name="apple-touch-icon-precomposed")
+@compress.compress()
+async def apple_touch_icon(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+    """
+    This endpoint is used to get the apple touch icon
+    :param request: The request object
+    :return: The response object
+    """
+    content_type = mimetypes.guess_type(f"res/site-meta/apple-touch-icon.png", False)[0] or "text/plain"
+    async with aiofiles.open(f"res/site-meta/apple-touch-icon.png", "rb") as file:
+        return sanic.response.raw(await file.read(), content_type=content_type)

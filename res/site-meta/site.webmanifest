@@ -15,5 +15,5 @@
     ],
     "theme_color": "#0049A4",
     "background_color": "#0049A4",
-    "display": "standalone"
+    "display": "minimal-ui"
 }
