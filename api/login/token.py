@@ -114,16 +114,16 @@ async def login_token_route(request: sanic.request.Request) -> sanic.response.JS
                 "errorMessage": "Your password is too long"})
         else:
             # TODO: implement better signup system
-            if re.match(r"[^@]+@[^@]*\.[^@]*", username):
+            if re.match(r"^[^@]+@[^@]*\.[^@]*$", username):
                 account_data: dict = await request.app.ctx.database["accounts"].find_one(
-                    {"email": {"$regex": re.escape(username.strip()), "$options": "i"}}, {
+                    {"email": {"$regex": f"^{re.escape(username.strip())}$", "$options": "i"}}, {
                         "_id": 1,
                         "displayName": 1,
                         "extra.pwhash": 1
                     })
             else:
                 account_data: dict = await request.app.ctx.database["accounts"].find_one(
-                    {"displayName": {"$regex": re.escape(username.strip()), "$options": "i"}}, {
+                    {"displayName": {"$regex": f"^{re.escape(username.strip())}$", "$options": "i"}}, {
                         "_id": 1,
                         "displayName": 1,
                         "extra.pwhash": 1

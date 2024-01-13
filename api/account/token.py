@@ -132,9 +132,32 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                     raise errors.com.epicgames.account.auth_token.invalid_refresh_token()
             case 'password':  # backwards compatibility for old clients
                 # TODO: support display name and email login
-                account_data = await request.app.ctx.database["accounts"].find_one(
-                    {"displayName": {"$regex": f"^{re.escape(request.form.get('username').split('@')[0].strip())}$",
-                                     "$options": "i"}}, {"displayName": 1, "extra.pwhash": 1})
+                if len(request.form.get('username').split('@')[0].strip()) < 3:
+                    raise errors.com.epicgames.account.invalid_account_credentials()
+                elif len(request.form.get('username').split('@')[0].strip()) > 24:
+                    raise errors.com.epicgames.account.invalid_account_credentials()
+                if len(request.form.get('password')) < 8:
+                    raise errors.com.epicgames.account.invalid_account_credentials()
+                elif len(request.form.get('password')) > 64:
+                    raise errors.com.epicgames.account.invalid_account_credentials()
+                # TODO: implement better signup system
+                # allows email@. to be used as a username login
+                if re.match(r"^[^@]+@[^@]+\.[^@]+$", request.form.get('username')):
+                    account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                        {"email": {"$regex": f"^{re.escape(request.form.get('username').split('@')[0].strip())}$",
+                                   "$options": "i"}}, {
+                            "_id": 1,
+                            "displayName": 1,
+                            "extra.pwhash": 1
+                        })
+                else:
+                    account_data: dict = await request.app.ctx.database["accounts"].find_one(
+                        {"displayName": {"$regex": f"^{re.escape(request.form.get('username').split('@')[0].strip())}$",
+                                         "$options": "i"}}, {
+                            "_id": 1,
+                            "displayName": 1,
+                            "extra.pwhash": 1
+                        })
                 if account_data is None:
                     raise errors.com.epicgames.account.account_not_found(
                         request.form.get('username').split("@")[0].strip())
