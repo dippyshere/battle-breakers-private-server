@@ -11,6 +11,8 @@ import re
 
 import sanic
 
+from utils import enums
+from utils.enums import AuthClient
 from utils.exceptions import errors
 from utils.profile_system import PlayerProfile
 from utils.utils import (authorized as auth, oauth_response, parse_eg1, create_account, verify_google_token,
@@ -35,17 +37,23 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
     if request.headers.get('Authorization'):
         if request.headers.get('Authorization').startswith('basic'):
             try:
-                # TODO: add supported client ids
-                client_id = base64.b64decode(request.headers.get('Authorization').split(' ')[1]).decode().split(':')[0]
+                authorisation = base64.b64decode(request.headers.get('Authorization').split(' ')[1]).decode()
+                client_id = authorisation.split(':')[0]
+                client_secret = authorisation.split(':')[1]
             except:
                 raise errors.com.epicgames.common.oauth.invalid_client()
+            auth_client: AuthClient = enums.AuthClient.from_string(client_id)
+            if client_secret != auth_client.value[1]:
+                raise errors.com.epicgames.account.invalid_client_credentials()
         elif request.headers.get('Authorization').startswith('bearer'):
             client_id = "3cf78cd3b00b439a8755a878b160c7ad"
         else:
             raise errors.com.epicgames.common.oauth.oauth_error()
         match request.form.get('grant_type'):
             case 'client_credentials':
-                return sanic.response.json((await oauth_client_response(client_id)))
+                if not request.headers.get('Authorization').startswith('basic'):
+                    raise errors.com.epicgames.common.oauth.unsupported_grant_type()
+                return sanic.response.json((await oauth_client_response(auth_client.value[0])))
             case 'external_auth':
                 match request.form.get('external_auth_type'):
                     case 'google':

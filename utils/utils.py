@@ -195,18 +195,28 @@ async def generate_eg1(sub: Optional[str] = None, dn: Optional[str] = None, clid
     }, private_key, "RS256", headers)
 
 
-async def generate_client_eg1(clid: Optional[str] = None) -> str:
+async def generate_client_eg1(clid: str) -> str:
     """
     Generates an eg1 JWT token for client credentials
     :param clid: The client id to generate the token for
     :return: The JWT token
     """
-    if clid is None:
-        clid = "3cf78cd3b00b439a8755a878b160c7ad"
     headers = {"alg": "RS256", "kid": str(uuid.uuid4())}
+    if clid in ["3cf78cd3b00b439a8755a878b160c7ad", "3cf78cd3b00b439a8755a878b160c7ad",
+                "84cd036b576541e9ad1634c1448c0c30", "e645e4b96298419cbffbfa353ebf8b82",
+                "66e03bfeb7db44adaca611dae2674094", "ec813099a59f48d4a338f1901c1609db",
+                "f8eac541a1c241939f76d26cf2a673a6"]:
+        p = ("wexp:calendar=2,catalog:shared:offers=2,account:public:account:externalAuthOnly=1,"
+             "wexp:cloudstorage:system=2,account:public:account=1,wexp:cloudstorage:system:*=2,"
+             "affiliate:public:affiliate=2,wexp:storefront=2")
+    elif clid == "8e873617d81d4caf89bae28a4b74bbfe":
+        p = "account:public:account:externalAuthOnly=1,account:public:account=1"
+    elif clid == "34a02cf8f4414e29b15921876da36f9a":
+        p = "account:public:account:externalAuthOnly=1,account:public:account=1"  # TODO: add more permissions
+    else:
+        raise errors.com.epicgames.account.invalid_client_credentials()
     return jwt.encode({
-        "p": "eNp9zDEOgzAMheH7VCxltMTQE/QMxnEgkomR4wi4fQMS3drRz/r+jfcVCIVzQBv6jtBRdIIyo3EAjZGttB2JtGaHtY6SCO6Td2fLKK"
-             "/q8zvLMTy77SqK1lBcDSeGchTn5Wfkj4HHqWJMktD56+6hPS95Io6mrdV/AKLsT2A=",
+        "p": base64.b64encode(zlib.compress(p.encode())).decode(),
         "clsvc": "wex",
         "t": "s",
         "mver": False,
