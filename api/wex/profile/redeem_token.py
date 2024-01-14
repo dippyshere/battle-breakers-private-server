@@ -10,7 +10,7 @@ Handles redeeming tokens.
 import sanic
 
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, get_path_from_template_id, load_datatable, get_template_id_from_path
 
 from utils.sanic_gzip import Compress
 
@@ -29,4 +29,37 @@ async def redeem_token(request: sanic.request.Request, accountId: str) -> sanic.
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_implemented()
+    token_id = await request.ctx.profile.find_item_by_template_id(request.json.get("tokenTemplate"))
+    if not token_id:
+        raise errors.com.epicgames.world_explorers.not_found(errorMessage="This token was not found in your profile.")
+    item_path = (await get_path_from_template_id(request.json.get("tokenTemplate")))
+    token_item = await request.ctx.profile.get_item_by_guid(token_id[0])
+    try:
+        reward_item = (await load_datatable(
+            item_path.replace("res/Game/WorldExplorers/", "").replace(".json", "").replace("\\", "/")))[0][
+            "Properties"]
+        reward_item["RewardItem"]
+    except KeyError:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="This item cannot be redeemed.")
+    redeem_quantity = token_item["quantity"] // reward_item["RedeemQuantity"]
+    new_item_id = (await request.ctx.profile.find_item_by_template_id(
+        await get_template_id_from_path(reward_item["RewardItem"]["ObjectPath"])))
+    if not new_item_id:
+        new_item_id = await request.ctx.profile.add_item({
+            "templateId": await get_template_id_from_path(reward_item["RewardItem"]["ObjectPath"]),
+            "attributes": {},
+            "quantity": redeem_quantity
+        })
+    else:
+        new_item_id = new_item_id[0]
+        new_item_quantity = (await request.ctx.profile.get_item_by_guid(new_item_id))["quantity"]
+        await request.ctx.profile.change_item_quantity(new_item_id, new_item_quantity + redeem_quantity)
+    if token_item["quantity"] - (redeem_quantity * reward_item["RedeemQuantity"]) > 0:
+        await request.ctx.profile.change_item_quantity(token_id[0], token_item["quantity"] - (
+                redeem_quantity * reward_item["RedeemQuantity"]))
+    else:
+        await request.ctx.profile.remove_item(token_id[0])
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions)
+    )
