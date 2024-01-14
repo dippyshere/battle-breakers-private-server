@@ -41,6 +41,12 @@ async def redeem_token(request: sanic.request.Request, accountId: str) -> sanic.
         reward_item["RewardItem"]
     except KeyError:
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="This item cannot be redeemed.")
+    if token_item["quantity"] < reward_item["RedeemQuantity"]:
+        raise errors.com.epicgames.world_explorers.bad_request(reward_item["RedeemQuantity"], token_item["quantity"],
+                                                               errorMessage=f"{reward_item['RedeemQuantity']}x "
+                                                                            f"{request.json.get('tokenTemplate')}s "
+                                                                            f"required to redeem. You only have "
+                                                                            f"{token_item['quantity']}.")
     redeem_quantity = token_item["quantity"] // reward_item["RedeemQuantity"]
     new_item_id = (await request.ctx.profile.find_item_by_template_id(
         await get_template_id_from_path(reward_item["RewardItem"]["ObjectPath"])))
