@@ -6,9 +6,10 @@ This code is licensed under the [TBD] license.
 
 Handles the account login request for mobile
 """
-import mimetypes
+import email.utils
 
 import aiofiles
+import aiofiles.os
 import sanic
 
 import urllib.parse
@@ -29,8 +30,22 @@ async def login_page(request: sanic.request.Request) -> sanic.response.HTTPRespo
     :param request: The request object
     :return: The response object
     """
-    async with aiofiles.open("res/account/login/guided/index.html", "rb") as file:
-        return sanic.response.raw(await file.read(), content_type="text/html")
+    if request.route.name == "dippy_breakers.guided_login.register":
+        last_modified = (await aiofiles.os.stat("res/account/login/guided/index.html")).st_mtime
+        response = await sanic.response.validate_file(request.headers, last_modified)
+        if response is not None:
+            return response
+        headers = {"Last-Modified": email.utils.formatdate(last_modified, usegmt=True),
+                   "expires": email.utils.formatdate(last_modified + 604800, usegmt=True),
+                   "cache-control": "public, max-age=604800"}
+        async with aiofiles.open("res/account/login/guided/index.html", "rb") as file:
+            page = (await file.read()).decode()
+        page = page.replace('<script src="/id/login/guided/login-script.js"></script>',
+                            '<script src="/id/login/guided/signup-script.js"></script>', 1)
+        return sanic.response.HTTPResponse(page, headers=headers, content_type="text/html")
+    else:
+        return await sanic.response.file("res/account/login/guided/index.html", max_age=604800,
+                                         request_headers=request.headers)
 
 
 @guided_login.route("/id/login/guided/<file>", methods=["GET"], name="login-guided-files")
@@ -45,27 +60,39 @@ async def login_page_files(request: sanic.request.Request, file: str) -> sanic.r
     """
     match file:
         case "main.css":
-            async with aiofiles.open("res/account/login/guided/main.css", "rb") as file:
-                return sanic.response.raw(await file.read(), content_type="text/css")
+            return await sanic.response.file("res/account/login/guided/main.css", max_age=604800,
+                                             request_headers=request.headers)
+        case "signup-script.js":
+            last_modified = (await aiofiles.os.stat("res/account/login/guided/login-script.js")).st_mtime
+            response = await sanic.response.validate_file(request.headers, last_modified)
+            if response is not None:
+                return response
+            headers = {"Last-Modified": email.utils.formatdate(last_modified, usegmt=True),
+                       "expires": email.utils.formatdate(last_modified + 604800, usegmt=True),
+                       "cache-control": "public, max-age=604800"}
+            async with aiofiles.open("res/account/login/guided/login-script.js", "rb") as file:
+                script = (await file.read()).decode()
+            script = script.replace("loginFormDiv.style.display = 'block';",
+                                    "loginFormDiv.style.display = 'none';", 1)
+            script = script.replace("signupFormDiv.style.display = 'none';",
+                                    "signupFormDiv.style.display = 'block';", 1)
+            return sanic.response.HTTPResponse(script, headers=headers, content_type="application/javascript")
         case "login-script.js":
-            if "register" in request.headers.get("Referer") or request.route.name == "register-files":
-                async with aiofiles.open("res/account/login/register/signup-script.js", "rb") as file:
-                    return sanic.response.raw(await file.read(), content_type="text/javascript")
-            else:
-                async with aiofiles.open("res/account/login/guided/login-script.js", "rb") as file:
-                    return sanic.response.raw(await file.read(), content_type="text/javascript")
+            return await sanic.response.file("res/account/login/guided/login-script.js", max_age=604800,
+                                             request_headers=request.headers)
         case "index.html":
-            if request.route.name == "register-files":
+            if request.route.name == "dippy_breakers.guided_login.register-files":
                 return sanic.response.redirect("/id/register")
             else:
                 return sanic.response.redirect("/id/login/guided")
         case _:
             if urllib.parse.unquote(file).split(".")[-1] == "woff2":
-                content_type = "font/woff2"
+                return await sanic.response.file(f"res/site-meta/{urllib.parse.unquote(file)}", max_age=604800,
+                                                 request_headers=request.headers,
+                                                 mime_type="font/woff2")
             else:
-                content_type = mimetypes.guess_type(f"res/site-meta/{urllib.parse.unquote(file)}", False)[0] or "text/plain"
-            async with aiofiles.open(f"res/site-meta/{urllib.parse.unquote(file)}", "rb") as file:
-                return sanic.response.raw(await file.read(), content_type=content_type)
+                return await sanic.response.file(f"res/site-meta/{urllib.parse.unquote(file)}", max_age=604800,
+                                                 request_headers=request.headers)
 
 
 @guided_login.route("/id/login", methods=["GET"])
@@ -99,6 +126,5 @@ async def apple_touch_icon(request: sanic.request.Request) -> sanic.response.HTT
     :param request: The request object
     :return: The response object
     """
-    content_type = mimetypes.guess_type(f"res/site-meta/apple-touch-icon.png", False)[0] or "text/plain"
-    async with aiofiles.open(f"res/site-meta/apple-touch-icon.png", "rb") as file:
-        return sanic.response.raw(await file.read(), content_type=content_type)
+    return await sanic.response.file("res/site-meta/apple-touch-icon.png", max_age=604800,
+                                     request_headers=request.headers)
