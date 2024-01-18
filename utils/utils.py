@@ -882,8 +882,11 @@ async def get_path_from_template_id(template_id: str) -> str:
     :param template_id: The template id to get the path for
     :return: The path
     """
-    best_match = await find_best_match(template_id, game_files_list, True)
-    return best_match
+    if template_id is not None:
+        best_match = await find_best_match(template_id, game_files_list, True)
+        return best_match
+    else:
+        raise errors.com.epicgames.bad_request(errorMessage="Template ID is required")
 
 
 @alru_cache(maxsize=32)
