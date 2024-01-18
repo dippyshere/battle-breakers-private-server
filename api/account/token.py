@@ -144,7 +144,7 @@ async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResp
                     raise errors.com.epicgames.account.invalid_account_credentials()
                 elif len(request.form.get('username').split('@')[0].strip()) > 24:
                     raise errors.com.epicgames.account.invalid_account_credentials()
-                if len(request.form.get('password')) < 8:
+                if len(request.form.get('password')) < 4:
                     raise errors.com.epicgames.account.invalid_account_credentials()
                 elif len(request.form.get('password')) > 64:
                     raise errors.com.epicgames.account.invalid_account_credentials()
