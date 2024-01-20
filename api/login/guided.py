@@ -73,10 +73,10 @@ async def login_page_files(request: sanic.request.Request, file: str) -> sanic.r
                        "cache-control": "public, max-age=604800"}
             async with aiofiles.open("res/account/login/guided/login-script.js", "rb") as file:
                 script = (await file.read()).decode()
-            script = script.replace("loginFormDiv.style.display = 'block';",
-                                    "loginFormDiv.style.display = 'none';", 1)
-            script = script.replace("signupFormDiv.style.display = 'none';",
-                                    "signupFormDiv.style.display = 'block';", 1)
+            script = script.replace('loginFormDiv.style.display = "block";',
+                                    'loginFormDiv.style.display = "none";', 1)
+            script = script.replace('signupFormDiv.style.display = "none";',
+                                    'signupFormDiv.style.display = "block";', 1)
             return sanic.response.HTTPResponse(script, headers=headers, content_type="application/javascript")
         case "login-script.js":
             return await sanic.response.file("res/account/login/guided/login-script.js", max_age=604800,
