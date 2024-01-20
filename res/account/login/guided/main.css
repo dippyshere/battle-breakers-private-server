@@ -1,6 +1,9 @@
 @font-face {
     font-family: "HemiHead426";
     src: url('/id/login/guided/HemiHead426.woff2') format('woff2'),
+    url("/id/login/guided/HemiHead426.woff") format("woff"),
+    url("/id/login/guided/HemiHead426.eot") format("embedded-opentype"),
+    url("/id/login/guided/HemiHead426.svg") format("svg"),
     url('/id/login/guided/HemiHead426.ttf') format('ttf');
     font-weight: 426;
 }
@@ -45,11 +48,11 @@ section {
     -moz-box-align: center;
     align-items: center;
     min-height: 100vh;
-    background: -webkit-gradient(linear, left top, left bottom, from(#f1f4f9), to(#dff1ff));
-    background: -o-linear-gradient(top, #f1f4f9, #dff1ff);
-    background: -webkit-linear-gradient(top, #f1f4f9, #dff1ff);
-    background: -moz-linear-gradient(top, #f1f4f9, #dff1ff);
-    background: linear-gradient(to bottom, #f1f4f9, #dff1ff);
+    background: -webkit-gradient(linear, left top, left bottom, from(rgb(241, 244, 249)), to(rgb(223, 241, 255)));
+    background: -o-linear-gradient(top, rgb(241, 244, 249), rgb(223, 241, 255));
+    background: -webkit-linear-gradient(top, rgb(241, 244, 249), rgb(223, 241, 255));
+    background: -moz-linear-gradient(top, rgb(241, 244, 249), rgb(223, 241, 255));
+    background: linear-gradient(to bottom, rgb(241, 244, 249), rgb(223, 241, 255));
     width: 100vw;
     position: absolute;
     overflow: hidden;
@@ -69,10 +72,22 @@ section {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-image: url("/id/login/guided/bb extended blur hd.webp"), url("/id/login/guided/bb extended blur.webp");
+    background-color: rgb(35, 92, 161);
     -moz-background-size: cover;
     background-size: cover;
     background-position: center;
+}
+
+.no-webp .bg {
+    background-image: url('/id/login/guided/bb-extended-blur-hd.jpg'), url('/id/login/guided/bb-extended-blur.jpg');
+}
+
+.no-js .bg {
+    background-image: url('/id/login/guided/bb-extended-blur-hd.jpg'), url('/id/login/guided/bb-extended-blur.jpg');
+}
+
+.webp .bg {
+    background-image: url('/id/login/guided/bb-extended-blur-hd.webp'), url('/id/login/guided/bb-extended-blur.webp');
 }
 
 .box .square {
@@ -224,13 +239,13 @@ section {
 .form {
     position: relative;
     height: 100%;
-    padding: 38px;
+    padding: 2em;
 }
 
 .form .heading {
     position: relative;
-    color: #ffffff;
-    letter-spacing: 1px;
+    color: rgb(255, 255, 255);
+    letter-spacing: 0.063rem;
     margin-bottom: 40px;
     font-size: 0.9em;
 }
@@ -238,7 +253,7 @@ section {
 .form .heading h6 {
     font-size: 0.7em;
     font-weight: 400;
-    color: #dff1ff;
+    color: rgb(223, 241, 255);
 }
 
 .hero {
@@ -252,7 +267,7 @@ section {
     bottom: -10px;
     width: 80px;
     height: 4px;
-    background: #ffffff;
+    background: rgb(255, 255, 255);
 }
 
 .form .inputBox {
@@ -271,9 +286,9 @@ section {
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-right: 1px solid rgba(255, 255, 255, 0.3);
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-    font-size: 16px;
-    letter-spacing: 1px;
-    color: #ffffff;
+    font-size: 1rem;
+    letter-spacing: 0.063rem;
+    color: rgb(255, 255, 255);
     -webkit-box-shadow: 0 5px 25px rgba(255, 255, 255, 0.2);
     -moz-box-shadow: 0 5px 25px rgba(255, 255, 255, 0.2);
     box-shadow: 0 5px 25px rgba(255, 255, 255, 0.2);
@@ -288,32 +303,32 @@ section {
 }
 
 .form .inputBox input::-webkit-input-placeholder {
-    color: #ffffff;
+    color: rgb(255, 255, 255);
 }
 
 .form .inputBox input::-moz-placeholder {
-    color: #ffffff;
+    color: rgb(255, 255, 255);
 }
 
 .form .inputBox input:-ms-input-placeholder {
-    color: #ffffff;
+    color: rgb(255, 255, 255);
 }
 
 .form .inputBox input::-ms-input-placeholder {
-    color: #ffffff;
+    color: rgb(255, 255, 255);
 }
 
 .form .inputBox input:-moz-placeholder {
-    color: #ffffff;
+    color: rgb(255, 255, 255);
 }
 
 .form .inputBox input::placeholder {
-    color: #ffffff;
+    color: rgb(255, 255, 255);
 }
 
 .form .inputBox input[type="submit"] {
-    background: #ffffff;
-    color: #4f4f4f;
+    background: rgb(255, 255, 255);
+    color: rgb(79, 79, 79);
     max-width: 120px;
     cursor: pointer;
     margin-bottom: 20px;
@@ -321,8 +336,8 @@ section {
 }
 
 input#onboarding-button {
-    background: #ffffff;
-    color: #4f4f4f;
+    background: rgb(255, 255, 255);
+    color: rgb(79, 79, 79);
     max-width: none;
     cursor: pointer;
     margin-bottom: 20px;
@@ -336,21 +351,21 @@ input#onboarding-button {
 }
 
 .form .inputBox input[type="submit"]:active {
-    background: #d7d7d7;
+    background: rgb(215, 215, 215);
     -webkit-box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
     -moz-box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
 }
 
 .form .inputBox input[type="submit"]:focus-visible {
-    background: #ffffff;
+    background: rgb(255, 255, 255);
     -webkit-box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
     -moz-box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
     box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
 }
 
 .form .inputBox input[type="submit"]:disabled {
-    background: #939393;
+    background: rgb(147, 147, 147);
     cursor: not-allowed;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
@@ -359,11 +374,11 @@ input#onboarding-button {
 
 .forget {
     margin-top: 5px;
-    color: #ffffff;
+    color: rgb(255, 255, 255);
 }
 
 .forget a {
-    color: #ffffff;
+    color: rgb(255, 255, 255);
     font-weight: 600;
 }
 
@@ -376,7 +391,7 @@ input#onboarding-button {
     -moz-border-radius: 50%;
     border-radius: 50%;
     border: 2px solid transparent;
-    border-top-color: #ffffff;
+    border-top-color: rgb(255, 255, 255);
     -webkit-animation: spin 0.5s ease-in-out infinite;
     -moz-animation: spin 0.5s ease-in-out infinite;
     -o-animation: spin 0.5s ease-in-out infinite;
@@ -427,7 +442,7 @@ input#onboarding-button {
     -webkit-border-radius: 50%;
     -moz-border-radius: 50%;
     border-radius: 50%;
-    background-color: #ffffff;
+    background-color: rgb(255, 255, 255);
     opacity: 0.6;
     position: absolute;
     top: 0;

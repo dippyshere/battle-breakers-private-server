@@ -1,28 +1,26 @@
-const loginFormDiv = document.querySelector('.login-form');
-const signupFormDiv = document.querySelector('.signup-form');
-const onboardingFormDiv = document.querySelector('.onboarding-form');
-const signupLink = document.querySelector('.signup-link');
-const loginLink = document.querySelector('.login-link');
-const loginForm = document.querySelector('#login-form');
-const loginUsername = document.querySelector('#login-name');
-const loginPassword = document.querySelector('#login-password');
-const signupForm = document.querySelector('#signup-form');
-const signupUsername = document.querySelector('#signup-username');
-const signupPassword = document.querySelector('#signup-password');
-const signupConfirmPassword = document.querySelector('#signup-confirm-password');
-const onboardingForm = document.querySelector('#onboarding-form');
-const loginButton = document.querySelector('#login-button');
-const signupButton = document.querySelector('#signup-button');
-const onboardingButton = document.querySelector('#onboarding-button');
-const loginSpinner = document.querySelector('#login-spinner');
-const signupSpinner = document.querySelector('#signup-spinner');
-
+var loginFormDiv = document.querySelector('.login-form');
+var signupFormDiv = document.querySelector('.signup-form');
+var onboardingFormDiv = document.querySelector('.onboarding-form');
+var signupLink = document.querySelector('.signup-link');
+var loginLink = document.querySelector('.login-link');
+var loginForm = document.querySelector('#login-form');
+var loginUsername = document.querySelector('#login-name');
+var loginPassword = document.querySelector('#login-password');
+var signupForm = document.querySelector('#signup-form');
+var signupUsername = document.querySelector('#signup-username');
+var signupPassword = document.querySelector('#signup-password');
+var signupConfirmPassword = document.querySelector('#signup-confirm-password');
+var onboardingForm = document.querySelector('#onboarding-form');
+var loginButton = document.querySelector('#login-button');
+var signupButton = document.querySelector('#signup-button');
+var onboardingButton = document.querySelector('#onboarding-button');
+var loginSpinner = document.querySelector('#login-spinner');
+var signupSpinner = document.querySelector('#signup-spinner');
 loginFormDiv.style.display = 'block';
 signupFormDiv.style.display = 'none'; // hide the sign-up form initially
 onboardingFormDiv.style.display = 'none'; // hide the onboarding form initially
 
 document.querySelector('.javascript-warning').style.display = 'none'; // hide the javascript warning
-
 
 signupLink.addEventListener('click', handleSignupClick);
 loginLink.addEventListener('click', handleLoginClick);
@@ -49,30 +47,29 @@ function addListeners() {
     loginLink.addEventListener('click', handleLoginClick);
 }
 
-showOnboarding = (username, code, id, heading) => {
+showOnboarding = function showOnboarding(username, code, id, heading) {
     signupFormDiv.style.display = 'none';
     loginFormDiv.style.display = 'none';
     onboardingFormDiv.style.display = 'block';
     document.querySelector('#welcome').innerText = 'Welcome, ' + username;
     document.querySelector('#id').innerText = id;
     document.querySelector('#onboarding-heading').innerText = heading;
-    onboardingButton.addEventListener('click', () => {
+    onboardingButton.addEventListener('click', function () {
         event.preventDefault(); // Prevent the form from submitting
         window.location.href = 'com.epicgames.wex://authorize/?code=' + code;
     });
     return true;
 };
-
-signupForm.addEventListener('submit', (event) => {
+signupForm.addEventListener('submit', function (event) {
     event.preventDefault(); // Prevent the form from submitting
-    let timeoutId;
+    var timeoutId;
     signupSpinner.classList.add('show');
     signupButton.disabled = true;
     signupUsername.disabled = true;
     signupPassword.disabled = true;
     signupConfirmPassword.disabled = true;
     removeListeners();
-    setTimeout(() => {
+    setTimeout(function () {
         if (signupPassword.value !== signupConfirmPassword.value) {
             alert('Passwords do not match!');
             signupSpinner.classList.remove('show');
@@ -123,15 +120,15 @@ signupForm.addEventListener('submit', (event) => {
             addListeners();
         } else {
             // post to the server
-            const signupData = {
+            var signupData = {
                 username: document.querySelector('#signup-username').value,
                 password: document.querySelector('#signup-password').value
             };
-            const controller = new AbortController();
-            const signal = controller.signal;
+            var controller = new AbortController();
+            var signal = controller.signal;
 
             // set a 10 second timeout
-            timeoutId = setTimeout(() => {
+            timeoutId = setTimeout(function () {
                 // clear the timeout and show an error message
                 clearTimeout(timeoutId);
                 alert('Request timed out. Please try again later.');
@@ -142,7 +139,6 @@ signupForm.addEventListener('submit', (event) => {
                 signupConfirmPassword.disabled = false;
                 addListeners();
             }, 10000);
-
             fetch('/id/login/token', {
                 method: 'POST',
                 headers: {
@@ -155,14 +151,14 @@ signupForm.addEventListener('submit', (event) => {
                     'X-Request-Source-Form': 'signup-form'
                 },
                 body: JSON.stringify(signupData),
-                signal // pass the signal to the fetch request to be able to abort it
-            }).then(response => {
+                signal: signal // pass the signal to the fetch request to be able to abort it
+            }).then(function (response) {
                 if (response.status === 200) {
-                    response.json().then(data => {
+                    response.json().then(function (data) {
                         // window.location.href = '/id/login/onboarding?username=' + signupData.username + '&code=' + data.authorisationCode;
                         showOnboarding(signupData.username, data.authorisationCode, data.id, data.heading);
                         signupSpinner.classList.remove('show');
-                    }).catch(() => {
+                    })["catch"](function () {
                         alert('An error occurred when trying to log in!\n\nSomething went wrong when redirecting... Please try again later.');
                         signupSpinner.classList.remove('show');
                         signupButton.disabled = false;
@@ -172,7 +168,7 @@ signupForm.addEventListener('submit', (event) => {
                         addListeners();
                     });
                 } else {
-                    response.json().then(data => {
+                    response.json().then(function (data) {
                         alert('An error occurred when logging in!\n\n' + data.errorMessage);
                         signupSpinner.classList.remove('show');
                         signupButton.disabled = false;
@@ -180,7 +176,7 @@ signupForm.addEventListener('submit', (event) => {
                         signupPassword.disabled = false;
                         signupConfirmPassword.disabled = false;
                         addListeners();
-                    }).catch(() => {
+                    })["catch"](function () {
                         alert('An error occurred when trying to login!\n\nError Info:\n' + response.status + ' ' + response.statusText + '\n' + response.body.toString());
                         signupSpinner.classList.remove('show');
                         signupButton.disabled = false;
@@ -190,7 +186,7 @@ signupForm.addEventListener('submit', (event) => {
                         addListeners();
                     });
                 }
-            }).catch(error => {
+            })["catch"](function (error) {
                 alert('An error occurred when logging in!\n\nThe request timed out...\n\n' + error);
                 signupSpinner.classList.remove('show');
                 signupButton.disabled = false;
@@ -198,7 +194,7 @@ signupForm.addEventListener('submit', (event) => {
                 signupPassword.disabled = false;
                 signupConfirmPassword.disabled = false;
                 addListeners();
-            }).finally(() => {
+            })["finally"](function () {
                 clearTimeout(timeoutId); // clear the timeout if the request is completed
                 signupSpinner.classList.remove('show');
                 signupButton.disabled = false;
@@ -209,17 +205,15 @@ signupForm.addEventListener('submit', (event) => {
         }
     }, 1000);
 });
-
-
-loginForm.addEventListener('submit', (event) => {
+loginForm.addEventListener('submit', function (event) {
     event.preventDefault(); // Prevent the form from submitting
-    let timeoutId;
+    var timeoutId;
     loginSpinner.classList.add('show');
     loginButton.disabled = true;
     loginUsername.disabled = true;
     loginPassword.disabled = true;
     removeListeners();
-    setTimeout(() => {
+    setTimeout(function () {
         if (loginPassword.value.length < 4) {
             alert('Password must be at least 4 characters long!');
             loginSpinner.classList.remove('show');
@@ -256,15 +250,15 @@ loginForm.addEventListener('submit', (event) => {
             addListeners();
         } else {
             // post to the server
-            const loginData = {
+            var loginData = {
                 username: document.querySelector('#login-name').value,
                 password: document.querySelector('#login-password').value
             };
-            const controller = new AbortController();
-            const signal = controller.signal;
+            var controller = new AbortController();
+            var signal = controller.signal;
 
             // set a 10 second timeout
-            timeoutId = setTimeout(() => {
+            timeoutId = setTimeout(function () {
                 // clear the timeout and show an error message
                 clearTimeout(timeoutId);
                 alert('Request timed out. Please try again later.');
@@ -274,7 +268,6 @@ loginForm.addEventListener('submit', (event) => {
                 loginPassword.disabled = false;
                 addListeners();
             }, 10000);
-
             fetch('/id/login/token', {
                 method: 'POST',
                 headers: {
@@ -287,15 +280,15 @@ loginForm.addEventListener('submit', (event) => {
                     'X-Request-Source-Form': 'login-form'
                 },
                 body: JSON.stringify(loginData),
-                signal // pass the signal to the fetch request to be able to abort it
-            }).then(response => {
+                signal: signal // pass the signal to the fetch request to be able to abort it
+            }).then(function (response) {
                 if (response.status === 200) {
-                    response.json().then(data => {
+                    response.json().then(function (data) {
                         // console.log('Login successful! Redirecting to /id/login/complete?username=' + data.username + '&code=' + data.authorisationCode);
                         // window.location.href = '/id/login/complete?username=' + data.username + '&code=' + data.authorisationCode;
                         showOnboarding(data.username, data.authorisationCode, data.id, data.heading);
                         loginSpinner.classList.remove('show');
-                    }).catch(() => {
+                    })["catch"](function () {
                         alert('An error occurred when trying to log in!\n\nSomething went wrong when redirecting... Please try again later.');
                         loginSpinner.classList.remove('show');
                         loginButton.disabled = false;
@@ -304,14 +297,14 @@ loginForm.addEventListener('submit', (event) => {
                         addListeners();
                     });
                 } else {
-                    response.json().then(data => {
+                    response.json().then(function (data) {
                         alert('An error occurred when logging in!\n\n' + data.errorMessage);
                         loginSpinner.classList.remove('show');
                         loginButton.disabled = false;
                         loginUsername.disabled = false;
                         loginPassword.disabled = false;
                         addListeners();
-                    }).catch(() => {
+                    })["catch"](function () {
                         alert('An error occurred when trying to login!\n\nError Info:\n' + response.status + ' ' + response.statusText + '\n' + response.body.toString());
                         loginSpinner.classList.remove('show');
                         loginButton.disabled = false;
@@ -320,14 +313,14 @@ loginForm.addEventListener('submit', (event) => {
                         addListeners();
                     });
                 }
-            }).catch(error => {
+            })["catch"](function (error) {
                 alert('An error occurred when logging in!\n\nThe request timed out...\n\n' + error);
                 loginSpinner.classList.remove('show');
                 loginButton.disabled = false;
                 loginUsername.disabled = false;
                 loginPassword.disabled = false;
                 addListeners();
-            }).finally(() => {
+            })["finally"](function () {
                 clearTimeout(timeoutId); // clear the timeout if the request is completed
                 loginSpinner.classList.remove('show');
                 loginButton.disabled = false;

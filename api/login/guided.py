@@ -7,6 +7,7 @@ This code is licensed under the [TBD] license.
 Handles the account login request for mobile
 """
 import email.utils
+import mimetypes
 
 import aiofiles
 import aiofiles.os
@@ -80,6 +81,9 @@ async def login_page_files(request: sanic.request.Request, file: str) -> sanic.r
         case "login-script.js":
             return await sanic.response.file("res/account/login/guided/login-script.js", max_age=604800,
                                              request_headers=request.headers)
+        case "webp-detection.js":
+            return await sanic.response.file("res/account/login/guided/webp-detection.js", max_age=604800,
+                                             request_headers=request.headers)
         case "index.html":
             if request.route.name == "dippy_breakers.guided_login.register-files":
                 return sanic.response.redirect("/id/register")
@@ -87,12 +91,15 @@ async def login_page_files(request: sanic.request.Request, file: str) -> sanic.r
                 return sanic.response.redirect("/id/login/guided")
         case _:
             if urllib.parse.unquote(file).split(".")[-1] == "woff2":
-                return await sanic.response.file(f"res/site-meta/{urllib.parse.unquote(file)}", max_age=604800,
-                                                 request_headers=request.headers,
-                                                 mime_type="font/woff2")
+                content_type = "font/woff2"
             else:
-                return await sanic.response.file(f"res/site-meta/{urllib.parse.unquote(file)}", max_age=604800,
-                                                 request_headers=request.headers)
+                content_type = mimetypes.guess_type(f"res/site-meta/{urllib.parse.unquote(file)}", False)[0] or "text/plain"
+            if request.headers.get("save-data") == "on" and urllib.parse.unquote(file) in ["bb-extended-blur-hd.jpg",
+                                                                                           "bb-extended-blur-hd.webp"]:
+                return sanic.response.redirect(
+                    f"/id/login/guided/bb-extended-blur.{urllib.parse.unquote(file).split('.')[-1]}")
+            return await sanic.response.file(f"res/site-meta/{urllib.parse.unquote(file)}", max_age=604800,
+                                             request_headers=request.headers, mime_type=content_type)
 
 
 @guided_login.route("/id/login", methods=["GET"])
