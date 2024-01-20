@@ -8,6 +8,7 @@ Handles miscellaneous endpoints
 """
 import sanic
 from .favicon import favicon
+from .robots import robots
 from .version import version
 
-misc = sanic.Blueprint.group(favicon, version)
+misc = sanic.Blueprint.group(favicon, robots, version)

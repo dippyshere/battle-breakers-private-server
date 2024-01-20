@@ -6,6 +6,7 @@
     url("/id/login/guided/HemiHead426.svg") format("svg"),
     url('/id/login/guided/HemiHead426.ttf') format('ttf');
     font-weight: 426;
+    font-display: swap;
 }
 
 * {
