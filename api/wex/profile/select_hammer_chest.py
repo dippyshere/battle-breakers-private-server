@@ -9,6 +9,7 @@ Handles selecting a hammer chest
 
 import sanic
 
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -28,7 +29,14 @@ async def select_hammer_chest(request: sanic.request.Request, accountId: str) ->
     :param accountId: The account id
     :return: The modified profile
     """
-    await request.ctx.profile.modify_stat("active_hammer_chest", request.json.get("chestId"), request.ctx.profile_id)
+    chest_item = await request.ctx.profile.get_item(request.json.get("chestId"))
+    if chest_item is None or not chest_item.get("templateId").startswith("HammerChest:"):
+        raise errors.com.epicgames.world_explorers.bad_request("Invalid chest ID")
+    await request.ctx.profile.modify_stat("active_hammer_chest", request.json.get("chestId"))
+    other_chests = await request.ctx.profile.find_items_by_type("HammerChest")
+    for other_chests_id in other_chests:
+        if other_chests_id != request.json.get("chestId"):
+            await request.ctx.profile.remove_item(other_chests_id)
     return sanic.response.json(
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
                                                      request.ctx.profile_revisions)
