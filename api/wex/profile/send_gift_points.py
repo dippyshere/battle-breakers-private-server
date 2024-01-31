@@ -6,10 +6,11 @@ This code is licensed under the [TBD] license.
 
 Handles sending gifts.
 """
+import datetime
 
 import sanic
 
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, format_time
 
 from utils.sanic_gzip import Compress
 
@@ -28,40 +29,27 @@ async def send_gift_points(request: sanic.request.Request, accountId: str) -> sa
     :param accountId: The account id
     :return: The response object
     """
-    return sanic.response.json({
-        "profileRevision": 39840,
-        "profileId": "profile0",
-        "profileChangesBaseRevision": 39838,
-        "profileChanges": [{
-            "changeType": "statModified",
-            "name": "activity",
-            "value": {
-                "a": {
-                    "date": "2022-12-28T00:00:00.000Z",
-                    "claimed": False,
-                    "props": {
-                        "BaseBonus": 10
-                    }
-                },
-                "b": {
-                    "date": "2022-12-27T00:00:00.000Z",
-                    "claimed": True,
-                    "props": {
-                        "BaseBonus": 10,
-                        "EnergySpent": 3
-                    }
-                },
-                "standardGift": 10
+    await request.ctx.profile.modify_stat("activity", {
+        "a": {
+            "date": await format_time(
+                datetime.datetime.now(datetime.UTC).replace(hour=0, minute=0, second=0, microsecond=0)),
+            "claimed": False,
+            "props": {
+                "BaseBonus": 10
             }
-        }],
-        "profileCommandRevision": 23699,
-        "serverTime": "2022-12-28T11:37:06.741Z",
-        "multiUpdate": [{
-            "profileRevision": 9864,
-            "profileId": "friends",
-            "profileChangesBaseRevision": 9862,
-            "profileChanges": [],
-            "profileCommandRevision": 8247
-        }],
-        "responseVersion": 1
+        },
+        "b": {
+            "date": await format_time(datetime.datetime.now(datetime.UTC).replace(hour=0, minute=0, second=0,
+                                                                                  microsecond=0) - datetime.timedelta(
+                days=1)),
+            "claimed": True,
+            "props": {
+                "BaseBonus": 10
+            }
+        },
+        "standardGift": 10
     })
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions)
+    )
