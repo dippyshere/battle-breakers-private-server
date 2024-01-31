@@ -45,7 +45,7 @@ async def select_start_options(request: sanic.request.Request, accountId: str) -
             "gear_weapon_item_id": "",
             "weapon_unlocked": False,
             "sidekick_template_id": "",
-            "is_new": True,
+            "is_new": False,
             "level": 1,
             "num_sold": 0,
             "skill_level": 1,
