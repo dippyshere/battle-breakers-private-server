@@ -28,7 +28,11 @@ loginLink.addEventListener("click", handleLoginClick);
 function handleSignupClick(event) {
     "use strict";
 
-    event.preventDefault();
+    if (event.preventDefault) {
+        event.preventDefault();
+    } else {
+        event.returnValue = false;
+    }
     loginFormDiv.style.display = "none";
     signupFormDiv.style.display = "block";
 }
@@ -36,7 +40,11 @@ function handleSignupClick(event) {
 function handleLoginClick(event) {
     "use strict";
 
-    event.preventDefault();
+    if (event.preventDefault) {
+        event.preventDefault();
+    } else {
+        event.returnValue = false;
+    }
     signupFormDiv.style.display = "none";
     loginFormDiv.style.display = "block";
 }
@@ -65,7 +73,11 @@ var showOnboarding = function showOnboarding(username, code, id, heading) {
     document.querySelector("#id").innerText = id;
     document.querySelector("#onboarding-heading").innerText = heading;
     onboardingButton.addEventListener("click", function () {
-        event.preventDefault(); // Prevent the form from submitting
+        if (event.preventDefault) {
+            event.preventDefault();
+        } else {
+            event.returnValue = false;
+        } // Prevent the form from submitting
         window.location.href = "com.epicgames.wex://authorize/?code=" + code;
     });
     return true;
@@ -73,7 +85,11 @@ var showOnboarding = function showOnboarding(username, code, id, heading) {
 signupForm.addEventListener("submit", function (event) {
     "use strict";
 
-    event.preventDefault(); // Prevent the form from submitting
+    if (event.preventDefault) {
+        event.preventDefault();
+    } else {
+        event.returnValue = false;
+    } // Prevent the form from submitting
     var timeoutId;
     signupSpinner.classList.add("show");
     signupButton.disabled = true;
@@ -252,7 +268,11 @@ signupForm.addEventListener("submit", function (event) {
 loginForm.addEventListener("submit", function (event) {
     "use strict";
 
-    event.preventDefault(); // Prevent the form from submitting
+    if (event.preventDefault) {
+        event.preventDefault();
+    } else {
+        event.returnValue = false;
+    } // Prevent the form from submitting
     var timeoutId;
     loginSpinner.classList.add("show");
     loginButton.disabled = true;
@@ -284,7 +304,11 @@ loginForm.addEventListener("submit", function (event) {
             // } else if (loginUsername.value.length > 24) {
             //     // if not trying to enter an account id
             //     if (!loginUsername.value.match(/^[0-9a-fA-F]{32}$/)) {
-            //         event.preventDefault(); // Prevent the form from submitting
+            //         if (event.preventDefault) {
+            //             event.preventDefault();
+            //         } else {
+            //             event.returnValue = false;
+            //         } // Prevent the form from submitting
             //         window.alert('This account ID is not valid!');
             //     }
         } else if (loginPassword.value === loginUsername.value) {
