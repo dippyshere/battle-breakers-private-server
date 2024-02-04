@@ -870,7 +870,8 @@ async def find_best_match(input_str: str, item_list: list, split_for_path: bool 
     # print(f"Found best match for {input_str} as {best_match} with score {best_match_score}")
     # return best_match
     if split_for_path:
-        return rapidfuzz.process.extractOne(input_str, item_list, processor=lambda x: x.split("\\")[-1].split(".")[0])[0]
+        return rapidfuzz.process.extractOne(input_str, item_list, processor=lambda x: x.split("\\")[-1].split(".")[0])[
+            0]
     else:
         return rapidfuzz.process.extractOne(input_str, item_list)[0]
 
@@ -1059,3 +1060,21 @@ async def get_curvetable_value(data_table: dict, row: str, time_input: float = 0
             return row_data['Keys'][i]['Value'] + (time_input - row_data['Keys'][i]['Time']) / (
                     row_data['Keys'][i + 1]['Time'] - row_data['Keys'][i]['Time']) * (
                     row_data['Keys'][i + 1]['Value'] - row_data['Keys'][i]['Value'])
+
+
+async def calculate_streakbreaker(current_streakbreaker: int, max_streakbreaker: int = 100000,
+                                  base_chance: int = 10) -> tuple[bool, int]:
+    """
+    Calculates a streakbreaker roll
+    :param current_streakbreaker: The current streakbreaker value
+    :param max_streakbreaker: The maximum streakbreaker value
+    :param base_chance: The base chance for the roll
+    :return: A tuple of whether the roll succeeded and the new streakbreaker value
+    """
+    calculated_probability = (1 / base_chance) + (1 - (1 / base_chance)) / (
+            1 + (max_streakbreaker / current_streakbreaker + 1) ** 2)
+    roll = random.random()
+    if roll < calculated_probability:
+        return True, 0
+    else:
+        return False, current_streakbreaker + random.randint(5000, 10000)
