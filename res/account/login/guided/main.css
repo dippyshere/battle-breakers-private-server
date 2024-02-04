@@ -410,6 +410,7 @@ input#onboarding-button {
     -moz-opacity: 0;
     -khtml-opacity: 0;
     opacity: 0;
+    pointer-events: none;
 }
 
 .spinner.show {
@@ -418,7 +419,6 @@ input#onboarding-button {
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
-    pointer-events: auto;
 }
 
 @-webkit-keyframes spin {

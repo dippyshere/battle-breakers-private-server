@@ -41,8 +41,8 @@ async def login_page(request: sanic.request.Request) -> sanic.response.HTTPRespo
                    "cache-control": "public, max-age=604800"}
         async with aiofiles.open("res/account/login/guided/index.html", "rb") as file:
             page = (await file.read()).decode()
-        page = page.replace('<script src="/id/login/guided/login-script.js"></script>',
-                            '<script src="/id/login/guided/signup-script.js"></script>', 1)
+        page = page.replace('<script src="/id/login/guided/login-script.min.js"></script>',
+                            '<script src="/id/login/guided/signup-script.min.js"></script>', 1)
         return sanic.response.HTTPResponse(page, headers=headers, content_type="text/html")
     else:
         return await sanic.response.file("res/account/login/guided/index.html", max_age=604800,
@@ -60,10 +60,10 @@ async def login_page_files(request: sanic.request.Request, file: str) -> sanic.r
     :return: The response object
     """
     match file:
-        case "main.css":
-            return await sanic.response.file("res/account/login/guided/main.css", max_age=604800,
+        case "main.css" | "main.min.css":
+            return await sanic.response.file("res/account/login/guided/main.min.css", max_age=604800,
                                              request_headers=request.headers)
-        case "signup-script.js":
+        case "signup-script.js" | "signup-script.min.js":
             last_modified = (await aiofiles.os.stat("res/account/login/guided/login-script.js")).st_mtime
             response = await sanic.response.validate_file(request.headers, last_modified)
             if response is not None:
@@ -71,18 +71,18 @@ async def login_page_files(request: sanic.request.Request, file: str) -> sanic.r
             headers = {"Last-Modified": email.utils.formatdate(last_modified, usegmt=True),
                        "expires": email.utils.formatdate(last_modified + 604800, usegmt=True),
                        "cache-control": "public, max-age=604800"}
-            async with aiofiles.open("res/account/login/guided/login-script.js", "rb") as file:
+            async with aiofiles.open("res/account/login/guided/login-script.min.js", "rb") as file:
                 script = (await file.read()).decode()
-            script = script.replace('loginFormDiv.style.display = "block";',
-                                    'loginFormDiv.style.display = "none";', 1)
-            script = script.replace('signupFormDiv.style.display = "none";',
-                                    'signupFormDiv.style.display = "block";', 1)
+            script = script.replace('loginFormDiv.style.display="block"',
+                                    'loginFormDiv.style.display="none"', 1)
+            script = script.replace('signupFormDiv.style.display="none"',
+                                    'signupFormDiv.style.display="block"', 1)
             return sanic.response.HTTPResponse(script, headers=headers, content_type="application/javascript")
-        case "login-script.js":
-            return await sanic.response.file("res/account/login/guided/login-script.js", max_age=604800,
+        case "login-script.js" | "login-script.min.js":
+            return await sanic.response.file("res/account/login/guided/login-script.min.js", max_age=604800,
                                              request_headers=request.headers)
-        case "webp-detection.js":
-            return await sanic.response.file("res/account/login/guided/webp-detection.js", max_age=604800,
+        case "webp-detection.js" | "webp-detection.min.js":
+            return await sanic.response.file("res/account/login/guided/webp-detection.min.js", max_age=604800,
                                              request_headers=request.headers)
         case "index.html":
             if request.route.name == "dippy_breakers.guided_login.register-files":
