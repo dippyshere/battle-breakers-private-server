@@ -8,41 +8,6 @@ This file contains generic error details for the server categorised by HTTP stat
 """
 
 error_details = {
-    300: {
-        "error_code": "errors.com.epicgames.common.multiple_choices",
-        "error_message": "Sorry there are multiple choices available",
-        "numeric_error_code": 1000
-    },
-    301: {
-        "error_code": "errors.com.epicgames.common.moved_permanently",
-        "error_message": "Sorry the resource you were trying to find has moved permanently",
-        "numeric_error_code": 1001
-    },
-    302: {
-        "error_code": "errors.com.epicgames.common.found",
-        "error_message": "Sorry the resource you were trying to find has moved temporarily",
-        "numeric_error_code": 1002
-    },
-    303: {
-        "error_code": "errors.com.epicgames.common.see_other",
-        "error_message": "Sorry the resource you were trying to find has moved",
-        "numeric_error_code": 1003
-    },
-    304: {
-        "error_code": "errors.com.epicgames.common.not_modified",
-        "error_message": "Sorry the resource you were trying to find has not been modified",
-        "numeric_error_code": 1004
-    },
-    305: {
-        "error_code": "errors.com.epicgames.common.use_proxy",
-        "error_message": "Sorry the resource you were trying to find must be accessed through the proxy given by the location field",
-        "numeric_error_code": 1005
-    },
-    307: {
-        "error_code": "errors.com.epicgames.common.temporary_redirect",
-        "error_message": "Sorry the resource you were trying to find has moved temporarily",
-        "numeric_error_code": 1007
-    },
     400: {
         "error_code": "errors.com.epicgames.common.bad_request",
         "error_message": "Sorry the request you made was invalid",

@@ -62,6 +62,11 @@ class CustomErrorHandler(ErrorHandler):
                     for message in message_vars:
                         error_message += f"{message}"
                 error_message += f" ({exception.__class__.__name__})"
+            if isinstance(exception, Exception) and "pymongo" in exception.__class__.__module__:
+                error_code = "errors.com.epicgames.common.mongo_execution_timeout_error"
+                error_message = "Sorry, there was a timeout utilizing the database."
+                numeric_error_code = 1045
+                ErrorHandler.log(request, exception)
             headers = {
                 "X-Epic-Error-Code": numeric_error_code,
                 "X-Epic-Error-Name": error_code,
