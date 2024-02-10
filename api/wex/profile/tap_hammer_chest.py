@@ -31,25 +31,26 @@ async def tap_hammer_chest(request: sanic.request.Request, accountId: str) -> sa
     :return: The modified profile
     """
     hammer_id = await request.ctx.profile.find_item_by_template_id("Currency:Hammer")
-    if hammer_id is None:
-        raise errors.com.epicgames.world_explorers.bad_request("You do not have any hammers")
-    hammer_item = await request.ctx.profile.get_item_by_guid(hammer_id)
+    if not hammer_id:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="You do not have any hammers")
+    hammer_item = await request.ctx.profile.get_item_by_guid(hammer_id[0])
     if hammer_item is None:
-        raise errors.com.epicgames.world_explorers.bad_request("Invalid hammer ID")
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid hammer ID")
     if hammer_item.get("quantity") < 1:
-        raise errors.com.epicgames.world_explorers.bad_request("You do not have enough hammers")
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="You do not have enough hammers")
     chest_id = await request.ctx.profile.get_stat("active_hammer_chest")
-    if chest_id is None:
-        raise errors.com.epicgames.world_explorers.bad_request("There is no active hammer chest")
+    if chest_id is None or chest_id == "":
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="There is no active hammer chest")
     chest_item = await request.ctx.profile.get_item_by_guid(chest_id)
     if chest_item is None:
-        raise errors.com.epicgames.world_explorers.bad_request("Invalid chest ID")
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid chest ID")
     if not chest_item.get("templateId").startswith("HammerChest:"):
-        raise errors.com.epicgames.world_explorers.bad_request("Invalid chest ID")
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid chest ID")
     if chest_item.get("attributes").get("taps_remaining") < 1:
-        raise errors.com.epicgames.world_explorers.bad_request("There are no taps remaining on this chest")
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="There are no taps remaining on this chest")
     streakbreaker_id = await request.ctx.profile.find_item_by_template_id("Currency:SB_HammerRare")
     if streakbreaker_id:
+        streakbreaker_id = streakbreaker_id[0]
         current_streakbreaker = (await request.ctx.profile.get_item_by_guid(streakbreaker_id)).get("quantity")
     else:
         current_streakbreaker = 0
@@ -67,7 +68,7 @@ async def tap_hammer_chest(request: sanic.request.Request, accountId: str) -> sa
                                                         chest_item.get("attributes").get("taps_remaining") - 1)
         await request.ctx.profile.change_item_attribute(chest_id, "taps_applied",
                                                         chest_item.get("attributes").get("taps_applied") + 1)
-        loot_tier_group = chest_data[0]["Properties"]["OnTapLootPackage"]
+        loot_tier_group = chest_data[0]["Properties"]["OnDamageLootPackage"]
         completed = False
     items = []
     match loot_tier_group:
@@ -1142,7 +1143,7 @@ async def tap_hammer_chest(request: sanic.request.Request, accountId: str) -> sa
                 "itemProfile": "profile0",
                 "quantity": random.randint(1, 2)
             })
-    await request.ctx.profile.change_item_quantity(hammer_id, hammer_quantity)
+    await request.ctx.profile.change_item_quantity(hammer_id[0], hammer_quantity)
     for item in items:
         if not item.get("itemGuid"):
             if item.get("itemType").startswith("Character:"):
@@ -1187,7 +1188,9 @@ async def tap_hammer_chest(request: sanic.request.Request, accountId: str) -> sa
                     "quantity": item.get("quantity")
                 })
         else:
-            await request.ctx.profile.change_item_quantity(item.get("itemGuid")[0], item.get("quantity"))
+            current_quantity = (await request.ctx.profile.get_item_by_guid(item.get("itemGuid")[0])).get("quantity")
+            await request.ctx.profile.change_item_quantity(item.get("itemGuid")[0],
+                                                           current_quantity + item.get("quantity"))
             item["itemGuid"] = item.get("itemGuid")[0]
     await request.ctx.profile.add_notifications({
         "type": "WExpHammerChestOpened",

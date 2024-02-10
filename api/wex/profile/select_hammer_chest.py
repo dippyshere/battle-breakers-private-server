@@ -29,9 +29,9 @@ async def select_hammer_chest(request: sanic.request.Request, accountId: str) ->
     :param accountId: The account id
     :return: The modified profile
     """
-    chest_item = await request.ctx.profile.get_item(request.json.get("chestId"))
+    chest_item = await request.ctx.profile.get_item_by_guid(request.json.get("chestId"))
     if chest_item is None or not chest_item.get("templateId").startswith("HammerChest:"):
-        raise errors.com.epicgames.world_explorers.bad_request("Invalid chest ID")
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid chest ID")
     await request.ctx.profile.modify_stat("active_hammer_chest", request.json.get("chestId"))
     other_chests = await request.ctx.profile.find_items_by_type("HammerChest")
     for other_chests_id in other_chests:

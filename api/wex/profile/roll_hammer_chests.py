@@ -32,13 +32,14 @@ async def roll_hammer_chests(request: sanic.request.Request, accountId: str) -> 
     :return: The modified profile
     """
     if (await request.ctx.profile.get_stat("active_hammer_chest")) != "":
-        raise errors.com.epicgames.world_explorers.bad_request("Unable to roll hammer chests while a chest is active")
+        raise errors.com.epicgames.world_explorers.bad_request(
+            errorMessage="Unable to roll hammer chests while a chest is active")
     hammer_chest_pool = await aiofiles.os.listdir("res/Game/WorldExplorers/Content/Loot/AccountItems/HammerChests")
     hammer_chest_pool.remove("HC_Tutorial.json")
     hammer_chest_pool = [chest[:-5] for chest in hammer_chest_pool]
     streakbreaker_id = await request.ctx.profile.find_item_by_template_id("Currency:SB_Hammer")
     if streakbreaker_id:
-        current_streakbreaker = (await request.ctx.profile.get_item_by_guid(streakbreaker_id)).get("quantity")
+        current_streakbreaker = (await request.ctx.profile.get_item_by_guid(streakbreaker_id[0])).get("quantity")
     else:
         current_streakbreaker = 0
     streakbreaker_roll = await calculate_streakbreaker(current_streakbreaker, base_chance=8)
@@ -48,7 +49,7 @@ async def roll_hammer_chests(request: sanic.request.Request, accountId: str) -> 
     else:
         hammer_chest_pool = [chest for chest in hammer_chest_pool if "Rare" not in chest]
     if streakbreaker_id:
-        await request.ctx.profile.change_item_quantity(streakbreaker_id, streakbreaker_roll[1] + 1)
+        await request.ctx.profile.change_item_quantity(streakbreaker_id[0], streakbreaker_roll[1] + 1)
     else:
         await request.ctx.profile.add_item({
             "templateId": "Currency:SB_Hammer",
