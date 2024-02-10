@@ -11,6 +11,7 @@ import hashlib
 import os
 
 import sanic
+import aiofiles.os
 
 from utils.exceptions import errors
 from utils.sanic_gzip import Compress
@@ -31,7 +32,7 @@ async def cloudstorage_system(request: sanic.request.Request) -> sanic.response.
     :return: The response object
     """
     files = []
-    for file in os.listdir("res/wex/api/cloudstorage/system"):
+    for file in await aiofiles.os.listdir("res/wex/api/cloudstorage/system"):
         with open(f"res/wex/api/cloudstorage/system/{file}", "rb") as f:
             data = f.read()
         # best solution tbh
@@ -66,7 +67,7 @@ async def cloudstorage_system_config(request: sanic.request.Request) -> sanic.re
     :return: The response object
     """
     return sanic.response.json({
-        "lastUpdated": await format_time(os.path.getmtime("api/wex/cloud_storage.py")),
+        "lastUpdated": await format_time((await aiofiles.os.stat("res/account/login/guided/index.html")).st_mtime),
         "disableV2": False,
         "isAuthenticated": True,
         "enumerateFilesPath": "/api/cloudstorage/system",
