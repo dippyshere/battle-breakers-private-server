@@ -1072,7 +1072,7 @@ async def calculate_streakbreaker(current_streakbreaker: int, max_streakbreaker:
     :return: A tuple of whether the roll succeeded and the new streakbreaker value
     """
     calculated_probability = (1 / base_chance) + (1 - (1 / base_chance)) / (
-            1 + (max_streakbreaker / current_streakbreaker + 1) ** 2)
+            1 + ((max_streakbreaker / current_streakbreaker) if current_streakbreaker else 1) ** 2)
     roll = random.random()
     if roll < calculated_probability:
         return True, 0
