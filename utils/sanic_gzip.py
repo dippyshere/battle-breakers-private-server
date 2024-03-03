@@ -1,8 +1,8 @@
 """
-Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2023 by Alex Hanson (Dippyshere).
+Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2024 by Alexander Hanson (Dippyshere).
 Please do not skid my hard work.
 https://github.com/dippyshere/battle-breakers-private-server
-This code is licensed under the MIT License.
+This specific file is licensed under the MIT License.
 
 Full credit to https://github.com/koug44/sanic-gzip/blob/master/sanic_gzip/__init__.py
 Modified to work with Battle Breakers Private Server, and to add brotli support and mime types.

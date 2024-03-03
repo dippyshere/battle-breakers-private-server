@@ -1,4 +1,9 @@
 """
+Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2024 by Alexander Hanson (Dippyshere).
+Please do not skid my hard work.
+https://github.com/dippyshere/battle-breakers-private-server
+This code is licensed under the Breakers Revived License (BRL).
+
 Handy utility to generate item templates to paste into a profile
 input is something like:
 WorldExplorers/Content/Characters/Classes/MartialArtist/Multi_TripleCombo/CD_MartialArtist_SR2_Dark_TripleCombo_T06

@@ -1,8 +1,8 @@
 """
-Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2023 by Alex Hanson (Dippyshere).
+Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2024 by Alexander Hanson (Dippyshere).
 Please do not skid my hard work.
 https://github.com/dippyshere/battle-breakers-private-server
-This code is licensed under the [TBD] license.
+This code is licensed under the Breakers Revived License (BRL).
 
 Handles the silly version info
 """
@@ -78,7 +78,7 @@ async def wex_version_route(request: sanic.request.Request) -> sanic.response.JS
         },
         "extra": {
             "About": "This is a Battle Breakers server 'emulator'. Not affiliated with Epic Games.",
-            "Author": "Alex Hanson",
+            "Author": "Alexander Hanson",
             "GitHub": "https://github.com/dippyshere",
             "Repository": "https://github.com/dippyshere/battle-breakers-private-server",
             "Discord": ["dippy is not here#1332", "dippyshere#8105"],

@@ -1,8 +1,8 @@
 """
-Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2023 by Alex Hanson (Dippyshere).
+Battle Breakers Private Server / Master Control Program ""Emulator"" Copyright 2024 by Alexander Hanson (Dippyshere).
 Please do not skid my hard work.
 https://github.com/dippyshere/battle-breakers-private-server
-This code is licensed under the [TBD] license.
+This code is licensed under the Breakers Revived License (BRL).
 
 Class based system to handle the profile management for wex mcp service
 """
@@ -751,7 +751,10 @@ class PlayerProfile:
                     case "statModified":
                         profile["stats"]["attributes"][change["name"]]: MCPTypes = change["value"]
                     case "itemRemoved":
-                        del profile["items"][change["itemId"]]
+                        try:
+                            del profile["items"][change["itemId"]]
+                        except KeyError:
+                            pass
                     case "itemAttrChanged":
                         profile["items"][change["itemId"]]["attributes"][change["attributeName"]]: \
                             MCPTypes = change["attributeValue"]
