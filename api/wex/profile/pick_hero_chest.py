@@ -9,6 +9,7 @@ Handles picking a hero chest.
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_pick_hero_chest = sanic.Blueprint("wex_profile_pick_hero_chest")
 @wex_profile_pick_hero_chest.route("/<accountId>/PickHeroChest", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def pick_hero_chest(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def pick_hero_chest(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to pick a hero chest.
     :param request: The request object

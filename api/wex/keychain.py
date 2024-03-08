@@ -8,6 +8,7 @@ Handles the keychain stub
 """
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 from utils.utils import authorized as auth
 
@@ -19,7 +20,7 @@ wex_keychain = sanic.Blueprint("wex_keychain")
 @wex_keychain.route("/api/storefront/v2/keychain", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()
-async def wex_catalog_request(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def wex_catalog_request(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Get the keychain for encrypted dynamic paks. The game never featured any pak encryption (dynamic or not), so this
     is likely a stub incase they ever wanted to add it and could make it work with their dynamic pak system.

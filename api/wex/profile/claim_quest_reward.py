@@ -9,6 +9,7 @@ Handles claiming quest rewards
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_claim_quest_reward = sanic.Blueprint("wex_profile_claim_quest_reward
 @wex_profile_claim_quest_reward.route("/<accountId>/ClaimQuestReward", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def claim_quest_reward(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def claim_quest_reward(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to claim quest rewards
     :param request: The request object

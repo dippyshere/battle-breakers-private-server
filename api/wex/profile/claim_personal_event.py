@@ -9,6 +9,7 @@ Handles claiming personal events
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_claim_personal_event = sanic.Blueprint("wex_profile_claim_personal_e
 @wex_profile_claim_personal_event.route("/<accountId>/ClaimPersonalEvent", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def claim_personal_event(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def claim_personal_event(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to claim a personal event.
     :param request: The request object

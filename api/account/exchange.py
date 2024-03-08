@@ -7,6 +7,8 @@ This code is licensed under the Breakers Revived License (BRL).
 Handles the exchange request
 """
 import sanic
+
+from utils import types
 from utils.utils import authorized as auth, generate_authorisation_eg1, parse_eg1
 
 from utils.sanic_gzip import Compress
@@ -19,7 +21,7 @@ exchange = sanic.Blueprint("exchange_token")
 @exchange.route("/api/oauth/exchange", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()
-async def exchange_route(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def exchange_route(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Handles the exchange token request
     :param request: The request object

@@ -10,7 +10,7 @@ import ast
 import datetime
 import uuid
 from types import UnionType
-from typing import Any, Optional, Self
+from typing_extensions import Any, Optional, Self
 
 import motor.core
 import motor.motor_asyncio

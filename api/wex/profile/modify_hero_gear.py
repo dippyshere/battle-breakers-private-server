@@ -9,6 +9,7 @@ Handles modifying hero gear.
 
 import sanic
 
+from utils import types
 from utils.enums import ProfileType
 from utils.exceptions import errors
 from utils.utils import authorized as auth
@@ -24,7 +25,7 @@ wex_profile_modify_hero_gear = sanic.Blueprint("wex_profile_modify_hero_gear")
 @wex_profile_modify_hero_gear.route("/<accountId>/ModifyHeroGear", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def modify_hero_gear(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def modify_hero_gear(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to modify hero gear.
     :param request: The request object

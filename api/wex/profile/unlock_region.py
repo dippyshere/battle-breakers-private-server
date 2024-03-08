@@ -9,6 +9,7 @@ Handles unlocking map regions
 
 import sanic
 
+from utils import types
 from utils.enums import ProfileType
 from utils.exceptions import errors
 from utils.utils import authorized as auth
@@ -23,7 +24,7 @@ wex_profile_unlock_region = sanic.Blueprint("wex_profile_unlock_region")
 @wex_profile_unlock_region.route("/<accountId>/UnlockRegion", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def unlock_region(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def unlock_region(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to unlock a map region
     :param request: The request object

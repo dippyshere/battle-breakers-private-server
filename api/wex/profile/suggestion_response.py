@@ -8,6 +8,7 @@ Handles suggestion responses.
 """
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.friend_system import PlayerFriends
 from utils.utils import authorized as auth
@@ -22,7 +23,7 @@ wex_profile_suggestion_response = sanic.Blueprint("wex_profile_suggestion_respon
 @wex_profile_suggestion_response.route("/<accountId>/SuggestionResponse", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def suggestion_response(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def suggestion_response(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to respond to friend suggestions
     :param request: The request object

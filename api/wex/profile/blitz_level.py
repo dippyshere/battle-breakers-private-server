@@ -9,6 +9,7 @@ Handles level blitz for burny mines
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_blitz_level = sanic.Blueprint("wex_profile_blitz_level")
 @wex_profile_blitz_level.route("/<accountId>/BlitzLevel", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def blitz_level(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to blitz a level
     :param request: The request object

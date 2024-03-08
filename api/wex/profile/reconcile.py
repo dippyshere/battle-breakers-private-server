@@ -8,6 +8,7 @@ Handles friends reconciliation.
 """
 import sanic
 
+from utils import types
 from utils.friend_system import PlayerFriends
 from utils.enums import ProfileType
 from utils.utils import authorized as auth
@@ -22,7 +23,7 @@ wex_profile_reconcile = sanic.Blueprint("wex_profile_reconcile")
 @wex_profile_reconcile.route("/<accountId>/Reconcile", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def reconcile(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def reconcile(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to determine whether epic friends have battle breakers or not.
     :param request: The request object

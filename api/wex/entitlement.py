@@ -9,6 +9,7 @@ Handles entitlement check
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, uuid_generator, format_time
 
@@ -18,7 +19,7 @@ wex_entitlement = sanic.Blueprint("wex_entitlement")
 # https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/entitlementCheck.md
 @wex_entitlement.route("/api/entitlementCheck", methods=["GET"])
 @auth
-async def entitlement_check(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def entitlement_check(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
     This endpoint is used to check if the user has access to the game, and if not, grant them (probably).
     :param request: The request object
@@ -32,7 +33,7 @@ async def entitlement_check(request: sanic.request.Request) -> sanic.response.HT
 
 @wex_entitlement.route("/api/storeaccess/v1/request_access/<accountId>", methods=["POST"])
 @auth(strict=True)
-async def request_access(request: sanic.request.Request, accountId: str) -> sanic.response.HTTPResponse:
+async def request_access(request: types.BBRequest, accountId: str) -> sanic.response.HTTPResponse:
     """
     This endpoint is used to request free access to the game.
     :param request: The request object
@@ -77,7 +78,7 @@ async def request_access(request: sanic.request.Request, accountId: str) -> sani
 
 @wex_entitlement.route("/api/storeaccess/v1/redeem_access/<accountId>", methods=["POST"])
 @auth(strict=True)
-async def redeem_access(request: sanic.request.Request, accountId: str) -> sanic.response.HTTPResponse:
+async def redeem_access(request: types.BBRequest, accountId: str) -> sanic.response.HTTPResponse:
     """
     This endpoint is used to redeem access to the game.
     :param request: The request object
@@ -116,7 +117,7 @@ async def redeem_access(request: sanic.request.Request, accountId: str) -> sanic
 
 @wex_entitlement.route("/api/accesscontrol/status", methods=["GET"])
 @auth
-async def real_game_access(request: sanic.request.Request, accountId: str) -> sanic.response.HTTPResponse:
+async def real_game_access(request: types.BBRequest, accountId: str) -> sanic.response.HTTPResponse:
     """
     This endpoint is used for something, who knows
     :param request: The request object

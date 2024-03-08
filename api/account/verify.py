@@ -9,6 +9,8 @@ verify if a token is valid
 import jwt
 import sanic
 import datetime
+
+from utils import types
 from utils.utils import authorized as auth, public_key
 
 from utils.sanic_gzip import Compress
@@ -21,7 +23,7 @@ verify = sanic.Blueprint("account_verify")
 @verify.route("/api/oauth/verify", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()
-async def verify_auth(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def verify_auth(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     verify game auth
     :param request: The request object

@@ -7,7 +7,7 @@ This code is licensed under the Breakers Revived License (BRL).
 Class based system to handle the friends service management
 """
 import random
-from typing import Optional, Self
+from typing_extensions import Optional, Self
 
 import motor.core
 import motor.motor_asyncio

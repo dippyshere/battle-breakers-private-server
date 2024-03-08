@@ -8,6 +8,7 @@ Handles the log uploader
 """
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth, write_file
 
 from utils.sanic_gzip import Compress
@@ -20,7 +21,7 @@ wex_log = sanic.Blueprint("wex_log_upload")
 @wex_log.route("/api/feedback/log-upload/<file>", methods=["POST", "PUT"])
 @auth(allow_basic=True)
 @compress.compress()
-async def logupload(request: sanic.request.Request, file: str) -> sanic.response.HTTPResponse:
+async def logupload(request: types.BBRequest, file: str) -> sanic.response.HTTPResponse:
     """
     Handles the log upload request
     :param request: The request object

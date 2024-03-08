@@ -10,6 +10,7 @@ import datetime
 
 import sanic
 
+from utils import types
 from utils.friend_system import PlayerFriends
 from utils.profile_system import PlayerProfile
 from utils.enums import ProfileType, FriendStatus
@@ -25,7 +26,7 @@ wex_profile_update_friends = sanic.Blueprint("wex_profile_update_friends")
 @wex_profile_update_friends.route("/<accountId>/UpdateFriends", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def update_friends(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def update_friends(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to update the friends list details
     :param request: The request object

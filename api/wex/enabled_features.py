@@ -9,6 +9,7 @@ Handles the enabled features stub
 
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -18,7 +19,7 @@ wex_enabled_features = sanic.Blueprint("wex_enabled_features")
 # https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/v2/versioncheck/Windows.md
 @wex_enabled_features.route("/api/game/v2/enabled_features", methods=['GET'])
 @compress.compress()
-async def enabled_features(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def enabled_features(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Handles the enabled features check.
     :param request: The request object

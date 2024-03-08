@@ -9,6 +9,7 @@ Handles removing a hero from all parties
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_remove_hero_from_all_parties = sanic.Blueprint("wex_profile_remove_h
 @wex_profile_remove_hero_from_all_parties.route("/<accountId>/RemoveHeroFromAllParties", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def remove_hero_parties(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def remove_hero_parties(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to remove a hero from all parties.
     :param request: The request object

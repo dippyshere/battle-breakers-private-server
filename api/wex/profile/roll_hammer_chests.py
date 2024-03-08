@@ -11,6 +11,7 @@ import random
 import aiofiles.os
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, calculate_streakbreaker, load_datatable
 
@@ -24,7 +25,7 @@ wex_profile_roll_hammer_chests = sanic.Blueprint("wex_profile_roll_hammer_chests
 @wex_profile_roll_hammer_chests.route("/<accountId>/RollHammerChests", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def roll_hammer_chests(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def roll_hammer_chests(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to roll for new hammer chests
     :param request: The request object

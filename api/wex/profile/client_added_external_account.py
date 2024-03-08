@@ -9,6 +9,7 @@ Handles adding an external account
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_client_ext_acc = sanic.Blueprint("wex_profile_client_ext_acc")
 @wex_profile_client_ext_acc.route("/<accountId>/ClientAddedExternalAccount", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def client_added_external_account(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def client_added_external_account(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to add an external account.
     :param request: The request object

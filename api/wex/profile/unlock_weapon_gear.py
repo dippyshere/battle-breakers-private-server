@@ -9,6 +9,7 @@ Handles unlocking weapon gear.
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, load_datatable, load_character_data
 
@@ -22,7 +23,7 @@ wex_profile_unlock_weapon_gear = sanic.Blueprint("wex_profile_unlock_weapon_gear
 @wex_profile_unlock_weapon_gear.route("/<accountId>/UnlockWeaponGear", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def unlock_weapon_gear(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def unlock_weapon_gear(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to unlock weapon gear
     :param request: The request object

@@ -10,6 +10,7 @@ import datetime
 
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 from utils.utils import authorized as auth, format_time
 
@@ -22,7 +23,7 @@ wex_catalog = sanic.Blueprint("wex_catalog")
 @auth(allow_basic=True)
 @compress.compress()
 async def wex_catalog_request(
-        request: sanic.request.Request) -> sanic.response.JSONResponse | sanic.response.HTTPResponse:
+        request: types.BBRequest) -> sanic.response.JSONResponse | sanic.response.HTTPResponse:
     """
     get store catalog
     :param request: The request object

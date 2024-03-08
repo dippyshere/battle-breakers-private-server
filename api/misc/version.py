@@ -16,6 +16,7 @@ import orjson
 import sanic
 import git
 
+from utils import types
 from utils.sanic_gzip import Compress
 from utils.utils import format_time
 
@@ -26,7 +27,7 @@ version = sanic.Blueprint("server_ver")
 # undocumented
 @version.route("version", methods=["GET"])
 @compress.compress()
-async def version_route(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def version_route(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Version information
 

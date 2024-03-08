@@ -9,6 +9,7 @@ Handles the silly version info
 
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 from utils.utils import format_time
 
@@ -19,7 +20,7 @@ eulatracking_version = sanic.Blueprint("eulatracking_ver")
 # undocumented
 @eulatracking_version.route("/api/version", methods=["GET"])
 @compress.compress()
-async def eula_version_route(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def eula_version_route(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Version information
 

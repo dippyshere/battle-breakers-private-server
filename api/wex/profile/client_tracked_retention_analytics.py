@@ -9,6 +9,7 @@ Handles tracking level milestones
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -21,7 +22,7 @@ wex_profile_client_tracked_retention_analytics = sanic.Blueprint("wex_profile_cl
 @wex_profile_client_tracked_retention_analytics.route("/<accountId>/ClientTrackedRetentionAnalytics", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def client_tracked_retention_analytics(request: sanic.request.Request,
+async def client_tracked_retention_analytics(request: types.BBProfileRequest,
                                              accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to track account level milestones (either for the level 20/50 fortnite promotions,

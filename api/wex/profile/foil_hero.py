@@ -9,6 +9,7 @@ Handles foiling hero
 
 import sanic
 
+from utils import types
 from utils.enums import ProfileType
 from utils.exceptions import errors
 from utils.utils import authorized as auth, load_datatable, load_character_data
@@ -23,7 +24,7 @@ wex_profile_foil_hero = sanic.Blueprint("wex_profile_foil_hero")
 @wex_profile_foil_hero.route("/<accountId>/FoilHero", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def foil_hero(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def foil_hero(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to foil heroes
     :param request: The request object

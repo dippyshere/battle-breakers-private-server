@@ -7,7 +7,7 @@ This code is licensed under the Breakers Revived License (BRL).
 Class based system to handle the calendar services
 """
 import datetime
-from typing import Any, Optional, Self
+from typing_extensions import Any, Optional, Self
 
 import utils.services.calendar.channels as channels
 

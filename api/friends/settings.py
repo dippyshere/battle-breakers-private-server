@@ -9,6 +9,7 @@ Handles the friend settings
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -21,7 +22,7 @@ settings = sanic.Blueprint("friends_settings")
 @settings.route("/api/v1/<accountId>/settings", methods=["GET", "PATCH", "PUT"])
 @auth(strict=True)
 @compress.compress()
-async def friends_settings(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def friends_settings(request: types.BBFriendRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get handle friend privacy settings
     :param request: The request object
@@ -43,7 +44,7 @@ async def friends_settings(request: sanic.request.Request, accountId: str) -> sa
 @settings.route("/api/public/settings/<accountId>", methods=["GET", "PATCH", "PUT"])
 @auth(strict=True)
 @compress.compress()
-async def friends_settings(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def friends_settings(request: types.BBFriendRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get handle friend privacy settings
     :param request: The request object

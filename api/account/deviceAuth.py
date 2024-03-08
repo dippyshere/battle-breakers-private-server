@@ -8,6 +8,7 @@ Handles the device auth creation for mobile
 """
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, uuid_generator, token_generator, format_time
 
@@ -21,7 +22,7 @@ device_auth = sanic.Blueprint("device_auth")
 @device_auth.route("/api/public/account/<accountId>/deviceAuth", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def device_auth_create(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def device_auth_create(request: types.BBRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Create a device auth for the account
     :param request: The request object
@@ -61,7 +62,7 @@ async def device_auth_create(request: sanic.request.Request, accountId: str) -> 
 @device_auth.route("/api/public/account/<accountId>/deviceAuth", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def device_auth_get(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def device_auth_get(request: types.BBRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Gets a list of all registered device auths for an account
     :param request: The request object
@@ -78,7 +79,7 @@ async def device_auth_get(request: sanic.request.Request, accountId: str) -> san
 @device_auth.route("/api/public/account/<accountId>/deviceAuth/<deviceId>", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def device_auth_info(request: sanic.request.Request, accountId: str,
+async def device_auth_info(request: types.BBRequest, accountId: str,
                            deviceId: str) -> sanic.response.JSONResponse:
     """
     Gets info about the specified device auth for an account
@@ -105,7 +106,7 @@ async def device_auth_info(request: sanic.request.Request, accountId: str,
 @device_auth.route("/api/public/account/<accountId>/deviceAuth/<deviceId>", methods=["DELETE"])
 @auth(strict=True)
 @compress.compress()
-async def device_auth_deletion(request: sanic.request.Request, accountId: str,
+async def device_auth_deletion(request: types.BBRequest, accountId: str,
                                deviceId: str) -> sanic.response.HTTPResponse:
     """
     Remove a device auth for the account

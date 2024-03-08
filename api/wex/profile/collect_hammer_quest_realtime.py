@@ -9,6 +9,7 @@ Handles collecting hammer quests real time
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_collect_hammer_quest_realtime = sanic.Blueprint("wex_profile_collect
 @wex_profile_collect_hammer_quest_realtime.route("/<accountId>/CollectHammerQuest_Realtime", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def collect_hammer_quest_realtime(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def collect_hammer_quest_realtime(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to collect hammer quests real time
     :param request: The request object

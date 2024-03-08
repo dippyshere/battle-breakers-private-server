@@ -9,6 +9,7 @@ Handles opening a hero chest.
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_open_hero_chest = sanic.Blueprint("wex_profile_open_hero_chest")
 @wex_profile_open_hero_chest.route("/<accountId>/OpenHeroChest", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def open_hero_chest(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def open_hero_chest(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to open a hero chest.
     :param request: The request object

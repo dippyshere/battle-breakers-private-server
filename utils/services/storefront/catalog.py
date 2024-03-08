@@ -8,7 +8,7 @@ Class based system to handle the storefronts
 """
 import datetime
 import uuid
-from typing import Any, Optional, Self
+from typing_extensions import Any, Optional, Self
 
 import utils.services.storefront.storefronts as storefronts
 from utils.utils import get_nearest_12_hour_interval, format_time, get_current_12_hour_interval

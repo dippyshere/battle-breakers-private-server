@@ -9,6 +9,7 @@ Handles marking a hero as seen
 
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 from utils.utils import authorized as auth
 
@@ -20,7 +21,7 @@ wex_profile_mark_hero_seen = sanic.Blueprint("wex_profile_mark_hero_seen")
 @wex_profile_mark_hero_seen.route("/<accountId>/MarkHeroSeen", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def mark_hero_seen(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def mark_hero_seen(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used in older versions of the game to mark a hero as seen. It's deprecated and replaced by item
     :param request: The request object

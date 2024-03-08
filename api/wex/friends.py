@@ -10,6 +10,7 @@ import urllib.parse
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.friend_system import PlayerFriends
 from utils.profile_system import PlayerProfile
@@ -24,7 +25,7 @@ wex_friend = sanic.Blueprint("wex_friend")
 # undocumented
 @wex_friend.route("/api/game/v2/friends/<accountId>/search", methods=['GET'])
 @compress.compress()
-async def wex_friends_search(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def wex_friends_search(request: types.BBRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to search for friends
     :param request: The request object

@@ -9,6 +9,7 @@ Handles the manifest cdn downloads
 import aiofiles
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -18,7 +19,7 @@ build_manifest = sanic.Blueprint("cdn_build_manifest")
 # undocumented
 @build_manifest.route(r"/<version:(\d\.\d*\.\d*-r\d*)>/<file:(BuildManifest-\w*\.txt)>", methods=["GET"])
 @compress.compress()
-async def build_manifest_request(request: sanic.request.Request, version: str,
+async def build_manifest_request(request: types.BBRequest, version: str,
                                  file: str) -> sanic.response.HTTPResponse:
     """
     Handles the build manifest txt request
@@ -39,7 +40,7 @@ async def build_manifest_request(request: sanic.request.Request, version: str,
 # undocumented
 @build_manifest.route(r"/<version:(\d\.\d*\.\d*-r\d*)>/<platform>/<pak:(\w*chunk\d*[-_]pak\d*\.pak)>", methods=["GET"])
 @compress.compress()
-async def build_manifest_pak(request: sanic.request.Request, version: str, platform: str,
+async def build_manifest_pak(request: types.BBRequest, version: str, platform: str,
                              pak: str) -> sanic.response.HTTPResponse:
     """
     Handles the pak chunk downloads

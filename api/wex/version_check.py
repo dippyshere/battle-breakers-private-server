@@ -9,6 +9,7 @@ Handles the version check
 
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -18,7 +19,7 @@ wex_version_check = sanic.Blueprint("wex_version_check")
 # https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/World%20Explorers%20Service/wex/api/v2/versioncheck/Windows.md
 @wex_version_check.route("/api/v2/versioncheck/<platform>", methods=['GET'])
 @compress.compress()
-async def version_check(request: sanic.request.Request, platform: str) -> sanic.response.HTTPResponse:
+async def version_check(request: types.BBRequest, platform: str) -> sanic.response.HTTPResponse:
     """
     Handles the version check request
     :param request: The request object

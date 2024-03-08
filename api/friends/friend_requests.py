@@ -12,6 +12,7 @@ nvm
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -24,7 +25,7 @@ friend_request = sanic.Blueprint("friend_request")
 @friend_request.route("/api/v1/<accountId>/friends/<friendId>", methods=["POST", "DELETE"])
 @auth(strict=True)
 @compress.compress()
-async def send_friend_request(request: sanic.request.Request, accountId: str,
+async def send_friend_request(request: types.BBFriendRequest, accountId: str,
                               friendId: str) -> sanic.response.HTTPResponse:
     """
     Sends a friend request to the specified account id
@@ -48,7 +49,7 @@ async def send_friend_request(request: sanic.request.Request, accountId: str,
 @friend_request.route("/api/public/friends/<accountId>/<friendId>", methods=["POST", "DELETE"])
 @auth(strict=True)
 @compress.compress()
-async def send_friend_request_deprecated(request: sanic.request.Request, accountId: str,
+async def send_friend_request_deprecated(request: types.BBFriendRequest, accountId: str,
                                          friendId: str) -> sanic.response.HTTPResponse:
     """
     Identical to above, but serves as backwards compatability for old clients
@@ -71,7 +72,7 @@ async def send_friend_request_deprecated(request: sanic.request.Request, account
 @friend_request.route("/api/v1/<accountId>/incoming/accept", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def accept_bulk_requests(request: sanic.request.Request, accountId: str) -> sanic.response.HTTPResponse:
+async def accept_bulk_requests(request: types.BBFriendRequest, accountId: str) -> sanic.response.HTTPResponse:
     """
     Accepts all specified incoming friend requests
     :param request: The request object

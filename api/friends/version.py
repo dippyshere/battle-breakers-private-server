@@ -9,6 +9,7 @@ Handles the silly version info
 
 import sanic
 
+from utils import types
 from utils.utils import format_time
 
 friends_version = sanic.Blueprint("friends_ver")
@@ -16,7 +17,7 @@ friends_version = sanic.Blueprint("friends_ver")
 
 # undocumented
 @friends_version.route("/api/version", methods=["GET"])
-async def friends_version_route(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def friends_version_route(request: types.BBFriendRequest) -> sanic.response.JSONResponse:
     """
     Version information
 

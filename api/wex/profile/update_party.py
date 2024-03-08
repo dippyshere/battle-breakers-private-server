@@ -8,6 +8,7 @@ Handles party update request
 """
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -20,7 +21,7 @@ wex_profile_update_party = sanic.Blueprint("wex_profile_update_party")
 @wex_profile_update_party.route("/<accountId>/UpdateParty", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def update_party(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def update_party(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to update the party
     :param request: The request object

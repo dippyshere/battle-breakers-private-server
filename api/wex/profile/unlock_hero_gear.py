@@ -9,6 +9,7 @@ Handles unlocking hero gear.
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, load_datatable, load_character_data
 
@@ -22,7 +23,7 @@ wex_profile_unlock_hero_gear = sanic.Blueprint("wex_profile_unlock_hero_gear")
 @wex_profile_unlock_hero_gear.route("/<accountId>/UnlockHeroGear", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def unlock_hero_gear(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def unlock_hero_gear(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to unlock hero gear
     :param request: The request object

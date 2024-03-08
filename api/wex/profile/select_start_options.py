@@ -10,6 +10,7 @@ import datetime
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.friend_system import PlayerFriends
 from utils.profile_system import PlayerProfile
@@ -26,7 +27,7 @@ wex_profile_select_start_options = sanic.Blueprint("wex_profile_select_start_opt
 @wex_profile_select_start_options.route("/<accountId>/SelectStartOptions", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def select_start_options(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def select_start_options(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to choose a starter hero, and update the display name / support a creator code
     :param request: The request object

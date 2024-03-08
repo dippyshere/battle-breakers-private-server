@@ -8,6 +8,7 @@ Handles deleting friend suggestions / unfriending friends
 """
 import sanic
 
+from utils import types
 from utils.friend_system import PlayerFriends
 from utils.utils import authorized as auth
 
@@ -21,7 +22,7 @@ wex_profile_delete_friend = sanic.Blueprint("wex_profile_delete_friend")
 @wex_profile_delete_friend.route("/<accountId>/DeleteFriend", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def delete_friend(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def delete_friend(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to unfriend or get rid of a suggestion, and is the only friend endpoint called on old versions
     :param request: The request object

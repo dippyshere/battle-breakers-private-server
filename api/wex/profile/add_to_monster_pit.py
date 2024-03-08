@@ -9,6 +9,7 @@ Handles adding heroes to monster pit
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_add_to_monster_pit = sanic.Blueprint("wex_profile_add_to_monster_pit
 @wex_profile_add_to_monster_pit.route("/<accountId>/AddToMonsterPit", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def add_to_monster_pit(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def add_to_monster_pit(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to add heroes to the monster pit
     :param request: The request object

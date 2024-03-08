@@ -9,6 +9,7 @@ Handles purchasing a catalog entry.
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_purchase_catalog_entry = sanic.Blueprint("wex_profile_purchase_catal
 @wex_profile_purchase_catalog_entry.route("/<accountId>/PurchaseCatalogEntry", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def purchase_catalog_entry(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def purchase_catalog_entry(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to purchase a catalog entry.
     :param request: The request object

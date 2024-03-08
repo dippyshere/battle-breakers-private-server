@@ -9,6 +9,7 @@ Handles evolving heroes
 
 import sanic
 
+from utils import types
 from utils.enums import ProfileType
 from utils.exceptions import errors
 from utils.utils import authorized as auth, load_datatable, get_path_from_template_id, get_template_id_from_path
@@ -23,7 +24,7 @@ wex_profile_evolve_hero = sanic.Blueprint("wex_profile_evolve_hero")
 @wex_profile_evolve_hero.route("/<accountId>/EvolveHero", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def evolve_hero(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def evolve_hero(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to evolve heroes
     :param request: The request object

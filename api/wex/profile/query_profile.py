@@ -9,6 +9,7 @@ Handles profile queries
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -21,7 +22,7 @@ wex_profile_query = sanic.Blueprint("wex_profile_query")
 @wex_profile_query.route("/<accountId>/QueryProfile", methods=["GET", "POST"])
 @auth(strict=True)
 @compress.compress()
-async def query_profile(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def query_profile(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Handles the query profile request
     :param request: The request object

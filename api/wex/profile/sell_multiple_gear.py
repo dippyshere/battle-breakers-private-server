@@ -9,6 +9,7 @@ Handles selling multiple gear.
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_sell_multiple_gear = sanic.Blueprint("wex_profile_sell_multiple_gear
 @wex_profile_sell_multiple_gear.route("/<accountId>/SellMultipleGear", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def sell_multiple_gear(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def sell_multiple_gear(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to sell multiple gear
     :param request: The request object

@@ -9,6 +9,7 @@ Handles generating daily quests for a profile.
 
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 from utils.utils import authorized as auth, format_time
 
@@ -20,7 +21,7 @@ wex_profile_generate_daily_quests = sanic.Blueprint("wex_profile_generate_daily_
 @wex_profile_generate_daily_quests.route("/<accountId>/GenerateDailyQuests", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def generate_daily_quests(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def generate_daily_quests(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to generate daily quests for a profile, and fetch friend gift points.
     :param request: The request object

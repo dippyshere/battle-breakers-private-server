@@ -10,6 +10,7 @@ import datetime
 
 import sanic
 
+from utils import types
 from utils.enums import ProfileType
 from utils.friend_system import PlayerFriends
 from utils.profile_system import PlayerProfile
@@ -25,7 +26,7 @@ wex_profile_suggest_friends = sanic.Blueprint("wex_profile_suggest_friends")
 @wex_profile_suggest_friends.route("/<accountId>/SuggestFriends", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def suggest_friends(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def suggest_friends(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to request friend suggestions (on legacy clients/friend system)
     :param request: The request object

@@ -9,6 +9,7 @@ Handles claiming the notification opt-in reward
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_claim_notification_opt_in_reward = sanic.Blueprint("wex_profile_clai
 @wex_profile_claim_notification_opt_in_reward.route("/<accountId>/ClaimNotificationOptInReward", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def claim_notification_opt_in_reward(request: sanic.request.Request,
+async def claim_notification_opt_in_reward(request: types.BBProfileRequest,
                                            accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to claim the notification opt-in reward

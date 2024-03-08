@@ -10,6 +10,7 @@ import re
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth, generate_authorisation_eg1, bcrypt_hash, create_account, bcrypt_check
 
 from utils.sanic_gzip import Compress
@@ -22,7 +23,7 @@ login_token = sanic.Blueprint("login_token")
 @login_token.route("/id/login/token", methods=["POST"])
 @auth(allow_basic=True)
 @compress.compress()
-async def login_token_route(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def login_token_route(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Authenticate a mobile user logging in / signing up and return a token
     :param request: The request object

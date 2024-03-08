@@ -9,6 +9,7 @@ Handles claiming the come back reward
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_claim_comeback = sanic.Blueprint("wex_profile_claim_comeback")
 @wex_profile_claim_comeback.route("/<accountId>/ClaimComeBackReward", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def claim_comeback(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def claim_comeback(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to claim the come back reward.
     :param request: The request object

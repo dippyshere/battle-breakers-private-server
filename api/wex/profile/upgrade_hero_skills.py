@@ -9,6 +9,7 @@ Handles upgrading hero skills.
 
 import sanic
 
+from utils import types
 from utils.enums import ProfileType
 from utils.exceptions import errors
 from utils.utils import authorized as auth
@@ -23,7 +24,7 @@ wex_profile_upgrade_hero_skills = sanic.Blueprint("wex_profile_upgrade_hero_skil
 @wex_profile_upgrade_hero_skills.route("/<accountId>/UpgradeHeroSkills", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def upgrade_hero_skills(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def upgrade_hero_skills(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to upgrade hero skills
     :param request: The request object

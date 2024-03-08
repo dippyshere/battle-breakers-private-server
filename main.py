@@ -4,10 +4,10 @@ Please do not skid my hard work.
 https://github.com/dippyshere/battle-breakers-private-server
 This code is licensed under the Breakers Revived License (BRL).
 """
-from typing import Any
+from typing_extensions import Any, Type
 
 from api import api
-from utils import utils, error_handler
+from utils import utils, error_handler, types
 import middleware.mcp_middleware
 
 import orjson
@@ -23,8 +23,12 @@ from utils.custom_serialiser import custom_serialise
 
 colorama.init()
 toml_config = TomlConfig(path="utils/config.toml")
-app: sanic.app.Sanic = sanic.app.Sanic("dippy_breakers", dumps=lambda obj: orjson.dumps(obj, default=custom_serialise),
-                                       loads=orjson.loads, config=toml_config)
+app: sanic.app.Sanic[TomlConfig, Type[types.Context]] = sanic.app.Sanic("dippy_breakers",
+                                                                        dumps=lambda obj: orjson.dumps(obj,
+                                                                                                       default=
+                                                                                                       custom_serialise)
+                                                                        , loads=orjson.loads, config=toml_config,
+                                                                        ctx=types.Context)
 
 app.blueprint(api)
 sanic_ext.Extend(app)

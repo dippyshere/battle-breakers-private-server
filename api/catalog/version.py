@@ -9,6 +9,7 @@ Handles the silly version info
 
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 from utils.utils import format_time
 
@@ -19,7 +20,7 @@ catalog_version = sanic.Blueprint("catalog_ver")
 # undocumented
 @catalog_version.route("/api/version", methods=["GET"])
 @compress.compress()
-async def catalog_version_route(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def catalog_version_route(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Version information
 

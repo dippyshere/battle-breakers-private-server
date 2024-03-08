@@ -9,6 +9,7 @@ Handles claiming rewards from events
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_claim_event_rewards = sanic.Blueprint("wex_profile_claim_event_rewar
 @wex_profile_claim_event_rewards.route("/<accountId>/ClaimEventRewards", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def claim_event_rewards(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def claim_event_rewards(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used claim rewards from events
     :param request: The request object

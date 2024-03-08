@@ -9,6 +9,7 @@ Handles the friends summary
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -21,7 +22,7 @@ summary = sanic.Blueprint("friends_summary")
 @summary.route("/api/v1/<accountId>/summary", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def friends_summary(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def friends_summary(request: types.BBFriendRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get friends summary
     :param request: The request object
@@ -34,7 +35,7 @@ async def friends_summary(request: sanic.request.Request, accountId: str) -> san
 @summary.route("/api/v1/<accountId>/friends", methods=["GET", "DELETE"])
 @auth(strict=True)
 @compress.compress()
-async def friends_list_get_delete(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def friends_list_get_delete(request: types.BBFriendRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get friends summary
     :param request: The request object
@@ -50,7 +51,7 @@ async def friends_list_get_delete(request: sanic.request.Request, accountId: str
 @summary.route("/api/v1/<accountId>/incoming", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def friends_incoming(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def friends_incoming(request: types.BBFriendRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get friends incoming summary
     :param request: The request object
@@ -63,7 +64,7 @@ async def friends_incoming(request: sanic.request.Request, accountId: str) -> sa
 @summary.route("/api/v1/<accountId>/outgoing", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def friends_outgoing(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def friends_outgoing(request: types.BBFriendRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get friends outgoing summary
     :param request: The request object
@@ -76,7 +77,7 @@ async def friends_outgoing(request: sanic.request.Request, accountId: str) -> sa
 @summary.route("/api/v1/<accountId>/suggested", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def friends_suggested(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def friends_suggested(request: types.BBFriendRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get friends suggested summary
     :param request: The request object
@@ -89,7 +90,7 @@ async def friends_suggested(request: sanic.request.Request, accountId: str) -> s
 @summary.route("/api/v1/<accountId>/blocklist", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def friends_blocked(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def friends_blocked(request: types.BBFriendRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get friends blocked list
     :param request: The request object
@@ -102,7 +103,7 @@ async def friends_blocked(request: sanic.request.Request, accountId: str) -> san
 @summary.route("/api/v1/<accountId>/blocklist/<friendId>", methods=["POST", "DELETE"])
 @auth(strict=True)
 @compress.compress()
-async def block_friend(request: sanic.request.Request, accountId: str) -> sanic.response.HTTPResponse:
+async def block_friend(request: types.BBFriendRequest, accountId: str) -> sanic.response.HTTPResponse:
     """
     Get friends blocked list
     :param request: The request object
@@ -123,7 +124,7 @@ async def block_friend(request: sanic.request.Request, accountId: str) -> sanic.
 @summary.route("/api/public/friends/<accountId>", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def legacy_friends_summary(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def legacy_friends_summary(request: types.BBFriendRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get friends summary
     :param request: The request object
@@ -136,7 +137,7 @@ async def legacy_friends_summary(request: sanic.request.Request, accountId: str)
 @summary.route("/api/public/blocklist/<accountId>", methods=["GET", "DELETE"])
 @auth(strict=True)
 @compress.compress()
-async def friends_legacy_blocklist(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def friends_legacy_blocklist(request: types.BBFriendRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get friends blocklist
     :param request: The request object

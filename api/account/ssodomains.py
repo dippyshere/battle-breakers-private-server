@@ -9,6 +9,7 @@ Fetch domains that are compatible with epics single sign on system
 
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -18,7 +19,7 @@ ssodomains = sanic.Blueprint("account_ssodomains")
 # https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Account%20Service/account/api/epicdomains/ssodomains.md
 @ssodomains.route("/api/epicdomains/ssodomains", methods=["GET"])
 @compress.compress()
-async def epic_domains_sso_domains(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def epic_domains_sso_domains(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Get epic domains sso domains
     :param request: The request object

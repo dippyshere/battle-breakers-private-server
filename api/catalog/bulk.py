@@ -9,6 +9,7 @@ Handles the bulk offers for wex catalog
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth, read_file
 
 from utils.sanic_gzip import Compress
@@ -21,7 +22,7 @@ bulk = sanic.Blueprint("catalog_bulk")
 @bulk.route("/api/shared/bulk/offers", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()
-async def offers(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def offers(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Get offers
     :param request: The request object

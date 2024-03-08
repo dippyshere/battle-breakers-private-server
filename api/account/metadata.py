@@ -8,6 +8,7 @@ Handles the account metadata endpoints
 """
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -21,7 +22,7 @@ account_metadata = sanic.Blueprint("account_metadata")
 @account_metadata.route("/api/public/account/<accountId>/metadata", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def get_metadata(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def get_metadata(request: types.BBRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get all account metadata
     :param request: The request object
@@ -38,7 +39,7 @@ async def get_metadata(request: sanic.request.Request, accountId: str) -> sanic.
 @account_metadata.route("/api/public/account/<accountId>/metadata/<key>", methods=["GET", "DELETE"])
 @auth(strict=True)
 @compress.compress()
-async def get_delete_metadata(request: sanic.request.Request, accountId: str, key: str) -> sanic.response.HTTPResponse:
+async def get_delete_metadata(request: types.BBRequest, accountId: str, key: str) -> sanic.response.HTTPResponse:
     """
     Get/Delete a specific account metadata value
     :param request: The request object
@@ -70,7 +71,7 @@ async def get_delete_metadata(request: sanic.request.Request, accountId: str, ke
 @account_metadata.route("/api/public/account/<accountId>/metadata", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def set_metadata(request: sanic.request.Request, accountId: str) -> sanic.response.HTTPResponse:
+async def set_metadata(request: types.BBRequest, accountId: str) -> sanic.response.HTTPResponse:
     """
     Set a specific account metadata value
     :param request: The request object

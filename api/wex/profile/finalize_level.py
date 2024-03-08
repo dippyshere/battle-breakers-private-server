@@ -9,6 +9,7 @@ Handles finalizing levels
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.enums import ProfileType
 from utils.utils import authorized as auth
@@ -23,7 +24,7 @@ wex_profile_finalize_level = sanic.Blueprint("wex_profile_finalize_level")
 @wex_profile_finalize_level.route("/<accountId>/FinalizeLevel", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def finalize_level(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def finalize_level(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to finalize a level upon completion / abandoning
     :param request: The request object

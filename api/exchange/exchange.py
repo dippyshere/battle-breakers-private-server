@@ -11,6 +11,7 @@ import urllib.parse
 import jwt
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.sanic_gzip import Compress
 from utils.utils import public_key
@@ -22,7 +23,7 @@ exchange = sanic.Blueprint("exchange")
 # undocumented
 @exchange.route("/exchange", methods=["GET"])
 @compress.compress()
-async def exchange_route(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def exchange_route(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
     handle exchange of auth from game to web
     :param request: The request object

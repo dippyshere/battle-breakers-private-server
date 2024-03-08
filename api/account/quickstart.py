@@ -8,6 +8,7 @@ Handles the quick start account creation
 """
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth, oauth_response, generate_eg1, uuid_generator, create_account, \
     token_generator, format_time
 
@@ -21,7 +22,7 @@ account_quickstart = sanic.Blueprint("account_quickstart")
 @account_quickstart.route("/api/public/account", methods=["POST"])
 @auth(allow_basic=True)
 @compress.compress()
-async def quickstart(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def quickstart(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
     Create a quick start account
 

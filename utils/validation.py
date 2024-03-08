@@ -7,7 +7,7 @@ This code is licensed under the Breakers Revived License (BRL).
 Contains validation classes for requests
 """
 import uuid
-from typing import Callable, Any
+from typing_extensions import Callable, Any
 
 import pydantic
 import pydantic_core

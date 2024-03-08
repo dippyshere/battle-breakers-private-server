@@ -9,6 +9,7 @@ Handles verifying real money mtx mcp
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -21,7 +22,7 @@ wex_verify_realmoney = sanic.Blueprint("wex_verify_realmoney")
 @wex_verify_realmoney.route("/<accountId>/VerifyRealMoneyPurchase", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def verify_rmt(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def verify_rmt(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to verify if receipts are legit or fake!! Checks for profile changes after a purchase.
     :param request: The request object

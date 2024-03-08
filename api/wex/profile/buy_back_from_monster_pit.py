@@ -9,6 +9,7 @@ Handles monster pit buy back
 
 import sanic
 
+from utils import types
 from utils.enums import ProfileType
 from utils.exceptions import errors
 from utils.utils import authorized as auth, load_character_data, load_datatable, get_template_id_from_path
@@ -23,7 +24,7 @@ wex_profile_buy_back_from_monster_pit = sanic.Blueprint("wex_profile_buy_back_fr
 @wex_profile_buy_back_from_monster_pit.route("/<accountId>/BuyBackFromMonsterPit", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def buy_back_from_monster_pit(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def buy_back_from_monster_pit(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to buy back heroes and pets from the monster pit
     :param request: The request object

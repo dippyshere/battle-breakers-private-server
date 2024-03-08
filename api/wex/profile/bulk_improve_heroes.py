@@ -9,6 +9,7 @@ Handles bulk improve heroes (used for auto upgrade)
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, load_datatable, get_path_from_template_id
 
@@ -22,7 +23,7 @@ wex_profile_bulk_improve_heroes = sanic.Blueprint("wex_profile_bulk_improve_hero
 @wex_profile_bulk_improve_heroes.route("/<accountId>/BulkImproveHeroes", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def bulk_improve_heroes(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def bulk_improve_heroes(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to upgrade heroes in bulk
     :param request: The request object

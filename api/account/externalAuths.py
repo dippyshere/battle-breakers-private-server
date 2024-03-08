@@ -8,6 +8,7 @@ Handles the external auths endpoint
 """
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, verify_google_token
 
@@ -21,7 +22,7 @@ external_auths = sanic.Blueprint("account_external_auths")
 @external_auths.route("/api/public/account/<accountId>/externalAuths", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def external_auth(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def external_auth(request: types.BBRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get external auths
     :param request: The request object
@@ -39,7 +40,7 @@ async def external_auth(request: sanic.request.Request, accountId: str) -> sanic
 @external_auths.route("/api/public/account/<accountId>/externalAuths", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def add_external_auth(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def add_external_auth(request: types.BBRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Adds an external auth to an account.
     :param request: The request object
@@ -47,7 +48,7 @@ async def add_external_auth(request: sanic.request.Request, accountId: str) -> s
     :return: The response object
     """
     data = await request.app.ctx.db["accounts"].find_one({"_id": accountId},
-                                                               {"externalAuths": 1, "_id": 0, "name": 1, "lastName": 1})
+                                                         {"externalAuths": 1, "_id": 0, "name": 1, "lastName": 1})
     # not bothered to add ALL of the external auths, only adding google cause mobile (fb blocked insecure sign in)
     match request.json.get("authType"):
         case "google_user_id":
@@ -91,16 +92,16 @@ async def add_external_auth(request: sanic.request.Request, accountId: str) -> s
 
 
 # undocumented
-@external_auths.route("/api/public/account/<accountId>/externalAuths/<type>", methods=["GET", "DELETE"])
+@external_auths.route("/api/public/account/<accountId>/externalAuths/<authType>", methods=["GET", "DELETE"])
 @auth(strict=True)
 @compress.compress()
-async def manage_external_auth(request: sanic.request.Request, accountId: str,
-                               type: str) -> sanic.response.JSONResponse | sanic.response.HTTPResponse:
+async def manage_external_auth(request: types.BBRequest, accountId: str,
+                               authType: str) -> sanic.response.JSONResponse | sanic.response.HTTPResponse:
     """
     Manage external auths by type
     :param request: The request object
     :param accountId: The account id
-    :param type: The external auth type
+    :param authType: The external auth type
     :return: The response object
     """
     if request.method == "GET":
@@ -108,14 +109,14 @@ async def manage_external_auth(request: sanic.request.Request, accountId: str,
             {"_id": accountId}, {"externalAuths.$": 1, "_id": 0})
         if external_auth_account and "externalAuths" in external_auth_account:
             for auth_type, auth_data in external_auth_account["externalAuths"].items():
-                if auth_data.get("type") == type:
+                if auth_data.get("type") == authType:
                     return sanic.response.json(auth_data)
             raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()
         else:
             raise errors.com.epicgames.account.ext_auth.unknown_external_auth_type()
     elif request.method == "DELETE":
         result = await request.app.ctx.db["accounts"].update_one({"_id": accountId},
-                                                                       {"$pull": {"externalAuths": {"type": type}}})
+                                                                 {"$pull": {"externalAuths": {"type": authType}}})
         if result.matched_count == 1 and result.modified_count == 1:
             return sanic.response.empty()
         else:

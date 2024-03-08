@@ -9,6 +9,7 @@ Handles the chunkv3 manifest cdn downloads
 import aiofiles
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -20,7 +21,7 @@ chunk_manifest = sanic.Blueprint("cdn_chunkv3_manifest")
     r"/<environment:(WorldExplorers\w*)>/<changelist:(CL_\d*)>/<platform>/<file:(WorldExplorers_pakchunk\d*CL_\d*\.manifest)>",
     methods=["GET"])
 @compress.compress()
-async def chunk_manifest_request(request: sanic.request.Request, environment: str, changelist: str, platform: str,
+async def chunk_manifest_request(request: types.BBRequest, environment: str, changelist: str, platform: str,
                                  file: str) -> sanic.response.HTTPResponse:
     """
     Handles the chunkv3 individual pak manifest request
@@ -43,7 +44,7 @@ async def chunk_manifest_request(request: sanic.request.Request, environment: st
     r"/<environment:(WorldExplorers\w*)>/<changelist:(CL_\d*)>/<platform>/ChunksV3/<DataGroupList:(\d{2})>/<ChunkHashGUID:([0-9A-F]*_[0-9A-F]*\.chunk)>",
     methods=["GET"])
 @compress.compress()
-async def chunk_manifest_serve_chunks(request: sanic.request.Request, environment: str, changelist: str, platform: str,
+async def chunk_manifest_serve_chunks(request: types.BBRequest, environment: str, changelist: str, platform: str,
                                       DataGroupList: str, ChunkHashGUID: str) -> sanic.response.HTTPResponse:
     """
     Handles the chunked cloudv3 downloads

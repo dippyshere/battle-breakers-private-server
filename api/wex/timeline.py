@@ -9,6 +9,7 @@ Handles the events timeline
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth, format_time
 
 from utils.sanic_gzip import Compress
@@ -21,7 +22,7 @@ wex_timeline = sanic.Blueprint("wex_timeline")
 @wex_timeline.route("/api/calendar/v1/timeline", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()
-async def calendar(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def calendar(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     get calendar timeline
     :param request: The request object

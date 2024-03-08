@@ -9,6 +9,7 @@ Handles collecting hammer quests energy
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_collect_hammer_quest_energy = sanic.Blueprint("wex_profile_collect_h
 @wex_profile_collect_hammer_quest_energy.route("/<accountId>/CollectHammerQuest_Energy", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def collect_hammer_quest_energy(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def collect_hammer_quest_energy(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to collect hammer quests energy
     :param request: The request object

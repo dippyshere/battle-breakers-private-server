@@ -10,6 +10,7 @@ import datetime
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.sanic_gzip import Compress
 from utils.utils import authorized as auth, load_datatable, get_template_id_from_path, extract_version_info, format_time
@@ -22,7 +23,7 @@ wex_profile_claim_login = sanic.Blueprint("wex_profile_claim_login")
 @wex_profile_claim_login.route("/<accountId>/ClaimLoginReward", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def claim_login_reward(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def claim_login_reward(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Handles the daily reward request
     :param request: The request object

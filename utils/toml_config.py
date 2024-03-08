@@ -6,7 +6,7 @@ This code is licensed under the Breakers Revived License (BRL).
 
 Handles loading the toml config into the Sanic application
 """
-from typing import Any
+from typing_extensions import Any
 
 import sanic
 

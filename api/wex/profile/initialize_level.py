@@ -10,6 +10,7 @@ import uuid
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.enums import ProfileType
 from utils.utils import authorized as auth, load_datatable, format_time, room_generator
@@ -24,7 +25,7 @@ wex_profile_initialize_level = sanic.Blueprint("wex_profile_initialize_level")
 @wex_profile_initialize_level.route("/<accountId>/InitializeLevel", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def initialize_level(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def initialize_level(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to initialize a level for a profile.
     :param request: The request object

@@ -9,6 +9,7 @@ Handles the service status for Battle Breakers
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -21,7 +22,7 @@ status = sanic.Blueprint("lightswitch_status")
 @status.route("/api/service/bulk/status", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()
-async def lightswitch_bulk(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def lightswitch_bulk(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Handles the lightswitch bulk status request
     :param request: The request object
@@ -54,7 +55,7 @@ async def lightswitch_bulk(request: sanic.request.Request) -> sanic.response.JSO
 # undocumented
 @status.route("/api/service/<serviceId>/status", methods=["GET"])
 @compress.compress()
-async def lightswitch_service(request: sanic.request.Request, serviceId: str) -> sanic.response.JSONResponse:
+async def lightswitch_service(request: types.BBRequest, serviceId: str) -> sanic.response.JSONResponse:
     """
     Handles the lightswitch status request
     :param request: The request object

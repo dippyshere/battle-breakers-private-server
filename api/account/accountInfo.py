@@ -8,6 +8,7 @@ Handles the account endpoint
 """
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, get_account_data, get_account_data_owner
 
@@ -21,7 +22,7 @@ account_info = sanic.Blueprint("account_info")
 @account_info.route("/api/public/account/<accountId>", methods=["GET"])
 @auth
 @compress.compress()
-async def account_route(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def account_route(request: types.BBRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get account info
     :param request: The request object

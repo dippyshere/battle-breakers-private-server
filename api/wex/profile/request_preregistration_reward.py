@@ -9,6 +9,7 @@ Handles requesting the preregistration reward
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_request_prereg = sanic.Blueprint("wex_profile_request_prereg")
 @wex_profile_request_prereg.route("/<accountId>/RequestPreregistrationReward", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def request_preregistration(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def request_preregistration(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to claim the preregistration reward.
     :param request: The request object

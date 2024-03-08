@@ -9,6 +9,7 @@ Handles leveling up heroes.
 
 import sanic
 
+from utils import types
 from utils.enums import ProfileType
 from utils.exceptions import errors
 from utils.utils import authorized as auth, load_datatable
@@ -23,7 +24,7 @@ wex_profile_level_up_hero = sanic.Blueprint("wex_profile_level_up_hero")
 @wex_profile_level_up_hero.route("/<accountId>/LevelUpHero", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def level_up_hero(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def level_up_hero(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to level up heroes.
     :param request: The request object

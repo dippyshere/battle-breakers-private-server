@@ -6,7 +6,7 @@ This code is licensed under the Breakers Revived License (BRL).
 
 Class based systems for each of the storefronts in the storefront service
 """
-from typing import Any, Self
+from typing_extensions import Any, Self
 
 
 class Offer:

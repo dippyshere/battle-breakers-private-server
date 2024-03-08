@@ -9,6 +9,7 @@ Handles claiming account level up rewards etc
 
 import sanic
 
+from utils import types
 from utils.enums import AccountPerk
 from utils.exceptions import errors
 from utils.utils import authorized as auth, get_path_from_template_id
@@ -23,7 +24,7 @@ wex_profile_claim_account_reward = sanic.Blueprint("wex_profile_claim_account_re
 @wex_profile_claim_account_reward.route("/<accountId>/ClaimAccountReward", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def claim_account_reward(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def claim_account_reward(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to claim account level up rewards
     :param request: The request object

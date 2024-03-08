@@ -15,6 +15,7 @@ import sanic
 
 import urllib.parse
 
+from utils import types
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -25,7 +26,7 @@ guided_login = sanic.Blueprint("guided_login")
 @guided_login.route("/id/login/guided", methods=["GET"], strict_slashes=False, name="login-guided")
 @guided_login.route("/id/register", methods=["GET"], strict_slashes=False, name="register")
 @compress.compress()
-async def login_page(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def login_page(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
     This endpoint is used to get the login page
     :param request: The request object
@@ -52,7 +53,7 @@ async def login_page(request: sanic.request.Request) -> sanic.response.HTTPRespo
 @guided_login.route("/id/login/guided/<file>", methods=["GET"], name="login-guided-files")
 @guided_login.route("/id/register/<file>", methods=["GET"], name="register-files")
 @compress.compress()
-async def login_page_files(request: sanic.request.Request, file: str) -> sanic.response.HTTPResponse:
+async def login_page_files(request: types.BBRequest, file: str) -> sanic.response.HTTPResponse:
     """
     This endpoint is used to get supporting files for the site
     :param request: The request object
@@ -104,7 +105,7 @@ async def login_page_files(request: sanic.request.Request, file: str) -> sanic.r
 
 @guided_login.route("/id/login", methods=["GET"])
 @compress.compress()
-async def login_redirect1(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def login_redirect1(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
     Redirects to the login page
     :param request: The request object
@@ -115,7 +116,7 @@ async def login_redirect1(request: sanic.request.Request) -> sanic.response.HTTP
 
 @guided_login.route("/id/exchange", methods=["GET"])
 @compress.compress()
-async def login_redirect2(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def login_redirect2(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
     Redirects to the login page
     :param request: The request object
@@ -127,7 +128,7 @@ async def login_redirect2(request: sanic.request.Request) -> sanic.response.HTTP
 @guided_login.route("/apple-touch-icon.png", methods=["GET"], name="apple-touch-icon")
 @guided_login.route("/apple-touch-icon-precomposed.png", methods=["GET"], name="apple-touch-icon-precomposed")
 @compress.compress()
-async def apple_touch_icon(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def apple_touch_icon(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
     This endpoint is used to get the apple touch icon
     :param request: The request object

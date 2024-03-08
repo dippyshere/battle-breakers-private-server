@@ -8,6 +8,7 @@ Handles the CSRF code generation
 """
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 
 from utils.sanic_gzip import Compress
@@ -19,7 +20,7 @@ csrf_req = sanic.Blueprint("csrf_req")
 # stub
 @csrf_req.route("/id/api/csrf", methods=["POST"])
 @compress.compress()
-async def csrf_route(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def csrf_route(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Generates a CSRF code
     :param request: The request object

@@ -9,6 +9,7 @@ Handles removing a hero from the monster pit
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_remove_from_monster_pit = sanic.Blueprint("wex_profile_remove_from_m
 @wex_profile_remove_from_monster_pit.route("/<accountId>/RemoveFromMonsterPit", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def remove_from_monster_pit(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def remove_from_monster_pit(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to remove a hero from the monster pit
     :param request: The request object

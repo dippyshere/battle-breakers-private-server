@@ -9,6 +9,7 @@ Handles the telemetry data from the client
 
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -18,7 +19,7 @@ data = sanic.Blueprint("datarouter_data")
 # https://github.com/dippyshere/battle-breakers-documentation/blob/main/docs/Data%20Router/datarouter/api/v1/public/data.md
 @data.route("/api/v1/public/data", methods=["POST"])
 @compress.compress()
-async def datarouter(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def datarouter(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
     Handles the datarouter requests (telemetry)
     :param request: The request object

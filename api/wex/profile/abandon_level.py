@@ -10,6 +10,7 @@ Handles level abandon/exit profile mcp
 import sanic
 import sanic_ext
 
+from utils import types
 from utils.enums import ProfileType
 from utils.utils import authorized as auth, format_time
 from utils.validation import MCPValidation
@@ -25,7 +26,7 @@ wex_profile_abandon_level = sanic.Blueprint("wex_profile_abandon_level")
 @auth(strict=True)
 @sanic_ext.validate(json=MCPValidation.AbandonLevel)
 @compress.compress()
-async def abandon_level(request: sanic.request.Request, accountId: str,
+async def abandon_level(request: types.BBProfileRequest, accountId: str,
                         body: MCPValidation.AbandonLevel) -> sanic.response.JSONResponse:
     """
     This endpoint is used to abandon the level

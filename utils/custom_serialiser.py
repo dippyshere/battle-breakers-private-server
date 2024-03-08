@@ -6,7 +6,7 @@ This code is licensed under the Breakers Revived License (BRL).
 
 Handles serialising custom objects into json for requests and other purposes
 """
-from typing import Any
+from typing_extensions import Any
 
 from utils.profile_system import MCPProfile, MCPItem
 

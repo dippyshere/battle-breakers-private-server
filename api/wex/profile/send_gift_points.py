@@ -10,6 +10,7 @@ import datetime
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth, format_time
 
 from utils.sanic_gzip import Compress
@@ -22,7 +23,7 @@ wex_profile_send_gift = sanic.Blueprint("wex_profile_send_gift")
 @wex_profile_send_gift.route("/<accountId>/SendGiftPoints", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def send_gift_points(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def send_gift_points(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Handles the send gift point request
     :param request: The request object

@@ -9,6 +9,7 @@ Handles redeeming tokens.
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, get_path_from_template_id, load_datatable, get_template_id_from_path
 
@@ -22,7 +23,7 @@ wex_profile_redeem_token = sanic.Blueprint("wex_profile_redeem_token")
 @wex_profile_redeem_token.route("/<accountId>/RedeemToken", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def redeem_token(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def redeem_token(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to upgrade tokens to the actual item (for migrating from old accounts)
     :param request: The request object

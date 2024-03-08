@@ -9,6 +9,7 @@ Handles the eula tracking
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -21,7 +22,7 @@ agreements = sanic.Blueprint("eula_agreements")
 @agreements.route("/api/public/agreements/egstore/account/<accountId>", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def eula_agreements(request: sanic.request.Request, accountId: str) -> sanic.response.HTTPResponse:
+async def eula_agreements(request: types.BBRequest, accountId: str) -> sanic.response.HTTPResponse:
     """
     track eula agreements
     :param request: The request object

@@ -9,6 +9,7 @@ Handles promoting a hero.
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_promote_hero = sanic.Blueprint("wex_profile_promote_hero")
 @wex_profile_promote_hero.route("/<accountId>/PromoteHero", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def promote_hero(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def promote_hero(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to promote a hero.
     :param request: The request object

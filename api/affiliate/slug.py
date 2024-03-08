@@ -9,6 +9,7 @@ Handles the sac code api
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth, get_account_id_from_display_name
 
 from utils.sanic_gzip import Compress
@@ -21,7 +22,7 @@ sac_code = sanic.Blueprint("sac_code")
 @sac_code.route("/api/public/affiliates/slug/<sacSlug>", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()
-async def sac_code_info(request: sanic.request.Request, sacSlug: str) -> sanic.response.JSONResponse:
+async def sac_code_info(request: types.BBRequest, sacSlug: str) -> sanic.response.JSONResponse:
     """
     Get support a creator code info
 

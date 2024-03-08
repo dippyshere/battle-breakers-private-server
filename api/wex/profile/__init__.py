@@ -8,6 +8,7 @@ Handles the mcp profile subsystem
 """
 import sanic
 
+from utils import types
 from utils.profile_system import PlayerProfile
 from utils.enums import ProfileType
 from .abandon_level import wex_profile_abandon_level
@@ -125,7 +126,7 @@ wex_profile = sanic.Blueprint.group(wex_profile_abandon_level, wex_profile_add_e
 
 
 @wex_profile.on_request
-async def add_mcp_profile(request: sanic.request.Request) -> None:
+async def add_mcp_profile(request: types.BBProfileRequest) -> None:
     """
     Adds the profile data to the request context for use in the handlers
     :param request: The request object
@@ -153,7 +154,7 @@ async def add_mcp_profile(request: sanic.request.Request) -> None:
 
 
 @wex_profile.on_response
-async def add_profile_revision_header(request: sanic.request.Request, response: sanic.response.HTTPResponse) -> None:
+async def add_profile_revision_header(request: types.BBProfileRequest, response: sanic.response.HTTPResponse) -> None:
     """
     Adds the profile revision header to the response
     :param request: The request object

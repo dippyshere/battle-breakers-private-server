@@ -8,6 +8,7 @@ Handles updating default party
 """
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -20,7 +21,7 @@ wex_profile_set_default_party = sanic.Blueprint("wex_profile_set_default_party")
 @wex_profile_set_default_party.route("/<accountId>/SetDefaultParty", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def set_default_party(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def set_default_party(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to update the default hero party slot
     :param request: The request object

@@ -8,9 +8,12 @@ Handles adding epic friend and fetching their wex specific data
 """
 
 import sanic
+from typing_extensions import Type
 
+from utils import types
 from utils.friend_system import PlayerFriends
 from utils.sanic_gzip import Compress
+from utils.toml_config import TomlConfig
 from utils.utils import authorized as auth
 
 compress = Compress()
@@ -21,7 +24,7 @@ wex_profile_add_epic_friend = sanic.Blueprint("wex_profile_add_epic_friend")
 @wex_profile_add_epic_friend.route("/<accountId>/AddEpicFriend", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def add_epic_friend(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def add_epic_friend(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to fetch a new friend's wex data
 

@@ -9,6 +9,7 @@ Handles selling treasure.
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, load_datatable, get_path_from_template_id
 
@@ -22,7 +23,7 @@ wex_profile_sell_treasure = sanic.Blueprint("wex_profile_sell_treasure")
 @wex_profile_sell_treasure.route("/<accountId>/SellTreasure", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def sell_treasure(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def sell_treasure(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to sell treasure
     :param request: The request object

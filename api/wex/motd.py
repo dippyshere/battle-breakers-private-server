@@ -9,6 +9,7 @@ Handles the motd of old versions
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.sanic_gzip import Compress
 
@@ -19,7 +20,7 @@ wex_motd = sanic.Blueprint("wex_motd")
 # undocumented
 @wex_motd.route("/api/game/v2/motd", methods=['GET'])
 @compress.compress()
-async def motd(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def motd(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
     Handles the motd of old versions
     :param request: The request object

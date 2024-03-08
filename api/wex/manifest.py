@@ -11,6 +11,7 @@ import hashlib
 import aiofiles
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.sanic_gzip import Compress
 
@@ -21,7 +22,7 @@ wex_manifest = sanic.Blueprint("wex_manifest")
 # undocumented
 @wex_manifest.route("/api/game/v2/manifests/<manifest>", methods=['GET'])
 @compress.compress()
-async def wex_cloudv3_manifests(request: sanic.request.Request, manifest: str) -> sanic.response.HTTPResponse:
+async def wex_cloudv3_manifests(request: types.BBRequest, manifest: str) -> sanic.response.HTTPResponse:
     """
     Handles the manifest request for builds before build manifest (i.e. v1.5 and older)
     :param request: The request object

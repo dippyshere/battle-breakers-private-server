@@ -9,6 +9,7 @@ Handles the account token kill request
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, parse_eg1
 
@@ -22,7 +23,7 @@ kill = sanic.Blueprint("account_kill")
 @kill.route("/api/oauth/sessions/kill/<token>", methods=["DELETE"])
 @auth
 @compress.compress()
-async def kill_auth(request: sanic.request.Request, token: str) -> sanic.response.HTTPResponse:
+async def kill_auth(request: types.BBRequest, token: str) -> sanic.response.HTTPResponse:
     """
     kill a token
     :param request: The request object
@@ -40,7 +41,7 @@ async def kill_auth(request: sanic.request.Request, token: str) -> sanic.respons
 @kill.route("/api/oauth/sessions/kill", methods=["DELETE"])
 @auth
 @compress.compress()
-async def kill_others(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def kill_others(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
     kill a token but quirky this time
     :param request: The request object

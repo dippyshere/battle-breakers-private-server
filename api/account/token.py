@@ -11,7 +11,7 @@ import re
 
 import sanic
 
-from utils import enums
+from utils import enums, types
 from utils.enums import AuthClient
 from utils.exceptions import errors
 from utils.profile_system import PlayerProfile
@@ -28,7 +28,7 @@ token = sanic.Blueprint("account_token")
 @token.route("/api/oauth/token", methods=["POST"])
 @auth(allow_basic=True)
 @compress.compress()
-async def oauth_route(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def oauth_route(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Handles the oauth token request
     :param request: The request object

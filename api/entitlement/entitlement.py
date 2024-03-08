@@ -9,6 +9,7 @@ Handles the entitlement checks for the launcher
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -21,7 +22,7 @@ entitlement = sanic.Blueprint("entitlement")
 @entitlement.route("/api/account/<accountId>/entitlements", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def entitlements_route(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def entitlements_route(request: types.BBRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Handles the entitlement check
     :param request: The request object

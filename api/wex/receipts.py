@@ -9,6 +9,7 @@ Handles the IAP receipts
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -21,7 +22,7 @@ wex_receipts = sanic.Blueprint("wex_receipts")
 @wex_receipts.route("/api/receipts/v1/account/<accountId>/receipts", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def receipts(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def receipts(request: types.BBRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     get receipts
     :param request: The request object

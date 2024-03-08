@@ -9,6 +9,7 @@ Handles setting a sac code
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_set_sac = sanic.Blueprint("wex_profile_set_sac")
 @wex_profile_set_sac.route("/<accountId>/SetAffiliate", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def set_sac(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def set_sac(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to set a sac code.
     :param request: The request object

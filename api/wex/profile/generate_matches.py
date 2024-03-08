@@ -9,6 +9,7 @@ Handles generating matches
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_generate_matches = sanic.Blueprint("wex_profile_generate_matches")
 @wex_profile_generate_matches.route("/<accountId>/GenerateMatches", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def generate_matches(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def generate_matches(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to generate matches.
     :param request: The request object

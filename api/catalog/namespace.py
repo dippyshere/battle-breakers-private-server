@@ -9,6 +9,7 @@ Handles the namespace offers for epic catalog
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, read_file
 
@@ -22,7 +23,7 @@ catalog_namespace = sanic.Blueprint("catalog_namespace")
 @catalog_namespace.route("/api/shared/bulk/namespace/<namespace>/bulk/items", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()
-async def items(request: sanic.request.Request, namespace: str) -> sanic.response.JSONResponse:
+async def items(request: types.BBRequest, namespace: str) -> sanic.response.JSONResponse:
     """
     Get items
     :param request: The request object

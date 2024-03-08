@@ -9,6 +9,7 @@ Handles upgrading buildings.
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, get_template_id_from_path, load_datatable
 
@@ -22,7 +23,7 @@ wex_profile_upgrade_building = sanic.Blueprint("wex_profile_upgrade_building")
 @wex_profile_upgrade_building.route("/<accountId>/UpgradeBuilding", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def upgrade_building(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def upgrade_building(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to upgrade buildings
     :param request: The request object

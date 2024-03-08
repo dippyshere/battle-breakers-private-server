@@ -10,6 +10,7 @@ appflyer seen in 1.71
 
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -19,7 +20,7 @@ appflyer = sanic.Blueprint("appflyer")
 # undocumented
 @appflyer.route("/api/v4/androidevent", methods=["POST"])
 @compress.compress()
-async def appflyer_event(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def appflyer_event(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Handles the stupid tracker in older versions
     :param request: The request object

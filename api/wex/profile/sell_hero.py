@@ -9,6 +9,7 @@ Handles selling heroes.
 
 import sanic
 
+from utils import types
 from utils.enums import ProfileType
 from utils.exceptions import errors
 from utils.utils import authorized as auth, get_template_id_from_path, load_datatable, load_character_data
@@ -23,7 +24,7 @@ wex_profile_sell_hero = sanic.Blueprint("wex_profile_sell_hero")
 @wex_profile_sell_hero.route("/<accountId>/SellHero", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def sell_hero(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def sell_hero(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to sell heroes
     :param request: The request object

@@ -9,6 +9,7 @@ Handles updating the monster pit power.
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_update_monster_pit_power = sanic.Blueprint("wex_profile_update_monst
 @wex_profile_update_monster_pit_power.route("/<accountId>/UpdateMonsterPitPower", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def update_monster_pit_power(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def update_monster_pit_power(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to update the monster pit power
     :param request: The request object

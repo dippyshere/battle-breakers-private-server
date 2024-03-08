@@ -9,6 +9,7 @@ Handles refreshing the run count
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_refresh_run_count = sanic.Blueprint("wex_profile_refresh_run_count")
 @wex_profile_refresh_run_count.route("/<accountId>/RefreshRunCount", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def refresh_run_count(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def refresh_run_count(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to refresh the run count.
     :param request: The request object

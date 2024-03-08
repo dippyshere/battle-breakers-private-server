@@ -6,7 +6,7 @@ This code is licensed under the Breakers Revived License (BRL).
 
 Error exceptions class for formatting error responses
 """
-from typing import Any
+from typing_extensions import Any
 
 
 class EpicException(Exception):

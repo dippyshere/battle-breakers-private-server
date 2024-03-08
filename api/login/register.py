@@ -13,6 +13,7 @@ import sanic
 
 import urllib.parse
 
+from utils import types
 from utils.sanic_gzip import Compress
 from utils.utils import oauth_response
 
@@ -23,7 +24,7 @@ register_login = sanic.Blueprint("register_login")
 # undocumented
 @register_login.route("/id/registertest", methods=["GET"])
 @compress.compress()
-async def register_test(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def register_test(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     This endpoint is used to get the registration page
     :param request: The request object

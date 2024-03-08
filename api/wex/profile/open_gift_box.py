@@ -9,6 +9,8 @@ Handles opening a gift box.
 
 import sanic
 
+from utils import types
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -21,7 +23,7 @@ wex_profile_open_gift_box = sanic.Blueprint("wex_profile_open_gift_box")
 @wex_profile_open_gift_box.route("/<accountId>/OpenGiftBox", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def open_gift_box(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def open_gift_box(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to open a gift box.
     :param request: The request object

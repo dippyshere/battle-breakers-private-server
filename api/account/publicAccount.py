@@ -10,6 +10,7 @@ import urllib.parse
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, get_account_id_from_email, get_account_id_from_display_name, \
     get_account_data, get_account_data_owner
@@ -24,7 +25,7 @@ public_account = sanic.Blueprint("account_public")
 @public_account.route("/api/public/account", methods=["GET"])
 @auth
 @compress.compress()
-async def public_account_info(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def public_account_info(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Bulk get account info
     :param request: The request object
@@ -53,7 +54,7 @@ async def public_account_info(request: sanic.request.Request) -> sanic.response.
 @public_account.route("/api/public/account/displayName/<displayName>", methods=["GET"])
 @auth
 @compress.compress()
-async def account_displayname(request: sanic.request.Request, displayName: str) -> sanic.response.JSONResponse:
+async def account_displayname(request: types.BBRequest, displayName: str) -> sanic.response.JSONResponse:
     """
     Get an account by name
     :param request: The request object
@@ -78,7 +79,7 @@ async def account_displayname(request: sanic.request.Request, displayName: str) 
 @public_account.route("/api/public/account/email/<email>", methods=["GET"])
 @auth
 @compress.compress()
-async def account_email(request: sanic.request.Request, email: str) -> sanic.response.JSONResponse:
+async def account_email(request: types.BBRequest, email: str) -> sanic.response.JSONResponse:
     """
     Get account by email (deprecated on official API)
     :param request: The request object
@@ -103,7 +104,7 @@ async def account_email(request: sanic.request.Request, email: str) -> sanic.res
 @public_account.route("/api/public/account/lookup/externalId", methods=["POST"])
 @auth()
 @compress.compress()
-async def external_id_lookup(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def external_id_lookup(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Look up accounts by external id
     same response structure as above
@@ -118,7 +119,7 @@ async def external_id_lookup(request: sanic.request.Request) -> sanic.response.J
                       methods=["GET"])
 @auth()
 @compress.compress()
-async def external_id_lookup_by_name(request: sanic.request.Request, externalAuthType: str,
+async def external_id_lookup_by_name(request: types.BBRequest, externalAuthType: str,
                                      displayName: str) -> sanic.response.JSONResponse:
     """
     Look up accounts by external id

@@ -9,6 +9,7 @@ Handles selecting a hammer chest
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_select_hammer_chest = sanic.Blueprint("wex_profile_select_hammer_che
 @wex_profile_select_hammer_chest.route("/<accountId>/SelectHammerChest", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def select_hammer_chest(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def select_hammer_chest(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to select a hammer chest to begin the unlock process
     :param request: The request object

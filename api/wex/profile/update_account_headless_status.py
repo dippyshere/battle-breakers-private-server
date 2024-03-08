@@ -8,6 +8,7 @@ Handles update headless mcp
 """
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 from utils.utils import authorized as auth
 
@@ -19,7 +20,7 @@ wex_update_headless = sanic.Blueprint("wex_update_headless")
 @wex_update_headless.route("/<accountId>/UpdateAccountHeadlessStatus", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def update_headless(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def update_headless(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to set the display name on an account and mark it as non-headless.
     :param request: The request object

@@ -9,6 +9,7 @@ Handles the favicon image
 import aiofiles
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -18,7 +19,7 @@ favicon = sanic.Blueprint("favicon")
 # undocumented
 @favicon.route("favicon.ico", methods=["GET"])
 @compress.compress()
-async def favicon_image(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def favicon_image(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
     Get the favicon image
 

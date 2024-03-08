@@ -13,6 +13,7 @@ import os
 import sanic
 import aiofiles.os
 
+from utils import types
 from utils.exceptions import errors
 from utils.sanic_gzip import Compress
 from utils.utils import authorized as auth, read_file, format_time
@@ -25,7 +26,7 @@ wex_cloud = sanic.Blueprint("wex_cloud")
 @wex_cloud.route("/api/cloudstorage/system", methods=["GET"])
 @auth(allow_basic=True)
 @compress.compress()
-async def cloudstorage_system(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def cloudstorage_system(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Handles the cloudstorage system request
     :param request: The request object

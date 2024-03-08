@@ -12,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial, wraps
 import gzip
 import zlib
-from typing import Optional, Any, Callable, Coroutine
+from typing_extensions import Optional, Any, Callable, Coroutine
 
 import brotli
 import sanic.response.types

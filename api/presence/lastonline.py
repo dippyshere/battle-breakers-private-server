@@ -9,6 +9,7 @@ Handles the last online presence request
 
 import sanic
 
+from utils import types
 from utils.friend_system import PlayerFriends
 from utils.enums import ProfileType
 from utils.utils import authorized as auth
@@ -23,7 +24,7 @@ lastonline = sanic.Blueprint("presence_lastonline")
 @lastonline.route("/api/v1/_/<accountId>/last-online", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def last_online(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def last_online(request: types.BBRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     Get the last online time
 

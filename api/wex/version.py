@@ -16,6 +16,7 @@ import orjson
 import sanic
 import git
 
+from utils import types
 from utils.sanic_gzip import Compress
 from utils.utils import format_time
 
@@ -26,7 +27,7 @@ wex_version = sanic.Blueprint("wex_ver")
 # undocumented
 @wex_version.route("/api/version", methods=["GET"])
 @compress.compress()
-async def wex_version_route(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def wex_version_route(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Version information
 

@@ -8,6 +8,7 @@ Handles adding friends and fetching their wex specific data
 """
 import sanic
 
+from utils import types
 from utils.friend_system import PlayerFriends
 from utils.utils import authorized as auth
 
@@ -21,7 +22,7 @@ wex_profile_add_friend = sanic.Blueprint("wex_profile_add_friend")
 @wex_profile_add_friend.route("/<accountId>/AddFriend", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def add_friend(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def add_friend(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to fetch a new friend's wex data; its called by 1.0-1.71, for the old wex friend system
     :param request: The request object

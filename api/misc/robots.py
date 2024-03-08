@@ -8,6 +8,7 @@ Handles the robots.txt file
 """
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -17,7 +18,7 @@ robots = sanic.Blueprint("robots")
 # undocumented
 @robots.route("robots.txt", methods=["GET"])
 @compress.compress()
-async def robots_txt(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def robots_txt(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
     Get the robots.txt file
 

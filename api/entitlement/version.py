@@ -9,6 +9,7 @@ Handles the silly version info
 
 import sanic
 
+from utils import types
 from utils.utils import format_time
 
 entitlement_version = sanic.Blueprint("entitlement_ver")
@@ -16,7 +17,7 @@ entitlement_version = sanic.Blueprint("entitlement_ver")
 
 # undocumented
 @entitlement_version.route("/api/version", methods=["GET"])
-async def entitlement_version_route(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def entitlement_version_route(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Version information
 

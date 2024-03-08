@@ -13,6 +13,7 @@ import sanic
 
 import urllib.parse
 
+from utils import types
 from utils.sanic_gzip import Compress
 
 compress = Compress()
@@ -22,7 +23,7 @@ purchase_flow = sanic.Blueprint("purchase_flow")
 # undocumented
 @purchase_flow.route("/purchase", methods=["GET"])
 @compress.compress()
-async def purchase_flow_route(request: sanic.request.Request) -> sanic.response.HTTPResponse:
+async def purchase_flow_route(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
     This endpoint is used to get the purchase flow page
     :param request: The request object
@@ -34,7 +35,7 @@ async def purchase_flow_route(request: sanic.request.Request) -> sanic.response.
 
 @purchase_flow.route("/purchase/<file>", methods=["GET"])
 @compress.compress()
-async def purchase_flow_files(request: sanic.request.Request, file: str) -> sanic.response.HTTPResponse:
+async def purchase_flow_files(request: types.BBRequest, file: str) -> sanic.response.HTTPResponse:
     """
     This endpoint is used to get supporting files for the site
     :param request: The request object

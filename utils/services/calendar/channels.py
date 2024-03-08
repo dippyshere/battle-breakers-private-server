@@ -6,7 +6,7 @@ This code is licensed under the Breakers Revived License (BRL).
 
 Class based systems for each of the channels in the calendar service
 """
-from typing import Any
+from typing_extensions import Any
 import datetime
 
 import aiofiles

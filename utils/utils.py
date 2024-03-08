@@ -16,7 +16,7 @@ import re
 import uuid
 import zlib
 from inspect import isawaitable
-from typing import Any, Tuple, Optional, Callable
+from typing_extensions import Any, Tuple, Optional, Callable
 
 import aiohttp
 import bcrypt

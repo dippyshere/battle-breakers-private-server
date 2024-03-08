@@ -10,6 +10,7 @@ import urllib.parse
 
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 from utils.utils import authorized as auth, load_character_data, load_datatable, read_file
 
@@ -21,7 +22,7 @@ wex_item_ratings = sanic.Blueprint("wex_item_ratings")
 @wex_item_ratings.route("/api/game/v2/item_ratings/<accountId>/<templateId>", methods=["GET"])
 @auth(strict=True)
 @compress.compress()
-async def item_ratings(request: sanic.request.Request, accountId: str, templateId: str) -> sanic.response.JSONResponse:
+async def item_ratings(request: types.BBRequest, accountId: str, templateId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to get item ratings from the server
     :param request: The request object
@@ -44,7 +45,7 @@ async def item_ratings(request: sanic.request.Request, accountId: str, templateI
         my_rating = data[rating_key]
     base_ratings = await read_file("res/wex/api/game/v2/item_ratings/base_ratings.json")
     user_ratings = request.app.ctx.db["item_ratings"].find({rating_key: {'$ne': None}},
-                                                                 {rating_key: 1, "_id": 0})
+                                                           {rating_key: 1, "_id": 0})
     ratings = [{
         "gameplayRating": 0,
         "appearanceRating": 0
@@ -89,8 +90,7 @@ async def item_ratings(request: sanic.request.Request, accountId: str, templateI
 @wex_item_ratings.route("/api/game/v2/item_ratings/<accountId>/<templateId>", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def set_item_rating(request: sanic.request.Request, accountId: str,
-                          templateId: str) -> sanic.response.JSONResponse:
+async def set_item_rating(request: types.BBRequest, accountId: str, templateId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to rate an item
     :param request: The request object
@@ -117,10 +117,10 @@ async def set_item_rating(request: sanic.request.Request, accountId: str,
     elif rating_data["appearanceRating"] < 0:
         rating_data["appearanceRating"] = 0
     await request.app.ctx.db["item_ratings"].update_one({"_id": accountId}, {"$set": {rating_key: rating_data}},
-                                                              upsert=True)
+                                                        upsert=True)
     base_ratings = await read_file("res/wex/api/game/v2/item_ratings/base_ratings.json")
     user_ratings = request.app.ctx.db["item_ratings"].find({rating_key: {'$ne': None}},
-                                                                 {rating_key: 1, "_id": 0})
+                                                           {rating_key: 1, "_id": 0})
     ratings = [{
         "gameplayRating": 0,
         "appearanceRating": 0

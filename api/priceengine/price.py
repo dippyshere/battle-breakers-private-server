@@ -9,6 +9,7 @@ Handles the tax calculation
 
 import sanic
 
+from utils import types
 from utils.utils import authorized as auth, read_file
 
 from utils.sanic_gzip import Compress
@@ -21,7 +22,7 @@ price = sanic.Blueprint("priceengine_price")
 @price.route("/api/shared/offers/price", methods=["POST"])
 @auth(allow_basic=True)
 @compress.compress()
-async def price_request(request: sanic.request.Request) -> sanic.response.JSONResponse:
+async def price_request(request: types.BBRequest) -> sanic.response.JSONResponse:
     """
     Get price information
     :param request: The request object

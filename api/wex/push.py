@@ -10,6 +10,7 @@ import aiohttp
 import sanic
 from sanic import HTTPResponse
 
+from utils import types
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -22,7 +23,7 @@ wex_push = sanic.Blueprint("wex_push")
 @wex_push.route("/api/push/<accountId>/register", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def push(request: sanic.request.Request, accountId: str) -> HTTPResponse:
+async def push(request: types.BBRequest, accountId: str) -> HTTPResponse:
     """
     Register a push notification token for the account
     Path Parameters

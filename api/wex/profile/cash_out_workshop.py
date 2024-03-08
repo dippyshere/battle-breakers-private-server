@@ -9,6 +9,7 @@ Handles workshop cash out
 
 import sanic
 
+from utils import types
 from utils.sanic_gzip import Compress
 from utils.utils import authorized as auth, load_datatable, get_current_12_hour_interval, format_time
 
@@ -20,7 +21,7 @@ wex_profile_cash_out_workshop = sanic.Blueprint("wex_profile_cash_out_workshop")
 @wex_profile_cash_out_workshop.route("/<accountId>/CashOutWorkshop", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def cash_out_workshop(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def cash_out_workshop(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to exchange workshop stars to gold
     :param request: The request object

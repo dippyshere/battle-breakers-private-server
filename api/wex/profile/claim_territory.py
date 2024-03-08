@@ -9,6 +9,7 @@ Handles claiming territory
 
 import sanic
 
+from utils import types
 from utils.enums import ProfileType
 from utils.exceptions import errors
 from utils.utils import authorized as auth
@@ -23,7 +24,7 @@ wex_profile_claim_territory = sanic.Blueprint("wex_profile_claim_territory")
 @wex_profile_claim_territory.route("/<accountId>/ClaimTerritory", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def claim_territory(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def claim_territory(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to claim a territory when completing all 1/2/3/4 star missions in a zone
     :param request: The request object

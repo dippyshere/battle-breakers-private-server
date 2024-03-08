@@ -9,6 +9,7 @@ Handles crafting recipes
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_craft_recipe = sanic.Blueprint("wex_profile_craft_recipe")
 @wex_profile_craft_recipe.route("/<accountId>/CraftRecipe", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def craft_recipe(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def craft_recipe(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to craft recipes
     :param request: The request object

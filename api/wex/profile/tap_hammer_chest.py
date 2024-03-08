@@ -10,6 +10,7 @@ import random
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth, load_datatable, calculate_streakbreaker
 
@@ -23,7 +24,7 @@ wex_profile_tap_hammer_chest = sanic.Blueprint("wex_profile_tap_hammer_chest")
 @wex_profile_tap_hammer_chest.route("/<accountId>/TapHammerChest", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def tap_hammer_chest(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def tap_hammer_chest(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to tap the hammer chest
     :param request: The request object

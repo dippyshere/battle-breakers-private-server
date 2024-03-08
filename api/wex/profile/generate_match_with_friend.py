@@ -9,6 +9,7 @@ Handles generating a match with a friend for a profile.
 
 import sanic
 
+from utils import types
 from utils.exceptions import errors
 from utils.utils import authorized as auth
 
@@ -22,7 +23,7 @@ wex_profile_generate_match_with_friend = sanic.Blueprint("wex_profile_generate_m
 @wex_profile_generate_match_with_friend.route("/<accountId>/GenerateMatchWithFriend", methods=["POST"])
 @auth(strict=True)
 @compress.compress()
-async def generate_match_with_friend(request: sanic.request.Request, accountId: str) -> sanic.response.JSONResponse:
+async def generate_match_with_friend(request: types.BBProfileRequest, accountId: str) -> sanic.response.JSONResponse:
     """
     This endpoint is used to spar with a friend.
     :param request: The request object
