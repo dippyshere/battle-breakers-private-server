@@ -104,7 +104,9 @@ async def login_page_files(request: types.BBRequest, file: str) -> sanic.respons
                                              request_headers=request.headers, mime_type=content_type)
 
 
-@guided_login.route("/id/login", methods=["GET"])
+@guided_login.route("/id/login", methods=["GET"], name="login-redirect")
+@guided_login.route("/id", methods=["GET"], name="login-redirect2")
+@guided_login.route("/", methods=["GET"], name="login-redirect3")
 @compress.compress()
 async def login_redirect1(request: types.BBRequest) -> sanic.response.HTTPResponse:
     """
