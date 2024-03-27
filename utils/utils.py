@@ -1078,3 +1078,24 @@ async def calculate_streakbreaker(current_streakbreaker: int, max_streakbreaker:
         return True, 0
     else:
         return False, current_streakbreaker + random.randint(5000, 10000)
+
+
+async def replace_nth_occurrence(input_string: str, target_string: str, occurrence: int,
+                                 replacement_string: str) -> str:
+    """
+    Replaces the nth occurrence of a string in a string with another string
+    :param input_string: The input string to replace in
+    :param target_string: The string to replace
+    :param occurrence: The occurrence to replace
+    :param replacement_string: The string to replace with
+    :return: The replaced string
+    """
+    new_string = input_string
+    occurrence_count = 0
+    for i in range(len(input_string)):
+        if input_string[i:].startswith(target_string):
+            occurrence_count += 1
+            if occurrence_count == occurrence:
+                new_string = input_string[:i] + replacement_string + input_string[i + len(target_string):]
+                break
+    return new_string

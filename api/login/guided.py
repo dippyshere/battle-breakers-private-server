@@ -15,6 +15,7 @@ import sanic
 
 import urllib.parse
 
+from utils import utils
 from utils import types
 from utils.sanic_gzip import Compress
 
@@ -74,10 +75,10 @@ async def login_page_files(request: types.BBRequest, file: str) -> sanic.respons
                        "cache-control": "public, max-age=604800"}
             async with aiofiles.open("res/account/login/guided/login-script.min.js", "rb") as file:
                 script = (await file.read()).decode()
-            script = script.replace('loginFormDiv.style.display="block"',
-                                    'loginFormDiv.style.display="none"', 1)
-            script = script.replace('signupFormDiv.style.display="none"',
-                                    'signupFormDiv.style.display="block"', 1)
+            script = await utils.replace_nth_occurrence(script, 'loginFormDiv.style.display="block"',
+                                                        2, 'loginFormDiv.style.display="none"')
+            script = await utils.replace_nth_occurrence(script, 'signupFormDiv.style.display="none"',
+                                                        2, 'signupFormDiv.style.display="block"')
             return sanic.response.HTTPResponse(script, headers=headers, content_type="application/javascript")
         case "login-script.js" | "login-script.min.js":
             return await sanic.response.file("res/account/login/guided/login-script.min.js", max_age=604800,
