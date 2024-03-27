@@ -1,6 +1,6 @@
 {
-    "name": "Battle Breakers Login Page",
-    "short_name": "Dippy Login",
+    "name": "Breakers Revived Login",
+    "short_name": "Breakers Revived",
     "icons": [
         {
             "src": "/id/login/guided/android-chrome-192x192.png",
@@ -231,8 +231,8 @@
             "purpose": "any"
         }
     ],
-    "theme_color": "#0049A4",
-    "background_color": "#0049A4",
+    "theme_color": "#0D8EEA",
+    "background_color": "#0D8EEA",
     "display": "standalone",
     "categories": [
         "games",
