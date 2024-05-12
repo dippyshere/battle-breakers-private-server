@@ -32,8 +32,9 @@ async def unlock_region(request: types.BBProfileRequest, accountId: str) -> sani
     :return: The modified profile
     """
     unlocked_regions = await request.ctx.profile.find_item_by_template_id("WorldUnlock:Region", ProfileType.LEVELS)
-    for region in unlocked_regions:
-        if region["attributes"]["regionId"] == request.json.get("regionId"):
+    for region_guid in unlocked_regions:
+        region = await request.ctx.profile.get_item_by_guid(region_guid, ProfileType.LEVELS)
+        if region is not None and region["attributes"]["regionId"] == request.json.get("regionId"):
             raise errors.com.epicgames.world_explorers.bad_request(
                 errorMessage=f"Region {request.json.get('regionId')} is already unlocked.")
     await request.ctx.profile.add_item({
