@@ -6,12 +6,7 @@ This code is licensed under the Breakers Revived License (BRL).
 
 Handles the account sign up request for mobile
 """
-import mimetypes
-
-import aiofiles
 import sanic
-
-import urllib.parse
 
 from utils import types
 from utils.sanic_gzip import Compress
