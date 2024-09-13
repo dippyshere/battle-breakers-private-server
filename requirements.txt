@@ -1,39 +1,39 @@
 # Required Python Dependencies
 # ----------------------------
 # JSON handling
-orjson>=3.9.7
+orjson>=3.10.7
 # Web server
-sanic[ext]>=23.6.0
+sanic[ext]>=24.6.0
 # Colourful logging
 colorama>=0.4.6
 # TOML backwards compatibility for Python 3.10
 tomli>=2.0.1
 # JSON Web Token handling
-pyjwt>=2.8.0
+pyjwt>=2.9.0
 # Information for /version
 py-cpuinfo>=9.0.0
-gitpython>=3.1.40
+gitpython>=3.1.43
 # GZIP + Deflate compression (here for credit, implementation is replaced)
 sanic-gzip>=0.4.1
 # Brotli compression
 Brotli>=1.1.0
 # Async file handling
-aiofiles>=23.2.1
+aiofiles>=24.1.0
 # Password hashing
-bcrypt>=4.1.2
+bcrypt>=4.2.0
 # Input validation
-pydantic>=2.5.2
+pydantic>=2.9.1
 # Crypto
-cryptography>=41.0.7
+cryptography>=43.0.1
 # Characterset detection speedup
 faust-cchardet>=2.1.19
 # Async HTTP client
-aiohttp[speedups]>=3.9.1
-urllib3>=2.1.0
+aiohttp[speedups]>=3.10.5
+urllib3>=2.2.3
 # MongoDB driver
-motor>=3.3.2
+motor>=3.5.1
 # Calendar system
-icalendar>=5.0.11
-recurring-ical-events>=2.1.1
+icalendar>=6.0.0a0
+recurring-ical-events>=3.3.0
 # async caching speedup
 async-lru>=2.0.4
