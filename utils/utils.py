@@ -205,7 +205,7 @@ async def generate_client_eg1(clid: str) -> str:
     if clid in ["3cf78cd3b00b439a8755a878b160c7ad", "3cf78cd3b00b439a8755a878b160c7ad",
                 "84cd036b576541e9ad1634c1448c0c30", "e645e4b96298419cbffbfa353ebf8b82",
                 "66e03bfeb7db44adaca611dae2674094", "ec813099a59f48d4a338f1901c1609db",
-                "f8eac541a1c241939f76d26cf2a673a6"]:
+                "016a103319b34d258c0e7d4d2760c985", "f8eac541a1c241939f76d26cf2a673a6"]:
         p = ("wexp:calendar=2,catalog:shared:offers=2,account:public:account:externalAuthOnly=1,"
              "wexp:cloudstorage:system=2,account:public:account=1,wexp:cloudstorage:system:*=2,"
              "affiliate:public:affiliate=2,wexp:storefront=2")

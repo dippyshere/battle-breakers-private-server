@@ -174,6 +174,7 @@ class AuthClient(enum.Enum):
     wexAndroidGameClient = ["e645e4b96298419cbffbfa353ebf8b82", "d03089fd-628a-448a-ac39-0e8c5b022a11"]
     wexAndroidGameClient_GameDev = ["66e03bfeb7db44adaca611dae2674094", "6870a624-efdb-404b-8927-383fb92b5d08"]
     wexIOSGameClient = ["ec813099a59f48d4a338f1901c1609db", "72f6db62-0e3e-4439-97df-ee21f7b0ae94"]
+    wexIOSGameClient_GameDev = ["016a103319b34d258c0e7d4d2760c985", "63f3acc5-7698-45a1-a6c4-4e7c99703b43"]
     wexpClient = ["f8eac541a1c241939f76d26cf2a673a6", "80f5551f151840ca9f52e2e14581a742"]
     wexpClient_GameDev = ["f8eac541a1c241939f76d26cf2a673a6", "cc545e608de846a18e75a36acc1cf3d0"]
     battlebreakers_web = ["8e873617d81d4caf89bae28a4b74bbfe", "d1d8b2a0-4b0a-4f4e-9f4a-3b3b7b0b0b0b"]
