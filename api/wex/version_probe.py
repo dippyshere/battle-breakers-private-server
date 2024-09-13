@@ -6,6 +6,7 @@ This code is licensed under the Breakers Revived License (BRL).
 
 Handles the mcp version probe
 """
+import datetime
 
 import sanic
 
@@ -31,4 +32,12 @@ async def version_probe(request: types.BBRequest) -> sanic.response.HTTPResponse
     # stop_url will open the url in the client's default browser, and halt the login process
     # switch_env will switch the client to the specified MCP environment (live, devtesting, etc),
     # the client will then call the version probe again after switching
-    return sanic.response.text("")
+    if not hasattr(request.conn_info.ctx, "probe_count"):
+        request.conn_info.ctx.probe_count = 0
+    request.conn_info.ctx.probe_count += 1
+    if request.conn_info.ctx.probe_count > 1 or (hasattr(request.ctx, "last_probe_time") and 0.5 >= (datetime.datetime.now(tz=datetime.timezone.utc) - request.ctx.last_probe_time).total_seconds() <= 1.5):
+        return sanic.response.text("switch_env:DevTesting")
+    request.ctx.last_probe_time = datetime.datetime.now(tz=datetime.timezone.utc)
+    return sanic.response.text(
+        "switch_env:\r\nBreakers Revived\r\n\r\nServer Emulator created by Dippyshere\r\n\r\n\r\n\r\n\r\nContacting game service..."
+    )
