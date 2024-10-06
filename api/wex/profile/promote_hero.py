@@ -10,8 +10,10 @@ Handles promoting a hero.
 import sanic
 
 from utils import types
+from utils.enums import ProfileType
 from utils.exceptions import errors
-from utils.utils import authorized as auth
+from utils.utils import authorized as auth, load_datatable, get_path_from_template_id, get_template_id_from_path, \
+    load_character_data
 
 from utils.sanic_gzip import Compress
 
@@ -31,4 +33,45 @@ async def promote_hero(request: types.BBProfileRequest, accountId: str) -> sanic
     :return: The modified profile
     """
     # errors.com.epicgames.modules.gameplayutils.recipe_failed - Unable to promote
-    raise errors.com.epicgames.not_implemented()
+    # TODO: investigate when prestigePromote is true
+    # TODO: validation
+    if request.json.get("bIsInPit"):
+        hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"), ProfileType.MONSTERPIT)
+    else:
+        hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"))
+    if not hero_item:
+        raise errors.com.epicgames.modules.gameplayutils.recipe_failed(errorMessage="Invalid hero item id")
+    hero_data = await load_character_data(hero_item["templateId"])
+    promotion_table = await load_datatable(
+        hero_data[0]["Properties"]["PromotionTable"]["AssetPathName"].replace("/Game/", "Content/").split(".")[0])
+    if len(promotion_table[0]["Properties"]["RankRecipes"]) <= hero_item["attributes"]["rank"]:
+        raise errors.com.epicgames.modules.gameplayutils.recipe_failed(errorMessage="Hero is already at max promotion")
+    promotion_recipe = (await load_datatable(
+        promotion_table[0]["Properties"]["RankRecipes"][hero_item["attributes"]["rank"]]["AssetPathName"].replace("/Game/", "Content/").split(".")[
+            0]))[0]["Properties"]
+    # There is a check for account level, but since it only ever requires above level 0, it is not necessary
+    pending_items = []
+    for consumed_item in promotion_recipe["ConsumedItems"]:
+        consumed_item_id = (await request.ctx.profile.find_item_by_template_id(
+            await get_template_id_from_path(consumed_item["ItemDefinition"]["ObjectPath"])))[0]
+        consumed_item_quantity = (await request.ctx.profile.get_item_by_guid(consumed_item_id))["quantity"]
+        if consumed_item_quantity < consumed_item["Count"]:
+            raise errors.com.epicgames.modules.gameplayutils.recipe_failed(
+                errorMessage=f"Not enough {consumed_item['ItemDefinition']['ObjectName']}")
+        pending_items.append({
+            "itemId": consumed_item_id,
+            "quantity": consumed_item_quantity - consumed_item["Count"]
+        })
+    if request.json.get("bIsInPit"):
+        await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "rank",
+                                                        hero_item["attributes"]["rank"] + 1, ProfileType.MONSTERPIT)
+    else:
+        await request.ctx.profile.change_item_attribute(request.json.get("heroItemId"), "rank",
+                                                        hero_item["attributes"]["rank"] + 1)
+    for pending_item in pending_items:
+        await request.ctx.profile.change_item_quantity(pending_item["itemId"], pending_item["quantity"])
+    # TODO: chest activity
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions, True)
+    )
