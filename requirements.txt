@@ -7,7 +7,7 @@ sanic[ext]>=24.6.0
 # Colourful logging
 colorama>=0.4.6
 # TOML backwards compatibility for Python 3.10
-tomli>=2.0.1
+tomli>=2.0.2
 # JSON Web Token handling
 pyjwt>=2.9.0
 # Information for /version
@@ -22,18 +22,19 @@ aiofiles>=24.1.0
 # Password hashing
 bcrypt>=4.2.0
 # Input validation
-pydantic>=2.9.1
+pydantic>=2.9.2
+pydantic_core>=2.24.0
 # Crypto
 cryptography>=43.0.1
 # Characterset detection speedup
 faust-cchardet>=2.1.19
 # Async HTTP client
-aiohttp[speedups]>=3.10.5
+aiohttp[speedups]>=3.10.9
 urllib3>=2.2.3
 # MongoDB driver
-motor>=3.5.1
+motor>=3.6.0
 # Calendar system
-icalendar>=6.0.0a0
-recurring-ical-events>=3.3.0
+icalendar>=6.0.0
+recurring-ical-events>=3.3.2
 # async caching speedup
 async-lru>=2.0.4
