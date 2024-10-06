@@ -30,4 +30,19 @@ async def remove_hero_parties(request: types.BBProfileRequest, accountId: str) -
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_implemented()
+    # TODO: validation
+    # TODO: determine when original game calls this and what data it sends
+    hero_item = await request.ctx.profile.get_item_by_guid(request.json.get("heroItemId"))
+    if not hero_item:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid hero item id")
+    if not hero_item.get("templateId").startswith("Character:"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid character item id")
+    party_instances = await request.ctx.profile.find_item_by_template_id("Party:Instance")
+    for party_instance in party_instances:
+        party = await request.ctx.profile.get_item_by_guid(party_instance)
+        if hero_item["guid"] in party["attributes"]["members"]:
+            party["attributes"]["members"].remove(hero_item["guid"])
+            await request.ctx.profile.change_item_attribute(party_instance, "members", party["attributes"]["members"])
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                    request.ctx.profile_id))
