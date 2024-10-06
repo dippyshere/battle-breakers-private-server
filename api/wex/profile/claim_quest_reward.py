@@ -30,4 +30,33 @@ async def claim_quest_reward(request: types.BBProfileRequest, accountId: str) ->
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_implemented()
+    # TODO: validation
+    quest_item = await request.ctx.profile.get_item_by_guid(request.json.get("questMcpId"))
+    if not quest_item:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid quest item id")
+    if not quest_item["attributes"]["bIsCompleted"]:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="You have not completed this quest")
+    if quest_item["attributes"]["requirements"]["required"] > quest_item["attributes"]["score"]:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="You have not met the requirements for this quest")
+    for reward in quest_item["attributes"]["rewards"]:
+        current_reward_id = await request.ctx.profile.find_item_by_template_id(reward["templateId"])
+        if not current_reward_id:
+            await request.ctx.profile.add_item(reward["templateId"], reward["quantity"])
+        else:
+            current_reward_item = await request.ctx.profile.get_item_by_guid(current_reward_id[0])
+            await request.ctx.profile.change_item_quantity(current_reward_id[0], current_reward_item["quantity"] + reward["quantity"])
+    await request.ctx.profile.remove_item(request.json.get("questMcpId"))
+    await request.ctx.profile.add_notifications({
+        "type": "WExpGiftPointReward",
+        "primary": True,
+        "totalPoints": 0,
+        "lootResult": {
+            "items": quest_item["attributes"]["rewards"]
+        }
+    }, request.ctx.profile_id)
+    # TODO: modify activity chest
+    # TODO: account leveling up & rewards
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions, True)
+    )
