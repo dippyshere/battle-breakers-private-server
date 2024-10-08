@@ -36,39 +36,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
     """
     # TODO: validation
     # TODO: modify activity chest
-    # TODO: balance rewards
-    # TODO: blitz mine streakbreaker
-    # {
-    #   "manifestVersion": "1.88.244-r17036752",
-    #   "levelId": "Level.Mine.Map4.D4",
-    #   "partyMembers": [
-    #     {
-    #       "heroType": "LocalCommander",
-    #       "heroItemId": "73bc3aeb-a61e-4a87-8c47-93190c8cf727"
-    #     },
-    #     {
-    #       "heroType": "Empty",
-    #       "heroItemId": ""
-    #     },
-    #     {
-    #       "heroType": "LocalHero",
-    #       "heroItemId": "dab75d65-7911-4f7b-8cc9-88790171650d"
-    #     },
-    #     {
-    #       "heroType": "LocalHero",
-    #       "heroItemId": "2dbc336a-554b-449c-ae84-b4697bb00119"
-    #     },
-    #     {
-    #       "heroType": "LocalHero",
-    #       "heroItemId": "a2daa288-5203-4c3e-b7fc-5602edfbc625"
-    #     },
-    #     {
-    #       "heroType": "LocalHero",
-    #       "heroItemId": "0cb63754-8755-47cd-96ad-c2d8df596735"
-    #     }
-    #   ],
-    #   "friendInstanceId": ""
-    # }
+    # TODO: proper blitz mine streakbreaker for magicite drops
     if not any(member.get("heroType") == "LocalCommander" for member in request.json.get("partyMembers")):
         raise errors.com.epicgames.world_explorers.bad_request("SingleCommander", "0", "0", "1", errorMessage="Invalid SingleCommander configuration f=0, d=0, l=1")
     treasure_hunter_count = 0
@@ -112,6 +80,8 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
         current_iron = (await request.ctx.profile.get_item_by_guid(iron_id))["quantity"]
     loot_items = []
     rolled_items = []
+    streakbreaker_id = (await request.ctx.profile.find_item_by_template_id("Currency:SB_Mine"))[0]
+    current_streakbreaker = (await request.ctx.profile.get_item_by_guid(streakbreaker_id))["quantity"]
     match level_id.split(".")[2]:
         case "Map1":
             match level_id.split(".")[3]:
@@ -120,8 +90,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 10000)
                     current_gold -= 10000
-                    if random.randint(1, 100) <= 5:
-                        magicite_instance = random.randint(4, 16)
+                    current_streakbreaker += 10000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(3, 6)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -137,7 +108,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(20, 40)
+                    silver_instance = random.randint(35, 55)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -153,7 +124,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(20, 40)
+                    iron_instance = random.randint(35, 55)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -174,8 +145,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 20000)
                     current_gold -= 20000
-                    if random.randint(1, 100) <= 10:
-                        magicite_instance = random.randint(8, 24)
+                    current_streakbreaker += 20000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(6, 12)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -191,7 +163,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(40, 80)
+                    silver_instance = random.randint(70, 110)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -207,7 +179,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(40, 80)
+                    iron_instance = random.randint(70, 110)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -228,8 +200,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 30000)
                     current_gold -= 30000
-                    if random.randint(1, 100) <= 15:
-                        magicite_instance = random.randint(12, 32)
+                    current_streakbreaker += 30000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(9, 18)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -245,7 +218,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(60, 120)
+                    silver_instance = random.randint(105, 165)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -261,7 +234,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(60, 120)
+                    iron_instance = random.randint(105, 165)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -282,8 +255,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 40000)
                     current_gold -= 40000
-                    if random.randint(1, 100) <= 20:
-                        magicite_instance = random.randint(16, 40)
+                    current_streakbreaker += 40000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(12, 24)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -299,7 +273,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(80, 160)
+                    silver_instance = random.randint(140, 220)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -315,7 +289,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(80, 160)
+                    iron_instance = random.randint(140, 220)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -338,8 +312,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 20000)
                     current_gold -= 20000
-                    if random.randint(1, 100) <= 10:
-                        magicite_instance = random.randint(8, 24)
+                    current_streakbreaker += 20000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(6, 12)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -355,7 +330,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(40, 80)
+                    silver_instance = random.randint(70, 110)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -371,7 +346,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(40, 80)
+                    iron_instance = random.randint(70, 110)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -392,8 +367,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 40000)
                     current_gold -= 40000
-                    if random.randint(1, 100) <= 20:
-                        magicite_instance = random.randint(16, 40)
+                    current_streakbreaker += 40000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(12, 24)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -409,7 +385,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(80, 160)
+                    silver_instance = random.randint(140, 220)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -425,7 +401,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(80, 160)
+                    iron_instance = random.randint(140, 220)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -446,8 +422,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 60000)
                     current_gold -= 60000
-                    if random.randint(1, 100) <= 30:
-                        magicite_instance = random.randint(24, 48)
+                    current_streakbreaker += 60000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(18, 36)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -463,7 +440,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(120, 240)
+                    silver_instance = random.randint(210, 330)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -479,7 +456,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(120, 240)
+                    iron_instance = random.randint(210, 330)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -500,8 +477,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 80000)
                     current_gold -= 80000
-                    if random.randint(1, 100) <= 40:
-                        magicite_instance = random.randint(32, 64)
+                    current_streakbreaker += 80000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(24, 48)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -517,7 +495,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(160, 320)
+                    silver_instance = random.randint(280, 440)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -533,7 +511,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(160, 320)
+                    iron_instance = random.randint(280, 440)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -556,8 +534,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 30000)
                     current_gold -= 30000
-                    if random.randint(1, 100) <= 15:
-                        magicite_instance = random.randint(12, 32)
+                    current_streakbreaker += 30000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(9, 18)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -573,7 +552,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(60, 120)
+                    silver_instance = random.randint(105, 165)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -589,7 +568,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(60, 120)
+                    iron_instance = random.randint(105, 165)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -610,8 +589,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 60000)
                     current_gold -= 60000
-                    if random.randint(1, 100) <= 30:
-                        magicite_instance = random.randint(24, 48)
+                    current_streakbreaker += 60000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(18, 36)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -627,7 +607,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(120, 240)
+                    silver_instance = random.randint(210, 330)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -643,7 +623,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(120, 240)
+                    iron_instance = random.randint(210, 330)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -664,8 +644,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 90000)
                     current_gold -= 90000
-                    if random.randint(1, 100) <= 45:
-                        magicite_instance = random.randint(36, 56)
+                    current_streakbreaker += 90000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(27, 56)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -681,7 +662,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(180, 300)
+                    silver_instance = random.randint(315, 495)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -697,7 +678,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(180, 300)
+                    iron_instance = random.randint(315, 495)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -718,8 +699,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 120000)
                     current_gold -= 120000
-                    if random.randint(1, 100) <= 60:
-                        magicite_instance = random.randint(48, 72)
+                    current_streakbreaker += 120000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(36, 72)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -735,7 +717,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(240, 400)
+                    silver_instance = random.randint(420, 660)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -751,7 +733,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(240, 400)
+                    iron_instance = random.randint(420, 660)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -774,8 +756,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 40000)
                     current_gold -= 40000
-                    if random.randint(1, 100) <= 20:
-                        magicite_instance = random.randint(16, 40)
+                    current_streakbreaker += 40000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(12, 24)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -791,7 +774,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(80, 160)
+                    silver_instance = random.randint(140, 220)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -807,7 +790,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(80, 160)
+                    iron_instance = random.randint(140, 220)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -828,8 +811,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 80000)
                     current_gold -= 80000
-                    if random.randint(1, 100) <= 40:
-                        magicite_instance = random.randint(32, 48)
+                    current_streakbreaker += 80000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(24, 48)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -845,7 +829,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(160, 240)
+                    silver_instance = random.randint(280, 440)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -861,7 +845,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(160, 240)
+                    iron_instance = random.randint(280, 440)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -882,8 +866,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 120000)
                     current_gold -= 120000
-                    if random.randint(1, 100) <= 60:
-                        magicite_instance = random.randint(48, 64)
+                    current_streakbreaker += 120000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(36, 72)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -899,7 +884,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(240, 320)
+                    silver_instance = random.randint(420, 660)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -915,7 +900,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(240, 320)
+                    iron_instance = random.randint(420, 660)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -936,8 +921,9 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough gold")
                     await request.ctx.profile.change_item_quantity(gold_id, current_gold - 160000)
                     current_gold -= 160000
-                    if random.randint(1, 100) <= 80:
-                        magicite_instance = random.randint(64, 80)
+                    current_streakbreaker += 160000
+                    if random.randint(1, 100) <= 25:
+                        magicite_instance = random.randint(48, 96)
                         rolled_items.append({
                                     "itemType": "Ore:Ore_Magicite",
                                     "itemGuid": magicite_id,
@@ -953,7 +939,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                                 "quantity": magicite_instance
                             }, magicite_id)
                         current_magicite += magicite_instance
-                    silver_instance = random.randint(320, 400)
+                    silver_instance = random.randint(560, 880)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Silver",
                                 "itemGuid": silver_id,
@@ -969,7 +955,7 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
                             "quantity": silver_instance
                         }, silver_id)
                     current_silver += silver_instance
-                    iron_instance = random.randint(320, 400)
+                    iron_instance = random.randint(560, 880)
                     rolled_items.append({
                                 "itemType": "Ore:Ore_Iron",
                                 "itemGuid": iron_id,
@@ -1050,6 +1036,26 @@ async def blitz_level(request: types.BBProfileRequest, accountId: str) -> sanic.
             }
         ]
     })
+    if current_streakbreaker > 68000000:
+        voucher_id = await request.ctx.profile.find_item_by_template_id("Voucher:Voucher_Hero_Mine")
+        if not voucher_id:
+            voucher_id = await request.ctx.profile.add_item({
+                "templateId": "Voucher:Voucher_Hero_Mine",
+                "attributes": {},
+                "quantity": 1
+            })
+        else:
+            voucher = await request.ctx.profile.get_item_by_guid(voucher_id[0])
+            await request.ctx.profile.change_item_quantity(voucher_id[0], voucher["quantity"] + 1)
+        rolled_items.insert(0, {
+            "itemType": "Voucher:Voucher_Hero_Mine",
+            "itemGuid": voucher_id,
+            "itemProfile": "profile0",
+            "quantity": 1
+        })
+        await request.ctx.profile.change_item_quantity(streakbreaker_id, 18000000)
+    else:
+        await request.ctx.profile.change_item_quantity(streakbreaker_id, current_streakbreaker)
     rolled_loot = {
         "tierGroupName": "",
         "items": []
