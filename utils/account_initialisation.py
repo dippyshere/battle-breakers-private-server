@@ -33,7 +33,7 @@ async def initialise_account(database: motor.core.AgnosticDatabase, account_id: 
         account_id = await uuid_generator()
     # initialise the account services
     await database["accounts"].insert_one({
-        "id": account_id,
+        "_id": account_id,
         "displayName": display_name,
         "minorVerified": False,
         "minorStatus": "NOT_MINOR",
