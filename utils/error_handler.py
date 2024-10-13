@@ -67,6 +67,7 @@ class CustomErrorHandler(ErrorHandler):
                 error_message = "Sorry, there was a timeout utilizing the database."
                 numeric_error_code = 1045
                 ErrorHandler.log(request, exception)
+            # TODO: better pydantic validation error handling
             headers = {
                 "X-Epic-Error-Code": numeric_error_code,
                 "X-Epic-Error-Name": error_code,

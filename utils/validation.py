@@ -7,7 +7,7 @@ This code is licensed under the Breakers Revived License (BRL).
 Contains validation classes for requests
 """
 import uuid
-from typing_extensions import Callable, Any
+from typing_extensions import Callable, Any, Optional
 
 import pydantic
 import pydantic_core
@@ -48,7 +48,7 @@ class UUIDString(str):
     def __get_pydantic_core_schema__(
             cls, source: type[Any], handler: Callable[[Any], pydantic_core.core_schema.CoreSchema]
     ) -> pydantic_core.core_schema.CoreSchema:
-        return pydantic_core.core_schema.general_plain_validator_function(cls.validate)
+        return pydantic_core.core_schema.with_info_plain_validator_function(cls.validate)
 
 
 class CharacterTemplateId(str):
@@ -88,7 +88,7 @@ class CharacterTemplateId(str):
     def __get_pydantic_core_schema__(
             cls, source: type[Any], handler: Callable[[Any], pydantic_core.core_schema.CoreSchema]
     ) -> pydantic_core.core_schema.CoreSchema:
-        return pydantic_core.core_schema.general_plain_validator_function(cls.validate)
+        return pydantic_core.core_schema.with_info_plain_validator_function(cls.validate)
 
 
 class AccountId(str):
@@ -128,7 +128,7 @@ class AccountId(str):
     def __get_pydantic_core_schema__(
             cls, source: type[Any], handler: Callable[[Any], pydantic_core.core_schema.CoreSchema]
     ) -> pydantic_core.core_schema.CoreSchema:
-        return pydantic_core.core_schema.general_plain_validator_function(cls.validate)
+        return pydantic_core.core_schema.with_info_plain_validator_function(cls.validate)
 
 
 class MCPValidation:
@@ -149,9 +149,10 @@ class MCPValidation:
         """
         levelItemId: UUIDString
         depthCompleted: int
-        levelElement: str
-        postBattleResults: dict[str, dict[str, int] | list[UUIDString] | list[CharacterTemplateId]]
-        dailyQuestZoneType: int
+        # These don't get sent by old clients
+        levelElement: Optional[str]
+        postBattleResults: Optional[dict[str, dict[str, int] | list[UUIDString] | list[CharacterTemplateId]]]
+        dailyQuestZoneType: Optional[int]
 
     class AddFriend(pydantic.BaseModel):
         """
@@ -181,10 +182,10 @@ class MCPValidation:
             partyMembers: The party members
             friendInstanceId: The friend instance id
         """
-        manifestVersion: str
+        manifestVersion: Optional[str]
         levelId: str
         partyMembers: list[dict[str, str | UUIDString]]
-        friendInstanceId: UUIDString
+        friendInstanceId: Optional[UUIDString]
 
     class BulkImproveHeroes(pydantic.BaseModel):
         """
@@ -624,3 +625,20 @@ class MCPValidation:
         heroItemId: UUIDString
         bIsInPit: bool
         xpToSpend: int
+
+    class VerifyRealMoneyPurchase(pydantic.BaseModel):
+        """
+        Validation class for the verify real money purchase request
+
+        Attributes:
+            appStore: The app store
+            appStoreId: The app store id
+            receiptId: The receipt id
+            receiptInfo: The receipt info
+            purchaseCorrelationId: The purchase correlation id
+        """
+        appStore: str
+        appStoreId: str
+        receiptId: str
+        receiptInfo: str
+        purchaseCorrelationId: Optional[str]
