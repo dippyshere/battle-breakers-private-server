@@ -30,4 +30,10 @@ async def update_monster_pit_power(request: types.BBProfileRequest, accountId: s
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_implemented()
+    # TODO: figure out hero power calculation to allow for monsterpit power to progress
+    # TODO: activity chest
+    await request.ctx.profile.modify_stat("pit_power_dirty", False)
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions, True)
+    )
