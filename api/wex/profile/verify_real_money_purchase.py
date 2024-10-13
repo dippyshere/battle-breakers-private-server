@@ -10,6 +10,7 @@ Handles verifying real money mtx mcp
 import sanic
 
 from utils import types
+from utils.exceptions import errors
 from utils.utils import authorized as auth
 
 from utils.sanic_gzip import Compress
@@ -29,6 +30,33 @@ async def verify_rmt(request: types.BBProfileRequest, accountId: str) -> sanic.r
     :param accountId: The account id
     :return: The response object containing the profile changes
     """
+    receipts = (await request.app.ctx.db["receipts"].find_one({"_id": accountId})).get("receipts", [])
+    for receipt in receipts:
+        if receipt["receiptId"] == request.json.get("receiptId") and \
+                receipt["appStore"] == request.json.get("appStore") and \
+                receipt["appStoreId"] == request.json.get("appStoreId") and \
+                receipt["receiptInfo"] == request.json.get("receiptInfo"):
+            break
+    else:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid receipt")
+    iap = await request.ctx.profile.get_stat("in_app_purchases")
+    match request.json.get("appStore"):
+        case "EpicPurchasingService":
+            if f"EPIC:{request.json.get('receiptId')}" not in iap["receipts"] and f"EPIC:{request.json.get('receiptId')}" not in iap["ignoredReceipts"]:
+                iap["receipts"].append(f"EPIC:{request.json.get('receiptId')}")
+                await request.ctx.profile.modify_stat("in_app_purchases", iap)
+                # TODO: fulfill the purchase
+                await request.ctx.profile.add_notifications({
+                    "type": "CatalogPurchase",
+                    "primary": True,
+                    "lootResult": {
+                        "tierGroupName": f"Fulfillment:/{request.json.get('receiptInfo')}",
+                        "items": []
+                    }
+                }, request.ctx.profile_id)
+        case _:
+            pass
     return sanic.response.json(
-        await request.ctx.profile.construct_response(client_command_revision=request.ctx.profile_revisions)
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions, True)
     )
