@@ -33,8 +33,8 @@ async def set_default_party(request: types.BBProfileRequest, accountId: str) -> 
     parties = await request.ctx.profile.get_stat("default_parties", request.ctx.profile_id)
     parties[party_type] = party_id
     parties["LastPvePartyUsed"] = party_id
-    # TODO: test compatability with old clients using different party names
     await request.ctx.profile.modify_stat("default_parties", parties, request.ctx.profile_id)
+    await request.ctx.profile.modify_stat("recent_party_id", party_id, request.ctx.profile_id)
     return sanic.response.json(
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
                                                      request.ctx.profile_revisions)

@@ -93,6 +93,7 @@ async def select_start_options(request: types.BBProfileRequest, accountId: str) 
         "quantity": 1
     })
     await request.ctx.profile.modify_stat("default_parties", {"LastPvePartyUsed": party_instance_guid})
+    await request.ctx.profile.modify_stat("recent_party_id", party_instance_guid)
     for _ in range(3):
         await request.ctx.profile.add_item({
             "templateId": "Party:Instance",
