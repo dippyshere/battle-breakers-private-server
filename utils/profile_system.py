@@ -669,8 +669,11 @@ class PlayerProfile:
         :return: None
         """
         profile_changes: list = getattr(self, f"{profile_id.value}_changes", [])
-        profile_changes.append({"changeType": "itemAttrChanged", "itemId": item_id, "attributeName": attribute_name,
-                                "attributeValue": new_value})
+        if new_value is None:
+            profile_changes.append({"changeType": "itemAttrChanged", "itemId": item_id, "attributeName": attribute_name})
+        else:
+            profile_changes.append({"changeType": "itemAttrChanged", "itemId": item_id, "attributeName": attribute_name,
+                                    "attributeValue": new_value})
         setattr(self, f"{profile_id.value}_changes", profile_changes)
 
     async def add_item(self, item_data: dict, item_id: Optional[str] = None,
