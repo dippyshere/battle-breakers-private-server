@@ -103,35 +103,9 @@ async def claim_login_reward(request: types.BBProfileRequest, accountId: str) ->
     # TODO: Add gift chest activity
     giftboxes = await request.ctx.profile.find_items_by_type("Giftbox")
     for giftbox in giftboxes:
-        await request.ctx.profile.change_item_attribute(giftbox, "sealed_days", 0)
+        sealed_days = (await request.ctx.profile.get_item_by_guid(giftbox))["attributes"]["sealed_days"]
+        await request.ctx.profile.change_item_attribute(giftbox, "sealed_days", max(0, sealed_days - 1))
     return sanic.response.json(
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
                                                      request.ctx.profile_revisions)
     )
-    #     {
-    #         "changeType": "statModified",
-    #         "name": "activity",
-    #         "value": {
-    #             "a": {
-    #                 "date": "2022-12-28T00:00:00.000Z",
-    #                 "claimed": False,
-    #                 "props": {
-    #                     "HeroAcquired": 137,
-    #                     "HeroPromote": 1,
-    #                     "HeroEvolve": 1,
-    #                     "MonsterPitLevelUp": 1,
-    #                     "HeroFoil": 1,
-    #                     "AccountLevelUp": 2,
-    #                     "BaseBonus": 10,
-    #                     "EnergySpent": 187
-    #                 }
-    #             },
-    #             "b": {
-    #                 "date": "2022-12-29T00:00:00.000Z",
-    #                 "claimed": False,
-    #                 "props": {
-    #                     "BaseBonus": 10
-    #                 }
-    #             },
-    #             "standardGift": 10
-    #         }
