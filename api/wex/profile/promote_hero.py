@@ -73,5 +73,5 @@ async def promote_hero(request: types.BBProfileRequest, accountId: str) -> sanic
     # TODO: chest activity
     return sanic.response.json(
         await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
-                                                     request.ctx.profile_revisions, True)
+                                                     request.ctx.profile_revisions)
     )

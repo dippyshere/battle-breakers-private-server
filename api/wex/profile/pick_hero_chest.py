@@ -30,4 +30,18 @@ async def pick_hero_chest(request: types.BBProfileRequest, accountId: str) -> sa
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_implemented()
+    tower_data = await request.ctx.profile.get_item_by_guid(request.json.get("towerId"))
+    if not tower_data:
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid tower id")
+    active_chest = tower_data["attributes"]["chest_options"][0]
+    active_chest["heroChestType"] = request.json.get("heroChestType")
+    if active_chest["heroTrackId"] != request.json.get("heroTrackId"):
+        raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Invalid hero track id")
+    await request.ctx.profile.change_item_attribute(request.json.get("towerId"), "active_chest", active_chest)
+    if tower_data["attributes"]["chest_info_content_version"] != "1.88.244-r17036752":
+        await request.ctx.profile.change_item_attribute(request.json.get("towerId"), "chest_info_content_version",
+                                                        "1.88.244-r17036752")
+    return sanic.response.json(
+        await request.ctx.profile.construct_response(request.ctx.profile_id, request.ctx.rvn,
+                                                     request.ctx.profile_revisions)
+    )

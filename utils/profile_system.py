@@ -756,8 +756,11 @@ class PlayerProfile:
                         except KeyError:
                             pass
                     case "itemAttrChanged":
-                        profile["items"][change["itemId"]]["attributes"][change["attributeName"]]: \
-                            MCPTypes = change["attributeValue"]
+                        if change["attributeValue"] is None:
+                            del profile["items"][change["itemId"]]["attributes"][change["attributeName"]]
+                        else:
+                            profile["items"][change["itemId"]]["attributes"][change["attributeName"]]: \
+                                MCPTypes = change["attributeValue"]
                     case "itemAdded":
                         profile["items"][change["itemId"]]: MCPTypes = change["item"]
                     case "itemQuantityChanged":
