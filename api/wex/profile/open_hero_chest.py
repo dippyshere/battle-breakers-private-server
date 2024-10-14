@@ -36,20 +36,20 @@ async def open_hero_chest(request: types.BBProfileRequest, accountId: str) -> sa
     if not tower_data["attributes"]["active_chest"]:
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Tower has no active chest. Call PickHeroChest")
     active_chest = tower_data["attributes"]["active_chest"]
-    currency_id = await request.ctx.profile.find_item_id_by_template_id(tower_data["attributes"][f"{active_chest['heroChestType']}_static_currency_template_id"])
+    currency_id = await request.ctx.profile.find_item_by_template_id(tower_data["attributes"][f"{active_chest['heroChestType']}_static_currency_template_id"])
     if not currency_id:
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Required reagent not found")
-    currency = await request.ctx.profile.get_item_by_guid(currency_id)
+    currency = await request.ctx.profile.get_item_by_guid(currency_id[0])
     if not currency:
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Required reagent not found")
-    if currency["attributes"]["quantity"] < active_chest["cost"]:
+    if currency["quantity"] < tower_data["attributes"][f"{active_chest['heroChestType']}_static_currency_amount"]:
         raise errors.com.epicgames.world_explorers.bad_request(errorMessage="Not enough reagents")
-    currency["attributes"]["quantity"] -= active_chest["cost"]
-    if currency["attributes"]["quantity"] == 0:
-        await request.ctx.profile.remove_item(currency_id)
+    currency["quantity"] -= tower_data["attributes"][f"{active_chest['heroChestType']}_static_currency_amount"]
+    if currency["quantity"] == 0:
+        await request.ctx.profile.remove_item(currency_id[0])
     else:
-        await request.ctx.profile.change_item_quantity(currency_id, currency["attributes"]["quantity"])
-    await request.ctx.profile.change_item_attribute(request.json.get("towerId"), f"{active_chest['heroChestType']}_progress", tower_data["attributes"][f"{active_chest['heroChestType']}_progress"] + 1)
+        await request.ctx.profile.change_item_quantity(currency_id[0], currency["quantity"])
+    await request.ctx.profile.change_item_attribute(request.json.get("towerId"), f"{active_chest['heroTrackId']}_progress", tower_data["attributes"][f"{active_chest['heroTrackId']}_progress"] + 1)
     await request.ctx.profile.change_item_attribute(request.json.get("towerId"), "level", tower_data["attributes"]["level"] + 1)
     await request.ctx.profile.add_item({
         "templateId": request.json.get("itemTemplateId"),

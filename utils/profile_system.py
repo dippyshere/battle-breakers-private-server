@@ -759,7 +759,7 @@ class PlayerProfile:
                         except KeyError:
                             pass
                     case "itemAttrChanged":
-                        if change["attributeValue"] is None:
+                        if change.get("attributeValue") is None:
                             del profile["items"][change["itemId"]]["attributes"][change["attributeName"]]
                         else:
                             profile["items"][change["itemId"]]["attributes"][change["attributeName"]]: \
