@@ -3,6 +3,8 @@
 # JSON handling
 orjson>=3.10.7
 # Web server
+# for python 3.13
+git+https://github.com/tacaswell/httptools.git@patch-1
 sanic[ext]>=24.6.0
 # Colourful logging
 colorama>=0.4.6
@@ -23,13 +25,13 @@ aiofiles>=24.1.0
 bcrypt>=4.2.0
 # Input validation
 pydantic>=2.9.2
-pydantic_core>=2.24.0
+pydantic_core>=2.23.4
 # Crypto
 cryptography>=43.0.1
 # Characterset detection speedup
 faust-cchardet>=2.1.19
 # Async HTTP client
-aiohttp[speedups]>=3.10.9
+aiohttp[speedups]>=3.10.10
 urllib3>=2.2.3
 # MongoDB driver
 motor>=3.6.0
@@ -38,3 +40,5 @@ icalendar>=6.0.0
 recurring-ical-events>=3.3.2
 # async caching speedup
 async-lru>=2.0.4
+# 
+rapidfuzz>=3.10.0
