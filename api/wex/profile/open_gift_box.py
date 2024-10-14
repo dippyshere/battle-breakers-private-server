@@ -30,7 +30,17 @@ async def open_gift_box(request: types.BBProfileRequest, accountId: str) -> sani
     :param accountId: The account id
     :return: The modified profile
     """
-    raise errors.com.epicgames.not_implemented()
+    # gift_id = await request.ctx.profile.add_item({
+    #     "templateId": "Giftbox:CustomGiftbox",
+    #     "attributes": {
+    #         "sealed_days": 0,
+    #         "params": {
+    #             "message": "Hi Discord!\n\nThis is a custom test message.",
+    #         },
+    #         "min_level": 1
+    #     },
+    #     "quantity": 1
+    # })
     opened_gift_box = await request.ctx.profile.get_item_by_guid(request.json.get("itemId"), request.ctx.profile_id)
     if opened_gift_box is None or not opened_gift_box["templateId"].startswith("Giftbox:"):
         raise errors.com.epicgames.world_explorers.not_found(errorMessage="Gift box not found.")
@@ -98,27 +108,281 @@ async def open_gift_box(request: types.BBProfileRequest, accountId: str) -> sani
                     "quantity": item["Quantity"]
                 })
         else:
-            # TODO: Implement more loot data
-            match '.'.join(giftbox_data["Loot"]["LootTable"].split(".")[:-1]):
+            match '.'.join(giftbox_data["Loot"]["TierGroupName"].split(".")[:-1]):
                 case "LTG.GiftBox.AccountLevel":
-                    pass
+                    stage = giftbox_data["Loot"]["TierGroupName"].split(".")[-1]
+                    match stage:
+                        # TODO: determine rewards for and implement 02-23 (level 25-999)
+                        case "01":
+                            reward_id = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_HeroMap_Elemental")
+                            if not reward_id:
+                                reward_id = await request.ctx.profile.add_item({
+                                    "templateId": "Reagent:Reagent_HeroMap_Elemental",
+                                    "attributes": {},
+                                    "quantity": 100
+                                })
+                            else:
+                                reward_id = reward_id[0]
+                                reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
+                                await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 100)
+                            items.append({
+                                "itemType": "Reagent:Reagent_HeroMap_Elemental",
+                                "itemGuid": reward_id,
+                                "itemProfile": "profile0",
+                                "quantity": 100
+                            })
+                            new_giftbox_id = await request.ctx.profile.add_item({
+                                "templateId": "Giftbox:GB_AccountLevel_Promo20",
+                                "attributes": {
+                                    "sealed_days": 0,
+                                    "params": {},
+                                    "min_level": 20
+                                },
+                                "quantity": 1
+                            })    
+                            items.append({
+                                "itemType": "Giftbox:GB_AccountLevel_Promo20",
+                                "itemGuid": new_giftbox_id,
+                                "itemProfile": "profile0",
+                                "quantity": 1
+                            })
                 case "LTG.GiftBox.AccountLevel.Promo20":
-                    pass
+                    reward_id = await request.ctx.profile.find_item_by_template_id("Currency:Gold")
+                    if not reward_id:
+                        reward_id = await request.ctx.profile.add_item({
+                            "templateId": "Currency:Gold",
+                            "attributes": {},
+                            "quantity": 150000
+                        })
+                    else:
+                        reward_id = reward_id[0]
+                        reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
+                        await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 150000)
+                    items.append({
+                        "itemType": "Currency:Gold",
+                        "itemGuid": reward_id,
+                        "itemProfile": "profile0",
+                        "quantity": 150000
+                    })
+                    new_giftbox_id = await request.ctx.profile.add_item({
+                        "templateId": "Giftbox:GB_AccountLevel02",
+                        "attributes": {
+                            "sealed_days": 0,
+                            "params": {},
+                            "min_level": 25
+                        },
+                        "quantity": 1
+                    })
+                    items.append({
+                        "itemType": "Giftbox:GB_AccountLevel02",
+                        "itemGuid": new_giftbox_id,
+                        "itemProfile": "profile0",
+                        "quantity": 1
+                    })
+                    items.append({
+                        "itemType": "StandIn:FN_STW_Razor",
+                        "quantity": 0
+                    })
+                    # This item was scrapped from the collab, but would have been granted here
+                    items.append({
+                        "itemType": "StandIn:FN_Backbling_Cloudpuff",
+                        "quantity": 0
+                    })
                 case "LTG.GiftBox.AccountLevel.Promo50":
-                    pass
+                    # TODO: determine the correct item to give
+                    reward_id = await request.ctx.profile.find_item_by_template_id("Currency:Gold")
+                    if not reward_id:
+                        reward_id = await request.ctx.profile.add_item({
+                            "templateId": "Currency:Gold",
+                            "attributes": {},
+                            "quantity": 150000
+                        })
+                    else:
+                        reward_id = reward_id[0]
+                        reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
+                        await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 150000)
+                    items.append({
+                        "itemType": "Currency:Gold",
+                        "itemGuid": reward_id,
+                        "itemProfile": "profile0",
+                        "quantity": 150000
+                    })
+                    new_giftbox_id = await request.ctx.profile.add_item({
+                        "templateId": "Giftbox:GB_AccountLevel04",
+                        "attributes": {
+                            "sealed_days": 0,
+                            "params": {},
+                            "min_level": 75
+                        },
+                        "quantity": 1
+                    })
+                    items.append({
+                        "itemType": "Giftbox:GB_AccountLevel04",
+                        "itemGuid": new_giftbox_id,
+                        "itemProfile": "profile0",
+                        "quantity": 1
+                    })
+                    items.append({
+                        "itemType": "StandIn:FN_STW_Kurohomura",
+                        "quantity": 0
+                    })
                 case "LTG.GiftBox.BattlePass":
-                    pass
+                    mtx_item_id = (await request.ctx.profile.find_item_by_template_id("Currency:MtxGiveaway"))[0]
+                    mtx_quantity = (await request.ctx.profile.get_item_by_guid(mtx_item_id))["quantity"]
+                    await request.ctx.profile.change_item_quantity(mtx_item_id, mtx_quantity + 100)
+                    items.append({
+                        "itemType": "Currency:MtxGiveaway",
+                        "itemGuid": mtx_item_id,
+                        "itemProfile": "profile0",
+                        "quantity": 100
+                    })
+                    stage = giftbox_data["Loot"]["TierGroupName"].split(".")[-1]
+                    if stage != "30":
+                        new_giftbox_id = await request.ctx.profile.add_item({
+                            "templateId": f"Giftbox:GB_Battlepass{str(int(stage) + 1).zfill(2)}",
+                            "attributes": {
+                                "sealed_days": 1,
+                                "params": {},
+                                "min_level": 1
+                            },
+                            "quantity": 1
+                        })
+                        items.append({
+                            "itemType": f"Giftbox:GB_Battlepass{str(int(stage) + 1).zfill(2)}",
+                            "itemGuid": new_giftbox_id,
+                            "itemProfile": "profile0",
+                            "quantity": 1
+                        })
                 case "LTG.GiftBox.DailyGems.Large":
-                    pass
+                    # TODO: determine correct gem count
+                    mtx_item_id = (await request.ctx.profile.find_item_by_template_id("Currency:MtxGiveaway"))[0]
+                    mtx_quantity = (await request.ctx.profile.get_item_by_guid(mtx_item_id))["quantity"]
+                    await request.ctx.profile.change_item_quantity(mtx_item_id, mtx_quantity + 100)
+                    items.append({
+                        "itemType": "Currency:MtxGiveaway",
+                        "itemGuid": mtx_item_id,
+                        "itemProfile": "profile0",
+                        "quantity": 100
+                    })
+                    stage = giftbox_data["Loot"]["TierGroupName"].split(".")[-1]
+                    if stage != "30":
+                        new_giftbox_id = await request.ctx.profile.add_item({
+                            "templateId": f"Giftbox:GB_DailyGems_Large{str(int(stage) + 1).zfill(2)}",
+                            "attributes": {
+                                "sealed_days": 1,
+                                "params": {},
+                                "min_level": 1
+                            },
+                            "quantity": 1
+                        })
+                        items.append({
+                            "itemType": f"Giftbox:GB_DailyGems_Large{str(int(stage) + 1).zfill(2)}",
+                            "itemGuid": new_giftbox_id,
+                            "itemProfile": "profile0",
+                            "quantity": 1
+                        })
                 case "LTG.GiftBox.DailyGems.Laundry":
-                    pass
+                    mtx_item_id = (await request.ctx.profile.find_item_by_template_id("Currency:MtxGiveaway"))[0]
+                    mtx_quantity = (await request.ctx.profile.get_item_by_guid(mtx_item_id))["quantity"]
+                    await request.ctx.profile.change_item_quantity(mtx_item_id, mtx_quantity + 50)
+                    items.append({
+                        "itemType": "Currency:MtxGiveaway",
+                        "itemGuid": mtx_item_id,
+                        "itemProfile": "profile0",
+                        "quantity": 50
+                    })
+                    stage = giftbox_data["Loot"]["TierGroupName"].split(".")[-1]
+                    if stage != "30":
+                        new_giftbox_id = await request.ctx.profile.add_item({
+                            "templateId": f"Giftbox:GB_DailyGems_Laundry{str(int(stage) + 1).zfill(2)}",
+                            "attributes": {
+                                "sealed_days": 1,
+                                "params": {},
+                                "min_level": 1
+                            },
+                            "quantity": 1
+                        })
+                        items.append({
+                            "itemType": f"Giftbox:GB_DailyGems_Laundry{str(int(stage) + 1).zfill(2)}",
+                            "itemGuid": new_giftbox_id,
+                            "itemProfile": "profile0",
+                            "quantity": 1
+                        })
                 case "LTG.GiftBox.DailyGems.Short.Large":
-                    pass
+                    # TODO: determine correct gem count
+                    mtx_item_id = (await request.ctx.profile.find_item_by_template_id("Currency:MtxGiveaway"))[0]
+                    mtx_quantity = (await request.ctx.profile.get_item_by_guid(mtx_item_id))["quantity"]
+                    await request.ctx.profile.change_item_quantity(mtx_item_id, mtx_quantity + 100)
+                    items.append({
+                        "itemType": "Currency:MtxGiveaway",
+                        "itemGuid": mtx_item_id,
+                        "itemProfile": "profile0",
+                        "quantity": 100
+                    })
+                    stage = giftbox_data["Loot"]["TierGroupName"].split(".")[-1]
+                    if stage != "7":
+                        new_giftbox_id = await request.ctx.profile.add_item({
+                            "templateId": f"Giftbox:GB_DailyGems_Short_Large{str(int(stage) + 1).zfill(2)}",
+                            "attributes": {
+                                "sealed_days": 1,
+                                "params": {},
+                                "min_level": 1
+                            },
+                            "quantity": 1
+                        })
+                        items.append({
+                            "itemType": f"Giftbox:GB_DailyGems_Short_Large{str(int(stage) + 1).zfill(2)}",
+                            "itemGuid": new_giftbox_id,
+                            "itemProfile": "profile0",
+                            "quantity": 1
+                        })
                 case "LTG.GiftBox.DailyGems.Small":
-                    pass
+                    # TODO: determine correct gem count
+                    mtx_item_id = (await request.ctx.profile.find_item_by_template_id("Currency:MtxGiveaway"))[0]
+                    mtx_quantity = (await request.ctx.profile.get_item_by_guid(mtx_item_id))["quantity"]
+                    await request.ctx.profile.change_item_quantity(mtx_item_id, mtx_quantity + 50)
+                    items.append({
+                        "itemType": "Currency:MtxGiveaway",
+                        "itemGuid": mtx_item_id,
+                        "itemProfile": "profile0",
+                        "quantity": 50
+                    })
+                    stage = giftbox_data["Loot"]["TierGroupName"].split(".")[-1]
+                    if stage != "30":
+                        new_giftbox_id = await request.ctx.profile.add_item({
+                            "templateId": f"Giftbox:GB_DailyGems_Small{str(int(stage) + 1).zfill(2)}",
+                            "attributes": {
+                                "sealed_days": 1,
+                                "params": {},
+                                "min_level": 1
+                            },
+                            "quantity": 1
+                        })
+                        items.append({
+                            "itemType": f"Giftbox:GB_DailyGems_Small{str(int(stage) + 1).zfill(2)}",
+                            "itemGuid": new_giftbox_id,
+                            "itemProfile": "profile0",
+                            "quantity": 1
+                        })
                 case "LTG.GiftBox.LevelUpPackage.Basic":
-                    pass
-            pass
+                    # TODO: determine and implement rewards for 1-15
+                    stage = giftbox_data["Loot"]["TierGroupName"].split(".")[-1]
+                    if stage != "15":
+                        new_giftbox_id = await request.ctx.profile.add_item({
+                            "templateId": f"Giftbox:GB_LevelUpPackage_Basic{str(int(stage) + 1).zfill(2)}",
+                            "attributes": {
+                                "sealed_days": 0,
+                                "params": {},
+                                "min_level": (stage + 1) * 10
+                            },
+                            "quantity": 1
+                        })
+                        items.append({
+                            "itemType": f"Giftbox:GB_LevelUpPackage_Basic{str(int(stage) + 1).zfill(2)}",
+                            "itemGuid": new_giftbox_id,
+                            "itemProfile": "profile0",
+                            "quantity": 1
+                        })
     await request.ctx.profile.add_notifications({
         "type": "WExpGiftBoxOpened",
         "primary": True,
