@@ -112,7 +112,6 @@ async def open_gift_box(request: types.BBProfileRequest, accountId: str) -> sani
                 case "LTG.GiftBox.AccountLevel":
                     stage = giftbox_data["Loot"]["TierGroupName"].split(".")[-1]
                     match stage:
-                        # TODO: determine rewards for and implement 02-23 (level 25-999)
                         case "01":
                             reward_id = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_HeroMap_Elemental")
                             if not reward_id:
@@ -146,66 +145,260 @@ async def open_gift_box(request: types.BBProfileRequest, accountId: str) -> sani
                                 "itemProfile": "profile0",
                                 "quantity": 1
                             })
-                case "LTG.GiftBox.AccountLevel.Promo20":
-                    reward_id = await request.ctx.profile.find_item_by_template_id("Currency:Gold")
-                    if not reward_id:
-                        reward_id = await request.ctx.profile.add_item({
-                            "templateId": "Currency:Gold",
-                            "attributes": {},
-                            "quantity": 150000
-                        })
-                    else:
-                        reward_id = reward_id[0]
-                        reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
-                        await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 150000)
-                    items.append({
-                        "itemType": "Currency:Gold",
-                        "itemGuid": reward_id,
-                        "itemProfile": "profile0",
-                        "quantity": 150000
-                    })
-                    new_giftbox_id = await request.ctx.profile.add_item({
-                        "templateId": "Giftbox:GB_AccountLevel02",
-                        "attributes": {
-                            "sealed_days": 0,
-                            "params": {},
-                            "min_level": 25
-                        },
-                        "quantity": 1
-                    })
-                    items.append({
-                        "itemType": "Giftbox:GB_AccountLevel02",
-                        "itemGuid": new_giftbox_id,
-                        "itemProfile": "profile0",
-                        "quantity": 1
-                    })
-                    items.append({
-                        "itemType": "StandIn:FN_STW_Razor",
-                        "quantity": 0
-                    })
-                    # This item was scrapped from the collab, but would have been granted here
-                    items.append({
-                        "itemType": "StandIn:FN_Backbling_Cloudpuff",
-                        "quantity": 0
-                    })
+                        # TODO: still need data for account level 25's reward
+                        case "02":
+                            reward_id = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_HeroMap_Elemental")
+                            if not reward_id:
+                                reward_id = await request.ctx.profile.add_item({
+                                    "templateId": "Reagent:Reagent_HeroMap_Elemental",
+                                    "attributes": {},
+                                    "quantity": 500
+                                })
+                            else:
+                                reward_id = reward_id[0]
+                                reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
+                                await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 500)
+                            items.append({
+                                "itemType": "Reagent:Reagent_HeroMap_Elemental",
+                                "itemGuid": reward_id,
+                                "itemProfile": "profile0",
+                                "quantity": 500
+                            })
+                            new_giftbox_id = await request.ctx.profile.add_item({
+                                "templateId": "Giftbox:GB_AccountLevel_Promo50_KurohomuraOnly",
+                                "attributes": {
+                                    "sealed_days": 0,
+                                    "params": {},
+                                    "min_level": 50
+                                },
+                                "quantity": 1
+                            })
+                            items.append({
+                                "itemType": "Giftbox:GB_AccountLevel_Promo50_KurohomuraOnly",
+                                "itemGuid": new_giftbox_id,
+                                "itemProfile": "profile0",
+                                "quantity": 1
+                            })
+                        case "03":
+                            reward_id = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_SupplyPoints_Elite")
+                            if not reward_id:
+                                reward_id = await request.ctx.profile.add_item({
+                                    "templateId": "Reagent:Reagent_SupplyPoints_Elite",
+                                    "attributes": {},
+                                    "quantity": 100
+                                })
+                            else:
+                                reward_id = reward_id[0]
+                                reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
+                                await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 100)
+                            items.append({
+                                "itemType": "Reagent:Reagent_SupplyPoints_Elite",
+                                "itemGuid": reward_id,
+                                "itemProfile": "profile0",
+                                "quantity": 100
+                            })
+                            new_giftbox_id = await request.ctx.profile.add_item({
+                                "templateId": "Giftbox:GB_AccountLevel04",
+                                "attributes": {
+                                    "sealed_days": 0,
+                                    "params": {},
+                                    "min_level": 75
+                                },
+                                "quantity": 1
+                            })
+                            items.append({
+                                "itemType": "Giftbox:GB_AccountLevel04",
+                                "itemGuid": new_giftbox_id,
+                                "itemProfile": "profile0",
+                                "quantity": 1
+                            })
+                        case "04":
+                            reward_id = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_HeroMap_SuperRare")
+                            if not reward_id:
+                                reward_id = await request.ctx.profile.add_item({
+                                    "templateId": "Reagent:Reagent_HeroMap_SuperRare",
+                                    "attributes": {},
+                                    "quantity": 50
+                                })
+                            else:
+                                reward_id = reward_id[0]
+                                reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
+                                await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 50)
+                            items.append({
+                                "itemType": "Reagent:Reagent_HeroMap_SuperRare",
+                                "itemGuid": reward_id,
+                                "itemProfile": "profile0",
+                                "quantity": 50
+                            })
+                            new_giftbox_id = await request.ctx.profile.add_item({
+                                "templateId": "Giftbox:GB_AccountLevel05",
+                                "attributes": {
+                                    "sealed_days": 0,
+                                    "params": {},
+                                    "min_level": 100
+                                },
+                                "quantity": 1
+                            })
+                            items.append({
+                                "itemType": "Giftbox:GB_AccountLevel05",
+                                "itemGuid": new_giftbox_id,
+                                "itemProfile": "profile0",
+                                "quantity": 1
+                            })
+                        case "05" | "06" | "07" | "09" | "10" | "11" | "12" | "14" | "15" | "16" | "17" | "18" | "20" | "21" | "22":
+                            reward_id = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_HeroMap_Elemental")
+                            if not reward_id:
+                                reward_id = await request.ctx.profile.add_item({
+                                    "templateId": "Reagent:Reagent_HeroMap_Elemental",
+                                    "attributes": {},
+                                    "quantity": 500
+                                })
+                            else:
+                                reward_id = reward_id[0]
+                                reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
+                                await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 500)
+                            items.append({
+                                "itemType": "Reagent:Reagent_HeroMap_Elemental",
+                                "itemGuid": reward_id,
+                                "itemProfile": "profile0",
+                                "quantity": 500
+                            })
+                            if stage == "22":
+                                new_giftbox_id = await request.ctx.profile.add_item({
+                                    "templateId": f"Giftbox:GB_AccountLevel{str(int(stage) + 1).zfill(2)}",
+                                    "attributes": {
+                                        "sealed_days": 0,
+                                        "params": {},
+                                        "min_level": 999
+                                    },
+                                    "quantity": 1
+                                })
+                            else:
+                                new_giftbox_id = await request.ctx.profile.add_item({
+                                    "templateId": f"Giftbox:GB_AccountLevel{str(int(stage) + 1).zfill(2)}",
+                                    "attributes": {
+                                        "sealed_days": 0,
+                                        "params": {},
+                                        "min_level": 100 + (50 * (int(stage) - 5))
+                                    },
+                                    "quantity": 1
+                                })
+                            items.append({
+                                "itemType": f"Giftbox:GB_AccountLevel{str(int(stage) + 1).zfill(2)}",
+                                "itemGuid": new_giftbox_id,
+                                "itemProfile": "profile0",
+                                "quantity": 1
+                            })
+                        case "08" | "13" | "19":
+                            reward_id = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_SupplyPoints_Elite")
+                            if not reward_id:
+                                reward_id = await request.ctx.profile.add_item({
+                                    "templateId": "Reagent:Reagent_SupplyPoints_Elite",
+                                    "attributes": {},
+                                    "quantity": 200
+                                })
+                            else:
+                                reward_id = reward_id[0]
+                                reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
+                                await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 200)
+                            items.append({
+                                "itemType": "Reagent:Reagent_SupplyPoints_Elite",
+                                "itemGuid": reward_id,
+                                "itemProfile": "profile0",
+                                "quantity": 200
+                            })
+                            new_giftbox_id = await request.ctx.profile.add_item({
+                                "templateId": f"Giftbox:GB_AccountLevel{str(int(stage) + 1).zfill(2)}",
+                                "attributes": {
+                                    "sealed_days": 0,
+                                    "params": {},
+                                    "min_level": 100 + (50 * (int(stage) - 5))
+                                },
+                                "quantity": 1
+                            })
+                            items.append({
+                                "itemType": f"Giftbox:GB_AccountLevel{str(int(stage) + 1).zfill(2)}",
+                                "itemGuid": new_giftbox_id,
+                                "itemProfile": "profile0",
+                                "quantity": 1
+                            })
+                        case "23":
+                            reward_id = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_HeroMap_SuperRare")
+                            if not reward_id:
+                                reward_id = await request.ctx.profile.add_item({
+                                    "templateId": "Reagent:Reagent_HeroMap_SuperRare",
+                                    "attributes": {},
+                                    "quantity": 100
+                                })
+                            else:
+                                reward_id = reward_id[0]
+                                reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
+                                await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 100)
+                            items.append({
+                                "itemType": "Reagent:Reagent_HeroMap_SuperRare",
+                                "itemGuid": reward_id,
+                                "itemProfile": "profile0",
+                                "quantity": 100
+                            })
+                        case "Promo20":
+                            reward_id = await request.ctx.profile.find_item_by_template_id("Currency:Gold")
+                            if not reward_id:
+                                reward_id = await request.ctx.profile.add_item({
+                                    "templateId": "Currency:Gold",
+                                    "attributes": {},
+                                    "quantity": 150000
+                                })
+                            else:
+                                reward_id = reward_id[0]
+                                reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
+                                await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 150000)
+                            items.append({
+                                "itemType": "Currency:Gold",
+                                "itemGuid": reward_id,
+                                "itemProfile": "profile0",
+                                "quantity": 150000
+                            })
+                            new_giftbox_id = await request.ctx.profile.add_item({
+                                "templateId": "Giftbox:GB_AccountLevel02",
+                                "attributes": {
+                                    "sealed_days": 0,
+                                    "params": {},
+                                    "min_level": 25
+                                },
+                                "quantity": 1
+                            })
+                            items.append({
+                                "itemType": "Giftbox:GB_AccountLevel02",
+                                "itemGuid": new_giftbox_id,
+                                "itemProfile": "profile0",
+                                "quantity": 1
+                            })
+                            items.append({
+                                "itemType": "StandIn:FN_STW_Razor",
+                                "quantity": 0
+                            })
+                            # This item was scrapped from the collab, but would have been granted here
+                            items.append({
+                                "itemType": "StandIn:FN_Backbling_Cloudpuff",
+                                "quantity": 0
+                            })
                 case "LTG.GiftBox.AccountLevel.Promo50":
-                    # TODO: determine the correct item to give
-                    reward_id = await request.ctx.profile.find_item_by_template_id("Currency:Gold")
+                    reward_id = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_SupplyPoints_Elite")
                     if not reward_id:
                         reward_id = await request.ctx.profile.add_item({
-                            "templateId": "Currency:Gold",
+                            "templateId": "Reagent:Reagent_SupplyPoints_Elite",
                             "attributes": {},
-                            "quantity": 150000
+                            "quantity": 100
                         })
                     else:
                         reward_id = reward_id[0]
                         reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
-                        await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 150000)
+                        await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 100)
                     items.append({
-                        "itemType": "Currency:Gold",
+                        "itemType": "Reagent:Reagent_SupplyPoints_Elite",
                         "itemGuid": reward_id,
                         "itemProfile": "profile0",
-                        "quantity": 150000
+                        "quantity": 100
                     })
                     new_giftbox_id = await request.ctx.profile.add_item({
                         "templateId": "Giftbox:GB_AccountLevel04",
@@ -365,8 +558,41 @@ async def open_gift_box(request: types.BBProfileRequest, accountId: str) -> sani
                             "quantity": 1
                         })
                 case "LTG.GiftBox.LevelUpPackage.Basic":
-                    # TODO: determine and implement rewards for 1-15
                     stage = giftbox_data["Loot"]["TierGroupName"].split(".")[-1]
+                    reward_id = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_HeroMap_Elemental")
+                    if not reward_id:
+                        reward_id = await request.ctx.profile.add_item({
+                            "templateId": "Reagent:Reagent_HeroMap_Elemental",
+                            "attributes": {},
+                            "quantity": 1000
+                        })
+                    else:
+                        reward_id = reward_id[0]
+                        reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
+                        await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 1000)
+                    items.append({
+                        "itemType": "Reagent:Reagent_HeroMap_Elemental",
+                        "itemGuid": reward_id,
+                        "itemProfile": "profile0",
+                        "quantity": 1000
+                    })
+                    gold_id = await request.ctx.profile.find_item_by_template_id("Currency:Gold")
+                    if not gold_id:
+                        gold_id = await request.ctx.profile.add_item({
+                            "templateId": "Currency:Gold",
+                            "attributes": {},
+                            "quantity": 100000
+                        })
+                    else:
+                        gold_id = gold_id[0]
+                        gold_data = await request.ctx.profile.get_item_by_guid(gold_id)
+                        await request.ctx.profile.change_item_quantity(gold_id, gold_data["quantity"] + 100000)
+                    items.append({
+                        "itemType": "Currency:Gold",
+                        "itemGuid": gold_id,
+                        "itemProfile": "profile0",
+                        "quantity": 100000
+                    })
                     if stage != "15":
                         new_giftbox_id = await request.ctx.profile.add_item({
                             "templateId": f"Giftbox:GB_LevelUpPackage_Basic{str(int(stage) + 1).zfill(2)}",
@@ -382,6 +608,24 @@ async def open_gift_box(request: types.BBProfileRequest, accountId: str) -> sani
                             "itemGuid": new_giftbox_id,
                             "itemProfile": "profile0",
                             "quantity": 1
+                        })
+                    else:
+                        reward_id = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_HeroMap_SuperRare")
+                        if not reward_id:
+                            reward_id = await request.ctx.profile.add_item({
+                                "templateId": "Reagent:Reagent_HeroMap_SuperRare",
+                                "attributes": {},
+                                "quantity": 100
+                            })
+                        else:
+                            reward_id = reward_id[0]
+                            reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
+                            await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 100)
+                        items.append({
+                            "itemType": "Reagent:Reagent_HeroMap_SuperRare",
+                            "itemGuid": reward_id,
+                            "itemProfile": "profile0",
+                            "quantity": 100
                         })
     await request.ctx.profile.add_notifications({
         "type": "WExpGiftBoxOpened",
