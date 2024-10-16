@@ -145,24 +145,23 @@ async def open_gift_box(request: types.BBProfileRequest, accountId: str) -> sani
                                 "itemProfile": "profile0",
                                 "quantity": 1
                             })
-                        # TODO: still need data for account level 25's reward
                         case "02":
                             reward_id = await request.ctx.profile.find_item_by_template_id("Reagent:Reagent_HeroMap_Elemental")
                             if not reward_id:
                                 reward_id = await request.ctx.profile.add_item({
                                     "templateId": "Reagent:Reagent_HeroMap_Elemental",
                                     "attributes": {},
-                                    "quantity": 500
+                                    "quantity": 300
                                 })
                             else:
                                 reward_id = reward_id[0]
                                 reward_data = await request.ctx.profile.get_item_by_guid(reward_id)
-                                await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 500)
+                                await request.ctx.profile.change_item_quantity(reward_id, reward_data["quantity"] + 300)
                             items.append({
                                 "itemType": "Reagent:Reagent_HeroMap_Elemental",
                                 "itemGuid": reward_id,
                                 "itemProfile": "profile0",
-                                "quantity": 500
+                                "quantity": 300
                             })
                             new_giftbox_id = await request.ctx.profile.add_item({
                                 "templateId": "Giftbox:GB_AccountLevel_Promo50_KurohomuraOnly",
